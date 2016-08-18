@@ -7,7 +7,7 @@ frontend in Elm.
 
 ## Elm bits
 
-The elm client lives in ./elm
+The elm client lives in ./elm.  Look there for more info.
 
 ## Backend bits
 
