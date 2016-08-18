@@ -5,7 +5,7 @@ defmodule TimeTrackerBackend.UserControllerTest do
   test "GET / with no users", %{conn: conn} do
     conn = get conn, "/users"
 
-    assert json_response(conn, 200) =~ "[]"
+    assert json_response(conn, 200) == []
   end
 
   describe "with a user" do
@@ -14,7 +14,7 @@ defmodule TimeTrackerBackend.UserControllerTest do
     test "GET / with a user", %{conn: conn} do
       conn = get conn, "/users"
 
-      assert json_response(conn, 200) =~ "[{\"name\":\"Josh\"}]"
+      assert json_response(conn, 200) == [%{"name" => "Josh"}]
     end
   end
 

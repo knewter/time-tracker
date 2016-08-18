@@ -4,6 +4,6 @@ defmodule TimeTrackerBackend.UserController do
   def index(conn, _params) do
     users = Repo.all(User)
 
-    json conn, Poison.encode!(users)
+    json conn, users
   end
 end

@@ -9,6 +9,8 @@ import Route
 import Msg exposing (Msg(..))
 import Task
 import Material
+import Http
+import Decoders
 
 
 main : Program Never
@@ -42,14 +44,20 @@ urlUpdate route model =
                 newModel ! []
 
 
-mockUser : User
-mockUser =
-    { name = "Jumpy McFiddlepants" }
-
-
 fetchUsers : Model -> Cmd Msg
 fetchUsers newModel =
+    -- This "error condition" that just says we got no users is dumb, we should log something and inform the UI
+    Task.perform (always (GotUsers [])) GotUsers (Http.get Decoders.usersDecoder "http://localhost:4000/users")
+
+
+fetchMockUsers : Model -> Cmd Msg
+fetchMockUsers newModel =
     Task.perform
         (always <| GotUsers (mockUser :: newModel.users))
         (always <| GotUsers (mockUser :: newModel.users))
         (Task.succeed ())
+
+
+mockUser : User
+mockUser =
+    { name = "Jumpy McFiddlepants" }

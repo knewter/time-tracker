@@ -38,5 +38,7 @@ defmodule TimeTrackerBackend.Endpoint do
     key: "_time_tracker_backend_key",
     signing_salt: "oT8ZqGe8"
 
+  plug CORSPlug
+
   plug TimeTrackerBackend.Router
 end
