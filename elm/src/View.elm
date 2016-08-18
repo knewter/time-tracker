@@ -11,11 +11,14 @@ import Material.Snackbar as Snackbar
 import Material.Color as Color
 import Material.List as List
 import Material.Options as Options exposing (when)
+import Material.Grid exposing (grid, size, cell, Device(..))
+import Material.Card as Card
+import Material.Elevation as Elevation
 
 
 view : Model -> Html Msg
 view model =
-    Material.Scheme.topWithScheme Color.BlueGrey Color.Cyan <|
+    Material.Scheme.topWithScheme Color.BlueGrey Color.LightBlue <|
         Layout.render Mdl
             model.mdl
             [ Layout.fixedHeader
@@ -88,4 +91,47 @@ viewDrawer model =
 
 viewBody : Model -> Html Msg
 viewBody model =
-    text "body contents here"
+    grid []
+        [ cell [ size All 12 ]
+            [ viewActivitySummary model
+            ]
+        , cell [ size All 6 ]
+            [ viewWordCloud model ]
+        , cell [ size All 6 ]
+            [ viewNewMembers model ]
+        ]
+
+
+viewGridCard contents =
+    Card.view
+        [ Options.css "width" "100%"
+        , Elevation.e2
+        ]
+        contents
+
+
+viewActivitySummary model =
+    [ Card.text
+        []
+        [ text "Imagine an activity summary here"
+        ]
+    ]
+        |> viewGridCard
+
+
+viewWordCloud model =
+    [ Card.text
+        []
+        [ text "Imagine a word cloud here"
+        ]
+    ]
+        |> viewGridCard
+
+
+viewNewMembers model =
+    [ Card.text
+        []
+        [ text "Imagine a list of new members here"
+        ]
+    ]
+        |> viewGridCard
