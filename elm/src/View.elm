@@ -9,6 +9,8 @@ import Material.Scheme
 import Material.Layout as Layout
 import Material.Snackbar as Snackbar
 import Material.Color as Color
+import Material.List as List
+import Material.Options as Options exposing (when)
 
 
 view : Model -> Html Msg
@@ -46,9 +48,42 @@ viewHeader model =
         ]
 
 
+type alias MenuItem =
+    { text : String
+    , iconName : String
+    }
+
+
+menuItems : List MenuItem
+menuItems =
+    [ { text = "Dashboard", iconName = "dashboard" }
+    , { text = "Users", iconName = "group" }
+    , { text = "Last Activity", iconName = "alarm" }
+    , { text = "Timesheets", iconName = "event" }
+    , { text = "Reports", iconName = "list" }
+    , { text = "Organizations", iconName = "store" }
+    , { text = "Project", iconName = "view_list" }
+    ]
+
+
+viewDrawerMenuItem : Model -> MenuItem -> Html Msg
+viewDrawerMenuItem model menuItem =
+    List.li
+        [ Options.css "cursor" "pointer"
+        ]
+        [ List.content
+            []
+            [ List.icon menuItem.iconName []
+            , text menuItem.text
+            ]
+        ]
+
+
 viewDrawer : Model -> Html Msg
 viewDrawer model =
-    text "drawer contents here"
+    List.ul
+        []
+        (List.map (viewDrawerMenuItem model) menuItems)
 
 
 viewBody : Model -> Html Msg
