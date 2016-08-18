@@ -2,6 +2,7 @@ module View exposing (view)
 
 import Html exposing (Html, text, div, span)
 import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
 import Html.App as App
 import Model exposing (Model)
 import Msg exposing (Msg(..))
@@ -14,6 +15,7 @@ import Material.Options as Options exposing (when)
 import Material.Grid exposing (grid, size, cell, Device(..))
 import Material.Card as Card
 import Material.Elevation as Elevation
+import Route exposing (Location(..))
 
 
 view : Model -> Html Msg
@@ -54,18 +56,19 @@ viewHeader model =
 type alias MenuItem =
     { text : String
     , iconName : String
+    , route : Maybe Route.Location
     }
 
 
 menuItems : List MenuItem
 menuItems =
-    [ { text = "Dashboard", iconName = "dashboard" }
-    , { text = "Users", iconName = "group" }
-    , { text = "Last Activity", iconName = "alarm" }
-    , { text = "Timesheets", iconName = "event" }
-    , { text = "Reports", iconName = "list" }
-    , { text = "Organizations", iconName = "store" }
-    , { text = "Project", iconName = "view_list" }
+    [ { text = "Dashboard", iconName = "dashboard", route = Just Home }
+    , { text = "Users", iconName = "group", route = Nothing }
+    , { text = "Last Activity", iconName = "alarm", route = Nothing }
+    , { text = "Timesheets", iconName = "event", route = Nothing }
+    , { text = "Reports", iconName = "list", route = Nothing }
+    , { text = "Organizations", iconName = "store", route = Nothing }
+    , { text = "Project", iconName = "view_list", route = Nothing }
     ]
 
 
@@ -73,6 +76,7 @@ viewDrawerMenuItem : Model -> MenuItem -> Html Msg
 viewDrawerMenuItem model menuItem =
     List.li
         [ Options.css "cursor" "pointer"
+        , Options.attribute <| onClick (NavigateTo menuItem.route)
         ]
         [ List.content
             []
@@ -91,6 +95,16 @@ viewDrawer model =
 
 viewBody : Model -> Html Msg
 viewBody model =
+    case model.route of
+        Just (Route.Home) ->
+            viewDashboard model
+
+        Nothing ->
+            text "404"
+
+
+viewDashboard : Model -> Html Msg
+viewDashboard model =
     grid []
         [ cell [ size All 12 ]
             [ viewActivitySummary model
