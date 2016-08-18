@@ -8,6 +8,7 @@ import Types exposing (User)
 import Route
 import Msg exposing (Msg(..))
 import Task
+import Material
 
 
 main : Program Never
@@ -17,8 +18,13 @@ main =
         , update = Update.update
         , urlUpdate = urlUpdate
         , view = View.view
-        , subscriptions = always Sub.none
+        , subscriptions = subscriptions
         }
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Material.subscriptions Mdl model
 
 
 urlUpdate : Maybe Route.Location -> Model -> ( Model, Cmd Msg )
