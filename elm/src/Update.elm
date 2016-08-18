@@ -28,3 +28,6 @@ update msg model =
 
                 Just location ->
                     model ! [ Navigation.newUrl (Route.urlFor location) ]
+
+        GotUsers users ->
+            { model | users = users } ! []

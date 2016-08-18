@@ -6,6 +6,7 @@ import Navigation
 
 type Location
     = Home
+    | Users
 
 
 type alias Model =
@@ -24,6 +25,9 @@ urlFor loc =
             case loc of
                 Home ->
                     "/"
+
+                Users ->
+                    "/users"
     in
         "#" ++ url
 
@@ -39,6 +43,9 @@ locFor path =
         case segments of
             [] ->
                 Just Home
+
+            [ "users" ] ->
+                Just Users
 
             _ ->
                 Nothing

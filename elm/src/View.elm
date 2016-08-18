@@ -12,10 +12,9 @@ import Material.Snackbar as Snackbar
 import Material.Color as Color
 import Material.List as List
 import Material.Options as Options exposing (when)
-import Material.Grid exposing (grid, size, cell, Device(..))
-import Material.Card as Card
-import Material.Elevation as Elevation
 import Route exposing (Location(..))
+import View.Home
+import View.Users
 
 
 view : Model -> Html Msg
@@ -63,7 +62,7 @@ type alias MenuItem =
 menuItems : List MenuItem
 menuItems =
     [ { text = "Dashboard", iconName = "dashboard", route = Just Home }
-    , { text = "Users", iconName = "group", route = Nothing }
+    , { text = "Users", iconName = "group", route = Just Users }
     , { text = "Last Activity", iconName = "alarm", route = Nothing }
     , { text = "Timesheets", iconName = "event", route = Nothing }
     , { text = "Reports", iconName = "list", route = Nothing }
@@ -77,6 +76,7 @@ viewDrawerMenuItem model menuItem =
     List.li
         [ Options.css "cursor" "pointer"
         , Options.attribute <| onClick (NavigateTo menuItem.route)
+        , Color.text Color.accent `when` (model.route == menuItem.route)
         ]
         [ List.content
             []
@@ -97,55 +97,10 @@ viewBody : Model -> Html Msg
 viewBody model =
     case model.route of
         Just (Route.Home) ->
-            viewDashboard model
+            View.Home.view model
+
+        Just (Route.Users) ->
+            View.Users.view model
 
         Nothing ->
             text "404"
-
-
-viewDashboard : Model -> Html Msg
-viewDashboard model =
-    grid []
-        [ cell [ size All 12 ]
-            [ viewActivitySummary model
-            ]
-        , cell [ size All 6 ]
-            [ viewWordCloud model ]
-        , cell [ size All 6 ]
-            [ viewNewMembers model ]
-        ]
-
-
-viewGridCard contents =
-    Card.view
-        [ Options.css "width" "100%"
-        , Elevation.e2
-        ]
-        contents
-
-
-viewActivitySummary model =
-    [ Card.text
-        []
-        [ text "Imagine an activity summary here"
-        ]
-    ]
-        |> viewGridCard
-
-
-viewWordCloud model =
-    [ Card.text
-        []
-        [ text "Imagine a word cloud here"
-        ]
-    ]
-        |> viewGridCard
-
-
-viewNewMembers model =
-    [ Card.text
-        []
-        [ text "Imagine a list of new members here"
-        ]
-    ]
-        |> viewGridCard
