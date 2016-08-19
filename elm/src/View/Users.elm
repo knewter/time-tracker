@@ -9,15 +9,13 @@ import Material.List as List
 
 view : Model -> Html Msg
 view model =
-    List.ul
-        []
+    List.ul []
         (List.map (viewUserRow model) model.users)
 
 
 viewUserRow : Model -> User -> Html Msg
 viewUserRow model user =
-    List.li
-        []
+    List.li []
         [ List.content []
             [ text user.name ]
         ]
