@@ -38,23 +38,23 @@ urlUpdate route model =
         case route of
             Just (Route.Users) ->
                 -- Pretend we did an API call and it got us some new users
-                newModel ! [ fetchUsers newModel ]
+                newModel ! [ fetchMockUsers newModel ]
 
             _ ->
                 newModel ! []
 
 
 fetchUsers : Model -> Cmd Msg
-fetchUsers newModel =
+fetchUsers model =
     -- This "error condition" that just says we got no users is dumb, we should log something and inform the UI
     Task.perform (always (GotUsers [])) GotUsers (Http.get Decoders.usersDecoder "http://localhost:4000/users")
 
 
 fetchMockUsers : Model -> Cmd Msg
-fetchMockUsers newModel =
+fetchMockUsers model =
     Task.perform
-        (always <| GotUsers (mockUser :: newModel.users))
-        (always <| GotUsers (mockUser :: newModel.users))
+        (always <| GotUsers (mockUser :: model.users))
+        (always <| GotUsers (mockUser :: model.users))
         (Task.succeed ())
 
 
