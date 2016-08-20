@@ -1,13 +1,33 @@
 # Time Tracker - Elm Client
 
-To run this:
+This is the Elm client for
+[knewter/time-tracker](http://github.com/knewter/time-tracker).  It provides a
+frontend Single Page Application that sits on top of a Phoenix-based API
+backend, that also lives in this repository.
+
+## Development
+
+This application uses webpack for building the modules and providing hot module
+replacement, as well as a dev server.
+
+To build the project:
 
 ```sh
-# install elm 0.17 or greater
-./build
-# serve the local directory as http - I do this:
-# alias servedir='ruby -run -e httpd . -p 9091' # serve current dir files on port 9091
-servedir
+npm run build # or ./build
 ```
 
-Visit <http://localhost:9091>
+To run webpack in `watch` mode:
+
+```sh
+npm run watch
+```
+
+To run the devserver:
+
+```sh
+npm run dev
+```
+
+## License
+
+This software is MIT Licensed.

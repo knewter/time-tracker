@@ -1,0 +1,36 @@
+{
+  "name": "time-tracker-client",
+  "version": "1.0.0",
+  "description": "An Elm-based frontend client for a Phoenix powered time-tracker API app.",
+  "main": "webpack.config.js",
+  "dependencies": {
+    "elm-hot-loader": "^0.3.3",
+    "elm-webpack-loader": "^3.0.6",
+    "file-loader": "^0.9.0",
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.14.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "watch": "webpack --watch",
+    "dev": "webpack-dev-server --port 3000 --hot"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/knewter/time-tracker.git"
+  },
+  "keywords": [
+    "phoenix",
+    "elm",
+    "chat"
+  ],
+  "author": "Josh Adams, DailyDrip",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/knewter/time-tracker/issues"
+  },
+  "homepage": "https://github.com/knewter/time-tracker#readme"
+}
