@@ -22,33 +22,34 @@ view model =
         ]
 
 
+viewActivitySummary : Model -> Html a
 viewActivitySummary model =
-    [ Card.text
-        []
+    [ Card.text []
         [ text "Imagine an activity summary here"
         ]
     ]
         |> viewGridCard
 
 
+viewWordCloud : Model -> Html a
 viewWordCloud model =
-    [ Card.text
-        []
+    [ Card.text []
         [ text "Imagine a word cloud here"
         ]
     ]
         |> viewGridCard
 
 
+viewNewMembers : Model -> Html a
 viewNewMembers model =
-    [ Card.text
-        []
+    [ Card.text []
         [ text "Imagine a list of new members here"
         ]
     ]
         |> viewGridCard
 
 
+viewGridCard : List (Card.Block a) -> Html a
 viewGridCard contents =
     Card.view
         [ Options.css "width" "100%"

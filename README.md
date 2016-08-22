@@ -14,7 +14,7 @@ The elm client lives in ./elm.  Look there for more info.
 I intend to ultimately write a basic
 [Phoenix-based](http://phoenixframework.org) backend API server for providing a
 nice means to give examples of persistence, loading data from a CRUD backend,
-etc.
+etc.  The current implementation is already alive, at `./time_tracker_backend`.
 
 ## License
 

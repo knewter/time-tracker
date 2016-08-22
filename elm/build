@@ -1,1 +1,1 @@
-elm make --output target/elm.js src/Main.elm --warn
+npm run build
