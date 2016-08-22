@@ -16,7 +16,7 @@ defmodule TimeTrackerBackend.Router do
   scope "/", TimeTrackerBackend do
     pipe_through :api # Use the default browser stack
 
-    get "/users", UserController, :index
+    resources "/users", UserController
   end
 
   # Other scopes may use custom stacks.

@@ -20,7 +20,7 @@ defmodule TimeTrackerBackend.ConnCase do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
 
-      alias TimeTrackerBackend.Repo
+      alias TimeTrackerBackend.{Repo, User}
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
