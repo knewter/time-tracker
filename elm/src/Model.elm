@@ -12,6 +12,7 @@ type alias Model =
     , snackbar : Snackbar.Model (Maybe Msg)
     , route : Route.Model
     , users : List User
+    , newUser : User
     }
 
 
@@ -21,6 +22,7 @@ initialModel location =
     , snackbar = Snackbar.model
     , route = Route.init location
     , users = mockUsers
+    , newUser = User ""
     }
 
 

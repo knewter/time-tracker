@@ -38,7 +38,7 @@ urlUpdate route model =
         case route of
             Just (Route.Users) ->
                 -- Pretend we did an API call and it got us some new users
-                newModel ! [ fetchMockUsers newModel ]
+                newModel ! [ fetchUsers model ]
 
             _ ->
                 newModel ! []

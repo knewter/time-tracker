@@ -7,6 +7,7 @@ import Navigation
 type Location
     = Home
     | Users
+    | NewUser
 
 
 type alias Model =
@@ -28,6 +29,9 @@ urlFor loc =
 
                 Users ->
                     "/users"
+
+                NewUser ->
+                    "/users/new"
     in
         "#" ++ url
 
@@ -46,6 +50,9 @@ locFor path =
 
             [ "users" ] ->
                 Just Users
+
+            [ "users", "new" ] ->
+                Just NewUser
 
             _ ->
                 Nothing

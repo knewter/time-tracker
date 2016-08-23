@@ -15,6 +15,7 @@ import Material.Options as Options exposing (when)
 import Route exposing (Location(..))
 import View.Home
 import View.Users
+import View.Users.New
 
 
 view : Model -> Html Msg
@@ -101,6 +102,9 @@ viewBody model =
 
         Just (Route.Users) ->
             View.Users.view model
+
+        Just (Route.NewUser) ->
+            View.Users.New.view model
 
         Nothing ->
             text "404"
