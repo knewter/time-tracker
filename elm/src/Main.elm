@@ -27,17 +27,5 @@ subscriptions model =
 
 
 urlUpdate : Maybe Route.Location -> Model -> ( Model, Cmd Msg )
-urlUpdate route model =
-    let
-        newModel =
-            { model | route = route }
-    in
-        case route of
-            Just (Route.Users) ->
-                newModel ! [ API.fetchUsers newModel ]
-
-            Just (Route.ShowUser id) ->
-                newModel ! [ API.fetchUser id newModel ]
-
-            _ ->
-                newModel ! []
+urlUpdate location model =
+    { model | route = route } ! (Model.cmdsForMaybeLocation location)

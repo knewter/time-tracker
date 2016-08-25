@@ -1,10 +1,11 @@
-module Model exposing (Model, init)
+module Model exposing (Model, init, cmdsForMaybeLocation)
 
 import Msg exposing (Msg)
 import Material
 import Material.Snackbar as Snackbar
 import Route
 import Types exposing (User)
+import Api
 
 
 type alias Model =
@@ -32,4 +33,17 @@ initialModel location =
 
 init : Maybe Route.Location -> ( Model, Cmd Msg )
 init location =
-    (initialModel location) ! []
+    (initialModel location) ! (cmdsForMaybeLocation location)
+
+
+cmdsForMaybeLocation : Maybe Route.Location -> Cmd Msg
+cmdsForMaybeLocation location =
+    case location of
+        Just (Route.Users) ->
+            [ API.fetchUsers newModel ]
+
+        Just (Route.ShowUser id) ->
+            [ API.fetchUser id newModel ]
+
+        _ ->
+            []
