@@ -8,7 +8,7 @@ import Html exposing (Html, text, h2, div)
 
 view : Model -> Int -> Html Msg
 view model id =
-    case user model id of
+    case model.shownUser of
         Nothing ->
             text "No user here, sorry bud."
 
@@ -16,10 +16,3 @@ view model id =
             div []
                 [ h2 [] [ text user.name ]
                 ]
-
-
-user : Model -> Int -> Maybe User
-user model id =
-    model.users
-        |> List.filter (\u -> u.id == (Just id))
-        |> List.head

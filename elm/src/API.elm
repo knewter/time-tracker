@@ -19,7 +19,7 @@ fetchUsers model =
 
 fetchUser : Int -> Model -> Cmd Msg
 fetchUser id model =
-    Http.get ("data" := Decoders.userDecoder) (model.baseUrl ++ "/users" ++ (toString id))
+    Http.get ("data" := Decoders.userDecoder) (model.baseUrl ++ "/users/" ++ (toString id))
         |> Task.perform (always NoOp) GotUser
 
 

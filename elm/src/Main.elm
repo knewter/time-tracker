@@ -7,13 +7,13 @@ import Model exposing (Model)
 import Route
 import Msg exposing (Msg(..))
 import Material
-import API
+import Util
 
 
 main : Program Never
 main =
     Navigation.program (Navigation.makeParser Route.locFor)
-        { init = Model.init
+        { init = init
         , update = Update.update
         , urlUpdate = urlUpdate
         , view = View.view
@@ -27,5 +27,18 @@ subscriptions model =
 
 
 urlUpdate : Maybe Route.Location -> Model -> ( Model, Cmd Msg )
-urlUpdate location model =
-    { model | route = route } ! (Model.cmdsForMaybeLocation location)
+urlUpdate location oldModel =
+    let
+        newModel =
+            { oldModel | route = location }
+    in
+        newModel ! (Util.cmdsForModelRoute newModel)
+
+
+init : Maybe Route.Location -> ( Model, Cmd Msg )
+init location =
+    let
+        model =
+            Model.initialModel location
+    in
+        model ! Util.cmdsForModelRoute model

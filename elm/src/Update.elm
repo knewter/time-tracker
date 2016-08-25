@@ -7,15 +7,12 @@ import Material
 import Material.Snackbar as Snackbar
 import Navigation
 import Route exposing (Location(..))
-import Http
-import Task
-import Decoders
 import API
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
+    case Debug.log "msg: " msg of
         Mdl msg' ->
             Material.update msg' model
 
