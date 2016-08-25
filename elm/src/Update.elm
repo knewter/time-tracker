@@ -2,16 +2,15 @@ module Update exposing (update)
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
+import Types exposing (User)
 import Material
 import Material.Snackbar as Snackbar
 import Navigation
 import Route exposing (Location(..))
 import Http
-import Json.Encode as JE
-import Json.Decode as JD exposing ((:=))
-import Types exposing (User)
 import Task
 import Decoders
+import API
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -46,10 +45,10 @@ update msg model =
                 { model | newUser = { oldNewUser | name = name } } ! []
 
         CreateNewUser ->
-            model ! [ createUser model.newUser CreateFailed CreateSucceeded ]
+            model ! [ API.createUser model.newUser model ]
 
         CreateSucceeded _ ->
-            { model | newUser = User "" }
+            { model | newUser = User Nothing "" }
                 ! [ Navigation.newUrl (Route.urlFor Users) ]
 
         CreateFailed error ->
@@ -59,30 +58,20 @@ update msg model =
             in
                 model ! []
 
+        DeleteUser user ->
+            let
+                _ =
+                    Debug.log "Deleting user: " user
+            in
+                model ! [ API.deleteUser user model ]
 
-baseUrl : String
-baseUrl =
-    "http://localhost:4000"
+        DeleteFailed error ->
+            let
+                _ =
+                    Debug.log "Delete User failed: " error
+            in
+                model ! []
 
-
-createUser : User -> (Http.Error -> msg) -> (User -> msg) -> Cmd msg
-createUser user errorMsg msg =
-    Http.send Http.defaultSettings
-        { verb = "POST"
-        , url = baseUrl ++ "/users"
-        , body = Http.string (encodeUser user |> JE.encode 0)
-        , headers = [ ( "Content-Type", "application/json" ) ]
-        }
-        |> Http.fromJson ("data" := Decoders.userDecoder)
-        |> Task.perform errorMsg msg
-
-
-encodeUser : User -> JE.Value
-encodeUser user =
-    JE.object
-        [ ( "user"
-          , JE.object
-                [ ( "name", JE.string user.name )
-                ]
-          )
-        ]
+        DeleteSucceeded user ->
+            -- What should we do here?  No clue yet...
+            model ! []

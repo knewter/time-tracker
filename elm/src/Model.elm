@@ -13,6 +13,7 @@ type alias Model =
     , route : Route.Model
     , users : List User
     , newUser : User
+    , baseUrl : String
     }
 
 
@@ -21,16 +22,12 @@ initialModel location =
     { mdl = Material.model
     , snackbar = Snackbar.model
     , route = Route.init location
-    , users = mockUsers
-    , newUser = User ""
+    , users = []
+    , newUser = User Nothing ""
+    , baseUrl = "http://localhost:4000"
     }
 
 
 init : Maybe Route.Location -> ( Model, Cmd Msg )
 init location =
     (initialModel location) ! []
-
-
-mockUsers : List User
-mockUsers =
-    [ { name = "Josh Adams" }, { name = "Adam Dill" } ]

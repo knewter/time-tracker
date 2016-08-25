@@ -11,7 +11,7 @@ import Decoders exposing (usersDecoder)
 all : Test
 all =
     describe "A Test Suite"
-        [ test "decoding slots" <|
+        [ test "decoding users" <|
             \() ->
-                Expect.equal (JD.decodeString usersDecoder "[{\"name\": \"Josh\"}]") (Ok [ (User "Josh") ])
+                Expect.equal (JD.decodeString usersDecoder "[{\"id\": 1, \"name\": \"Josh\"}]") (Ok [ (User (Just 1) "Josh") ])
         ]

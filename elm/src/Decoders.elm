@@ -11,5 +11,6 @@ usersDecoder =
 
 userDecoder : JD.Decoder User
 userDecoder =
-    JD.object1 User
+    JD.object2 User
+        (JD.maybe ("id" := JD.int))
         ("name" := JD.string)

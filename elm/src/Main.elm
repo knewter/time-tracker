@@ -4,14 +4,10 @@ import Navigation
 import View
 import Update
 import Model exposing (Model)
-import Types exposing (User)
 import Route
 import Msg exposing (Msg(..))
-import Task
 import Material
-import Http
-import Decoders
-import Json.Decode exposing ((:=))
+import API
 
 
 main : Program Never
@@ -38,27 +34,7 @@ urlUpdate route model =
     in
         case route of
             Just (Route.Users) ->
-                -- Pretend we did an API call and it got us some new users
-                newModel ! [ fetchUsers model ]
+                newModel ! [ API.fetchUsers newModel ]
 
             _ ->
                 newModel ! []
-
-
-fetchUsers : Model -> Cmd Msg
-fetchUsers model =
-    -- This "error condition" that just says we got no users is dumb, we should log something and inform the UI
-    Task.perform (always (GotUsers [])) GotUsers (Http.get ("data" := Decoders.usersDecoder) "http://localhost:4000/users")
-
-
-fetchMockUsers : Model -> Cmd Msg
-fetchMockUsers model =
-    Task.perform
-        (always <| GotUsers (mockUser :: model.users))
-        (always <| GotUsers (mockUser :: model.users))
-        (Task.succeed ())
-
-
-mockUser : User
-mockUser =
-    { name = "Jumpy McFiddlepants" }

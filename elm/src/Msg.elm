@@ -16,3 +16,6 @@ type Msg
     | CreateNewUser
     | CreateSucceeded User
     | CreateFailed Http.Error
+    | DeleteUser User
+    | DeleteSucceeded User
+    | DeleteFailed Http.RawError
