@@ -8,6 +8,7 @@ type Location
     = Home
     | Users
     | NewUser
+    | ShowUser Int
 
 
 type alias Model =
@@ -32,6 +33,9 @@ urlFor loc =
 
                 NewUser ->
                     "/users/new"
+
+                ShowUser id ->
+                    "/users/" ++ (toString id)
     in
         "#" ++ url
 
@@ -53,6 +57,14 @@ locFor path =
 
             [ "users", "new" ] ->
                 Just NewUser
+
+            [ "users", stringId ] ->
+                case String.toInt stringId of
+                    Ok id ->
+                        Just (ShowUser id)
+
+                    Err _ ->
+                        Nothing
 
             _ ->
                 Nothing

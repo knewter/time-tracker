@@ -1,4 +1,4 @@
-module API exposing (fetchUsers, createUser, deleteUser)
+module API exposing (fetchUsers, createUser, deleteUser, fetchUser)
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
@@ -15,6 +15,12 @@ fetchUsers : Model -> Cmd Msg
 fetchUsers model =
     Http.get ("data" := Decoders.usersDecoder) (model.baseUrl ++ "/users")
         |> Task.perform (always (GotUsers [])) GotUsers
+
+
+fetchUser : Int -> Model -> Cmd Msg
+fetchUser id model =
+    Http.get ("data" := Decoders.userDecoder) (model.baseUrl ++ "/users" ++ (toString id))
+        |> Task.perform (always NoOp) GotUser
 
 
 createUser : User -> Model -> Cmd Msg

@@ -16,6 +16,7 @@ import Route exposing (Location(..))
 import View.Home
 import View.Users
 import View.Users.New
+import View.Users.Show
 
 
 view : Model -> Html Msg
@@ -96,15 +97,22 @@ viewDrawer model =
 
 viewBody : Model -> Html Msg
 viewBody model =
-    case model.route of
-        Just (Route.Home) ->
-            View.Home.view model
+    let
+        _ =
+            Debug.log "model: " model
+    in
+        case model.route of
+            Just (Route.Home) ->
+                View.Home.view model
 
-        Just (Route.Users) ->
-            View.Users.view model
+            Just (Route.Users) ->
+                View.Users.view model
 
-        Just (Route.NewUser) ->
-            View.Users.New.view model
+            Just (Route.NewUser) ->
+                View.Users.New.view model
 
-        Nothing ->
-            text "404"
+            Just (Route.ShowUser id) ->
+                View.Users.Show.view model id
+
+            Nothing ->
+                text "404"

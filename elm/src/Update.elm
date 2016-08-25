@@ -73,5 +73,10 @@ update msg model =
                 model ! []
 
         DeleteSucceeded user ->
-            -- What should we do here?  No clue yet...
+            model ! [ API.fetchUsers model ]
+
+        GotUser user ->
+            { model | shownUser = Just user } ! []
+
+        NoOp ->
             model ! []

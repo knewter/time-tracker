@@ -19,3 +19,5 @@ type Msg
     | DeleteUser User
     | DeleteSucceeded User
     | DeleteFailed Http.RawError
+    | GotUser User
+    | NoOp

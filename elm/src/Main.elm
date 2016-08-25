@@ -36,5 +36,8 @@ urlUpdate route model =
             Just (Route.Users) ->
                 newModel ! [ API.fetchUsers newModel ]
 
+            Just (Route.ShowUser id) ->
+                newModel ! [ API.fetchUser id newModel ]
+
             _ ->
                 newModel ! []
