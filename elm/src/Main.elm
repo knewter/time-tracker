@@ -11,6 +11,7 @@ import Task
 import Material
 import Http
 import Decoders
+import Json.Decode exposing ((:=))
 
 
 main : Program Never
@@ -47,7 +48,7 @@ urlUpdate route model =
 fetchUsers : Model -> Cmd Msg
 fetchUsers model =
     -- This "error condition" that just says we got no users is dumb, we should log something and inform the UI
-    Task.perform (always (GotUsers [])) GotUsers (Http.get Decoders.usersDecoder "http://localhost:4000/users")
+    Task.perform (always (GotUsers [])) GotUsers (Http.get ("data" := Decoders.usersDecoder) "http://localhost:4000/users")
 
 
 fetchMockUsers : Model -> Cmd Msg

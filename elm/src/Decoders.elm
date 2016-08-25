@@ -6,7 +6,7 @@ import Types exposing (User)
 
 usersDecoder : JD.Decoder (List User)
 usersDecoder =
-    "data" := (JD.list userDecoder)
+    JD.list userDecoder
 
 
 userDecoder : JD.Decoder User
