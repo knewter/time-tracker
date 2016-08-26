@@ -3,7 +3,7 @@ module Msg exposing (Msg(..))
 import Material
 import Material.Snackbar as Snackbar
 import Route
-import Types exposing (User)
+import Types exposing (User, UserSortableField)
 import Http
 
 
@@ -20,4 +20,5 @@ type Msg
     | DeleteSucceeded User
     | DeleteFailed Http.RawError
     | GotUser User
+    | ReorderUsers UserSortableField
     | NoOp

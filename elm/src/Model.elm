@@ -4,7 +4,7 @@ import Msg exposing (Msg)
 import Material
 import Material.Snackbar as Snackbar
 import Route
-import Types exposing (User)
+import Types exposing (User, Sorted, UserSortableField)
 
 
 type alias Model =
@@ -15,6 +15,7 @@ type alias Model =
     , users : List User
     , newUser : User
     , shownUser : Maybe User
+    , usersSort : Maybe ( Sorted, UserSortableField )
     }
 
 
@@ -27,4 +28,5 @@ initialModel location =
     , users = []
     , newUser = User Nothing ""
     , shownUser = Nothing
+    , usersSort = Nothing
     }

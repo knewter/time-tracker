@@ -1,14 +1,15 @@
 module View.Users exposing (view)
 
 import Model exposing (Model)
-import Types exposing (User)
+import Types exposing (User, UserSortableField(..))
 import Msg exposing (Msg(..))
 import Route exposing (Location(..))
-import Html exposing (Html, text, div, a)
-import Html.Attributes exposing (href)
+import Html exposing (Html, text, div, a, img)
+import Html.Attributes exposing (href, src, style)
 import Material.List as List
 import Material.Button as Button
 import Material.Icon as Icon
+import Material.Table as Table
 import Json.Decode as JD
 
 
@@ -16,7 +17,29 @@ view : Model -> Html Msg
 view model =
     div []
         [ addUserButton model
-        , List.ul []
+        , usersTable model
+        ]
+
+
+usersTable : Model -> Html Msg
+usersTable model =
+    Table.table []
+        [ Table.thead []
+            [ Table.th [] []
+            , Table.th
+                [ Table.sorted Table.Ascending
+                , Table.onClick (ReorderUsers Name)
+                ]
+                [ text "Name" ]
+            , Table.th [] [ text "Position" ]
+            , Table.th [] [ text "Email" ]
+            , Table.th [] [ text "Today" ]
+            , Table.th [] [ text "Last 7 days" ]
+            , Table.th [] [ text "Projects" ]
+            , Table.th [] [ text "Open Tasks" ]
+            , Table.th [] [ text "Actions" ]
+            ]
+        , Table.tbody []
             (List.indexedMap (viewUserRow model) model.users)
         ]
 
@@ -32,11 +55,20 @@ viewUserRow model index user =
                 Just id ->
                     [ href (Route.urlFor (ShowUser id)) ]
     in
-        List.li []
-            [ List.content []
-                [ a attributes [ text user.name ]
-                , deleteButton model index user
+        Table.tr []
+            [ Table.td []
+                [ img
+                    [ src ("https://api.adorable.io/avatars/30/" ++ user.name ++ ".png"), style [ ( "border-radius", "50%" ) ] ]
+                    []
                 ]
+            , Table.td [] [ a attributes [ text user.name ] ]
+            , Table.td [] [ text "Monkey" ]
+            , Table.td [] [ text "monkey@example.com" ]
+            , Table.td [] [ text "3h 28m" ]
+            , Table.td [] [ text "57h 12m" ]
+            , Table.td [] [ text "20" ]
+            , Table.td [] [ text "8" ]
+            , Table.td [] [ deleteButton model index user ]
             ]
 
 

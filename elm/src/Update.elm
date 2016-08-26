@@ -2,7 +2,7 @@ module Update exposing (update)
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
-import Types exposing (User)
+import Types exposing (User, UserSortableField(..), Sorted(..))
 import Material
 import Material.Snackbar as Snackbar
 import Navigation
@@ -75,5 +75,47 @@ update msg model =
         GotUser user ->
             { model | shownUser = Just user } ! []
 
+        ReorderUsers field ->
+            reorderUsers field model ! []
+
         NoOp ->
             model ! []
+
+
+reorderUsers : UserSortableField -> Model -> Model
+reorderUsers sortableField model =
+    let
+        fun =
+            userSortableFieldFun sortableField
+    in
+        case model.usersSort of
+            Nothing ->
+                { model
+                    | usersSort = Just ( Ascending, sortableField )
+                    , users = List.sortBy fun model.users
+                }
+
+            Just ( Ascending, sortableField ) ->
+                { model
+                    | usersSort = Just ( Descending, sortableField )
+                    , users = List.sortBy fun model.users |> List.reverse
+                }
+
+            Just ( Descending, sortableField ) ->
+                { model
+                    | usersSort = Just ( Ascending, sortableField )
+                    , users = List.sortBy fun model.users
+                }
+
+            Just _ ->
+                { model
+                    | usersSort = Just ( Ascending, sortableField )
+                    , users = List.sortBy fun model.users
+                }
+
+
+userSortableFieldFun : UserSortableField -> (User -> String)
+userSortableFieldFun sortableField =
+    case sortableField of
+        Name ->
+            .name
