@@ -95,23 +95,27 @@ reorderUsers sortableField model =
                     , users = List.sortBy fun model.users
                 }
 
-            Just ( Ascending, sortableField ) ->
-                { model
-                    | usersSort = Just ( Descending, sortableField )
-                    , users = List.sortBy fun model.users |> List.reverse
-                }
+            Just ( sortOrder, currentSortableField ) ->
+                case currentSortableField == sortableField of
+                    True ->
+                        case sortOrder of
+                            Ascending ->
+                                { model
+                                    | usersSort = Just ( Descending, sortableField )
+                                    , users = List.sortBy fun model.users |> List.reverse
+                                }
 
-            Just ( Descending, sortableField ) ->
-                { model
-                    | usersSort = Just ( Ascending, sortableField )
-                    , users = List.sortBy fun model.users
-                }
+                            Descending ->
+                                { model
+                                    | usersSort = Just ( Ascending, sortableField )
+                                    , users = List.sortBy fun model.users
+                                }
 
-            Just _ ->
-                { model
-                    | usersSort = Just ( Ascending, sortableField )
-                    , users = List.sortBy fun model.users
-                }
+                    False ->
+                        { model
+                            | usersSort = Just ( Ascending, sortableField )
+                            , users = List.sortBy fun model.users
+                        }
 
 
 userSortableFieldFun : UserSortableField -> (User -> String)

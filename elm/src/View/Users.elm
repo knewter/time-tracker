@@ -1,7 +1,7 @@
 module View.Users exposing (view)
 
 import Model exposing (Model)
-import Types exposing (User, UserSortableField(..))
+import Types exposing (User, UserSortableField(..), Sorted(..))
 import Msg exposing (Msg(..))
 import Route exposing (Location(..))
 import Html exposing (Html, text, div, a, img)
@@ -10,6 +10,7 @@ import Material.List as List
 import Material.Button as Button
 import Material.Icon as Icon
 import Material.Table as Table
+import Material.Options as Options
 import Json.Decode as JD
 
 
@@ -27,9 +28,7 @@ usersTable model =
         [ Table.thead []
             [ Table.th [] []
             , Table.th
-                [ Table.sorted Table.Ascending
-                , Table.onClick (ReorderUsers Name)
-                ]
+                (thOptions Name model)
                 [ text "Name" ]
             , Table.th [] [ text "Position" ]
             , Table.th [] [ text "Email" ]
@@ -96,3 +95,25 @@ deleteButton model index user =
         , Button.onClick <| DeleteUser user
         ]
         [ Icon.i "delete" ]
+
+
+thOptions sortableField model =
+    [ Table.onClick (ReorderUsers sortableField)
+    , Options.css "cursor" "pointer"
+    ]
+        ++ case model.usersSort of
+            Nothing ->
+                []
+
+            Just ( sorted, sortedField ) ->
+                case sortedField == sortableField of
+                    True ->
+                        case sorted of
+                            Ascending ->
+                                [ Table.sorted Table.Ascending ]
+
+                            Descending ->
+                                [ Table.sorted Table.Descending ]
+
+                    False ->
+                        []
