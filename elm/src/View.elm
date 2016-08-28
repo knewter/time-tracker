@@ -11,6 +11,7 @@ import Material.Layout as Layout
 import Material.Snackbar as Snackbar
 import Material.Color as Color
 import Material.List as List
+import Material.Icon as Icon
 import Material.Options as Options exposing (when)
 import Route exposing (Location(..))
 import View.Home
@@ -28,7 +29,7 @@ view model =
             , Layout.fixedDrawer
             ]
             { header = [ viewHeader model ]
-            , drawer = [ viewDrawer model ]
+            , drawer = viewDrawer model
             , tabs = ( [], [] )
             , main =
                 [ div
@@ -73,26 +74,30 @@ menuItems =
     ]
 
 
+viewDrawer : Model -> List (Html Msg)
+viewDrawer model =
+    [ Layout.title []
+        [ text "App" ]
+    , Layout.navigation
+        [ Options.css "flex-grow" "1" ]
+        (List.map (viewDrawerMenuItem model) menuItems)
+    ]
+
+
 viewDrawerMenuItem : Model -> MenuItem -> Html Msg
 viewDrawerMenuItem model menuItem =
-    List.li
-        [ Options.css "cursor" "pointer"
-        , Options.attribute <| onClick (NavigateTo menuItem.route)
-        , Color.text Color.accent `when` (model.route == menuItem.route)
+    Layout.link
+        [ Layout.onClick (NavigateTo menuItem.route)
+        , (Color.text <| Color.accent) `when` (model.route == menuItem.route)
+        , Options.css "font-weight" "500"
+        , Options.css "cursor" "pointer"
+        , Options.css "outline" "none"
         ]
-        [ List.content
-            []
-            [ List.icon menuItem.iconName []
-            , text menuItem.text
+        [ Icon.view menuItem.iconName
+            [ Options.css "margin-right" "32px"
             ]
+        , text menuItem.text
         ]
-
-
-viewDrawer : Model -> Html Msg
-viewDrawer model =
-    List.ul
-        []
-        (List.map (viewDrawerMenuItem model) menuItems)
 
 
 viewBody : Model -> Html Msg
