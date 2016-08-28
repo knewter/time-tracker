@@ -96,12 +96,22 @@ update msg model =
                     model ! []
 
                 Just shownUser ->
-                    case shownUser.id of
-                        Nothing ->
-                            model ! []
+                    model ! [ API.updateUser shownUser model ]
 
-                        Just id ->
-                            { model | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowUser id ]
+        UpdateFailed error ->
+            let
+                _ =
+                    Debug.log "Create User failed: " error
+            in
+                model ! []
+
+        UpdateSucceeded user ->
+            case user.id of
+                Nothing ->
+                    { model | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.Users ]
+
+                Just id ->
+                    { model | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowUser id ]
 
         NoOp ->
             model ! []

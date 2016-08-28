@@ -23,4 +23,6 @@ type Msg
     | ReorderUsers UserSortableField
     | SetShownUserName String
     | UpdateShownUser
+    | UpdateFailed Http.Error
+    | UpdateSucceeded User
     | NoOp

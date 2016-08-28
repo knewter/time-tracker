@@ -1,4 +1,4 @@
-module API exposing (fetchUsers, createUser, deleteUser, fetchUser)
+module API exposing (fetchUsers, createUser, deleteUser, fetchUser, updateUser)
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
@@ -49,6 +49,23 @@ deleteUser user model =
                 , headers = [ ( "Content-Type", "application/json" ) ]
                 }
                 |> Task.perform DeleteFailed (always <| DeleteSucceeded user)
+
+
+updateUser : User -> Model -> Cmd Msg
+updateUser user model =
+    case user.id of
+        Nothing ->
+            Cmd.none
+
+        Just id ->
+            Http.send Http.defaultSettings
+                { verb = "PUT"
+                , url = model.baseUrl ++ "/users/" ++ (toString id)
+                , body = Http.string (encodeUser user |> JE.encode 0)
+                , headers = [ ( "Content-Type", "application/json" ) ]
+                }
+                |> Http.fromJson ("data" := Decoders.userDecoder)
+                |> Task.perform UpdateFailed UpdateSucceeded
 
 
 encodeUser : User -> JE.Value
