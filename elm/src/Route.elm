@@ -9,6 +9,7 @@ type Location
     | Users
     | NewUser
     | ShowUser Int
+    | EditUser Int
 
 
 type alias Model =
@@ -36,6 +37,9 @@ urlFor loc =
 
                 ShowUser id ->
                     "/users/" ++ (toString id)
+
+                EditUser id ->
+                    "/users/" ++ (toString id) ++ "/edit"
     in
         "#" ++ url
 
@@ -65,6 +69,11 @@ locFor path =
 
                     Err _ ->
                         Nothing
+
+            [ "users", stringId, "edit" ] ->
+                String.toInt stringId
+                    |> Result.toMaybe
+                    |> Maybe.map EditUser
 
             _ ->
                 Nothing

@@ -18,6 +18,7 @@ import View.Home
 import View.Users
 import View.Users.New
 import View.Users.Show
+import View.Users.Edit
 
 
 view : Model -> Html Msg
@@ -134,6 +135,9 @@ viewBody model =
 
             Just (Route.ShowUser id) ->
                 View.Users.Show.view model id
+
+            Just (Route.EditUser id) ->
+                View.Users.Edit.view model id
 
             Nothing ->
                 text "404"
