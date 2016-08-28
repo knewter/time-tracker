@@ -67,7 +67,10 @@ viewUserRow model index user =
             , Table.td [] [ text "57h 12m" ]
             , Table.td [] [ text "20" ]
             , Table.td [] [ text "8" ]
-            , Table.td [] [ deleteButton model index user ]
+            , Table.td []
+                [ editButton model index user
+                , deleteButton model index user
+                ]
             ]
 
 
@@ -102,6 +105,24 @@ deleteButton model index user =
         , Button.onClick <| DeleteUser user
         ]
         [ Icon.i "delete" ]
+
+
+editButton : Model -> Int -> User -> Html Msg
+editButton model index user =
+    case user.id of
+        Nothing ->
+            text ""
+
+        Just id ->
+            Button.render Mdl
+                [ 0, 2, index ]
+                model.mdl
+                [ Button.minifab
+                , Button.colored
+                , Button.ripple
+                , Button.onClick <| NavigateTo <| Just <| EditUser id
+                ]
+                [ Icon.i "edit" ]
 
 
 thOptions sortableField model =
