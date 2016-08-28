@@ -76,7 +76,14 @@ addUserButton model =
     Button.render Mdl
         [ 0, 0 ]
         model.mdl
-        [ Button.fab
+        [ Options.css "position" "fixed"
+        , Options.css "display" "block"
+        , Options.css "right" "0"
+        , Options.css "bottom" "0"
+        , Options.css "margin-right" "40px"
+        , Options.css "margin-bottom" "40px"
+        , Options.css "z-index" "900"
+        , Button.fab
         , Button.colored
         , Button.ripple
         , Button.onClick <| NavigateTo <| Just NewUser

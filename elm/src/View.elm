@@ -43,16 +43,30 @@ view model =
 
 viewHeader : Model -> Html Msg
 viewHeader model =
-    Layout.row
-        []
-        [ Layout.title [] [ text "Time Tracker" ]
-        , Layout.spacer
-        , Layout.navigation []
-            [ Layout.link
-                [ Layout.href "https://github.com/knewter/time-tracker" ]
-                [ span [] [ text "github" ] ]
-            ]
-        ]
+    case model.route of
+        Just Users ->
+            Layout.row
+                []
+                [ Layout.title [] [ text "Users" ]
+                , Layout.spacer
+                , Layout.navigation []
+                    [ Layout.link
+                        [ Layout.href "https://github.com/knewter/time-tracker" ]
+                        [ span [] [ text "github" ] ]
+                    ]
+                ]
+
+        _ ->
+            Layout.row
+                []
+                [ Layout.title [] [ text "Time Tracker" ]
+                , Layout.spacer
+                , Layout.navigation []
+                    [ Layout.link
+                        [ Layout.href "https://github.com/knewter/time-tracker" ]
+                        [ span [] [ text "github" ] ]
+                    ]
+                ]
 
 
 type alias MenuItem =
@@ -77,7 +91,7 @@ menuItems =
 viewDrawer : Model -> List (Html Msg)
 viewDrawer model =
     [ Layout.title []
-        [ text "App" ]
+        [ text "Time Tracker" ]
     , Layout.navigation
         [ Options.css "flex-grow" "1" ]
         (List.map (viewDrawerMenuItem model) menuItems)
@@ -91,6 +105,8 @@ viewDrawerMenuItem model menuItem =
         , (Color.text <| Color.accent) `when` (model.route == menuItem.route)
         , Options.css "font-weight" "500"
         , Options.css "cursor" "pointer"
+          -- http://outlinenone.com/ TODO: tl;dr don't do this
+          -- Should be using ":focus { outline: 0 }" for this but can't do that with inline styles so this is a hack til I get a proper stylesheet on here.
         , Options.css "outline" "none"
         ]
         [ Icon.view menuItem.iconName
