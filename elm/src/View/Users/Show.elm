@@ -17,5 +17,6 @@ view model id =
         Just user ->
             div []
                 [ h2 [] [ text user.name ]
-                , a [ href <| Route.urlFor (EditUser id) ] [ text "Edit" ]
+                , div [] [ a [ href <| Route.urlFor (EditUser id) ] [ text "Edit" ] ]
+                , div [] [ a [ href <| Route.urlFor Users ] [ text "Users" ] ]
                 ]

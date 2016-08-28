@@ -3,10 +3,12 @@ module View.Users.Edit exposing (view)
 import Model exposing (Model)
 import Types exposing (User)
 import Msg exposing (Msg(..))
-import Html exposing (Html, text, h2, div)
+import Html exposing (Html, text, h2, div, a)
+import Html.Attributes exposing (href)
 import Material.Button as Button
 import Material.Textfield as Textfield
 import Material.Grid exposing (grid, size, cell, Device(..))
+import Route exposing (Location(..))
 
 
 view : Model -> Int -> Html Msg
@@ -22,7 +24,9 @@ view model id =
                     [ cell [ size All 12 ]
                         [ nameField model ]
                     , cell [ size All 12 ]
-                        [ submitButton model ]
+                        [ submitButton model
+                        , div [] [ a [ href <| Route.urlFor Users ] [ text "Cancel" ] ]
+                        ]
                     ]
                 ]
 

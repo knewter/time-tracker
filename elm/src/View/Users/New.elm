@@ -4,7 +4,8 @@ import Model exposing (Model)
 import Types exposing (User)
 import Msg exposing (Msg(..))
 import Route exposing (Location(..))
-import Html exposing (Html, text, div, form)
+import Html exposing (Html, text, div, form, a)
+import Html.Attributes exposing (href)
 import Material.List as List
 import Material.Button as Button
 import Material.Textfield as Textfield
@@ -17,7 +18,9 @@ view model =
         [ cell [ size All 12 ]
             [ nameField model ]
         , cell [ size All 12 ]
-            [ submitButton model ]
+            [ submitButton model
+            , div [] [ a [ href <| Route.urlFor Users ] [ text "Cancel" ] ]
+            ]
         ]
 
 
