@@ -21,4 +21,6 @@ type Msg
     | DeleteFailed Http.RawError
     | GotUser User
     | ReorderUsers UserSortableField
+    | SetShownUserName String
+    | UpdateShownUser
     | NoOp

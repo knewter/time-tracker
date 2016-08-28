@@ -78,6 +78,31 @@ update msg model =
         ReorderUsers field ->
             reorderUsers field model ! []
 
+        SetShownUserName name ->
+            case model.shownUser of
+                Nothing ->
+                    model ! []
+
+                Just user ->
+                    let
+                        updatedUser =
+                            { user | name = name }
+                    in
+                        { model | shownUser = (Just updatedUser) } ! []
+
+        UpdateShownUser ->
+            case model.shownUser of
+                Nothing ->
+                    model ! []
+
+                Just shownUser ->
+                    case shownUser.id of
+                        Nothing ->
+                            model ! []
+
+                        Just id ->
+                            { model | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowUser id ]
+
         NoOp ->
             model ! []
 
