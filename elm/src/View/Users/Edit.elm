@@ -8,4 +8,9 @@ import Html exposing (Html, text, h2, div)
 
 view : Model -> Int -> Html Msg
 view model id =
-    text <| "Edit user " ++ (toString id)
+    case model.shownUser of
+        Nothing ->
+            text "No user here, sorry bud."
+
+        Just user ->
+            text <| "Edit user " ++ (toString id)

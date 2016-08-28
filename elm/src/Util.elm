@@ -15,5 +15,8 @@ cmdsForModelRoute model =
         Just (ShowUser id) ->
             [ API.fetchUser id model ]
 
+        Just (EditUser id) ->
+            [ API.fetchUser id model ]
+
         _ ->
             []
