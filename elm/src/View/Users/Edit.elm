@@ -21,15 +21,12 @@ view model id =
             text "No user here, sorry bud."
 
         Just user ->
-            div []
-                [ h2 [] [ text <| "Edit user " ++ (toString id) ]
-                , grid []
-                    [ cell [ size All 12 ]
-                        [ nameField model ]
-                    , cell [ size All 12 ]
-                        [ submitButton model
-                        , cancelButton model
-                        ]
+            grid []
+                [ cell [ size All 12 ]
+                    [ nameField model ]
+                , cell [ size All 12 ]
+                    [ submitButton model
+                    , cancelButton model
                     ]
                 ]
 
@@ -65,8 +62,7 @@ cancelButton model =
     Button.render Mdl
         [ 2, 2 ]
         model.mdl
-        [ Button.raised
-        , Button.ripple
+        [ Button.ripple
         , Button.onClick <| NavigateTo <| Just Users
         , Options.css "margin-left" "1rem"
         ]
@@ -86,18 +82,13 @@ header model id =
                     , { route = Users, linkText = "Users" }
                     ]
             in
-                [ Layout.row
-                    []
-                    [ Layout.title [] [ text user.name ]
-                    , Layout.spacer
-                    , Layout.navigation []
-                        (List.map
-                            (\{ route, linkText } ->
-                                Layout.link
-                                    [ Layout.href <| Route.urlFor route ]
-                                    [ span [] [ text linkText ] ]
-                            )
-                            links
+                Helpers.defaultHeaderWithNavigation model
+                    ("Edit " ++ user.name)
+                    (List.map
+                        (\{ route, linkText } ->
+                            Layout.link
+                                [ Layout.href <| Route.urlFor route ]
+                                [ span [] [ text linkText ] ]
                         )
-                    ]
-                ]
+                        links
+                    )

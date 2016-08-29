@@ -33,18 +33,13 @@ header model id =
                     , { route = Users, linkText = "Users" }
                     ]
             in
-                [ Layout.row
-                    []
-                    [ Layout.title [] [ text user.name ]
-                    , Layout.spacer
-                    , Layout.navigation []
-                        (List.map
-                            (\{ route, linkText } ->
-                                Layout.link
-                                    [ Layout.href <| Route.urlFor route ]
-                                    [ span [] [ text linkText ] ]
-                            )
-                            links
+                Helpers.defaultHeaderWithNavigation model
+                    user.name
+                    (List.map
+                        (\{ route, linkText } ->
+                            Layout.link
+                                [ Layout.href <| Route.urlFor route ]
+                                [ span [] [ text linkText ] ]
                         )
-                    ]
-                ]
+                        links
+                    )

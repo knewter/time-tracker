@@ -150,14 +150,7 @@ thOptions sortableField model =
 
 header : Model -> List (Html Msg)
 header model =
-    [ Layout.row
-        []
-        [ Layout.title [] [ text "Users" ]
-        , Layout.spacer
-        , Layout.navigation []
-            [ addUserButton model ]
-        ]
-    ]
+    Helpers.defaultHeaderWithNavigation model "Users" [ addUserButton model ]
 
 
 

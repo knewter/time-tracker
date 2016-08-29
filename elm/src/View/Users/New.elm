@@ -56,8 +56,7 @@ cancelButton model =
     Button.render Mdl
         [ 1, 2 ]
         model.mdl
-        [ Button.raised
-        , Button.ripple
+        [ Button.ripple
         , Button.onClick <| NavigateTo <| Just Users
         , Options.css "margin-left" "1rem"
         ]
