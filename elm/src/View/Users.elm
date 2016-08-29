@@ -1,4 +1,4 @@
-module View.Users exposing (view)
+module View.Users exposing (view, header)
 
 import Model exposing (Model)
 import Types exposing (User, UserSortableField(..), Sorted(..))
@@ -12,13 +12,13 @@ import Material.Icon as Icon
 import Material.Table as Table
 import Material.Options as Options
 import Material.Layout as Layout
+import View.Helpers as Helpers
 
 
 view : Model -> Html Msg
 view model =
     div []
-        [ addUserButton model
-        , usersTable model
+        [ usersTable model
         ]
 
 
@@ -82,9 +82,9 @@ addUserButton model =
         [ Options.css "position" "fixed"
         , Options.css "display" "block"
         , Options.css "right" "0"
-        , Options.css "bottom" "0"
-        , Options.css "margin-right" "40px"
-        , Options.css "margin-bottom" "40px"
+        , Options.css "top" "0"
+        , Options.css "margin-right" "35px"
+        , Options.css "margin-top" "35px"
         , Options.css "z-index" "900"
         , Button.fab
         , Button.colored
@@ -146,6 +146,18 @@ thOptions sortableField model =
 
                     False ->
                         []
+
+
+header : Model -> List (Html Msg)
+header model =
+    [ Layout.row
+        []
+        [ Layout.title [] [ text "Users" ]
+        , Layout.spacer
+        , Layout.navigation []
+            [ addUserButton model ]
+        ]
+    ]
 
 
 

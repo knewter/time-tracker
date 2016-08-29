@@ -19,6 +19,7 @@ import View.Users
 import View.Users.New
 import View.Users.Show
 import View.Users.Edit
+import View.Helpers as Helpers
 
 
 view : Model -> Html Msg
@@ -45,11 +46,23 @@ view model =
 header : Model -> List (Html Msg)
 header model =
     case model.route of
+        Just (ShowUser id) ->
+            View.Users.Show.header model id
+
+        Just (EditUser id) ->
+            View.Users.Edit.header model id
+
+        Just Users ->
+            View.Users.header model
+
+        Just Home ->
+            Helpers.defaultHeaderWithGitHubLink model "Dashboard"
+
         Just route ->
-            defaultHeader model <| routeHeaderText route
+            Helpers.defaultHeader model <| Helpers.routeHeaderText route
 
         Nothing ->
-            defaultHeader model "Time Tracker"
+            Helpers.defaultHeader model "Time Tracker"
 
 
 type alias MenuItem =
@@ -123,31 +136,3 @@ viewBody model =
 
             Nothing ->
                 text "404"
-
-
-defaultHeader : Model -> String -> List (Html Msg)
-defaultHeader model headerText =
-    [ Layout.row
-        []
-        [ Layout.title [] [ text headerText ]
-        , Layout.spacer
-        , Layout.navigation []
-            [ Layout.link
-                [ Layout.href "https://github.com/knewter/time-tracker" ]
-                [ span [] [ text "github" ] ]
-            ]
-        ]
-    ]
-
-
-routeHeaderText : Location -> String
-routeHeaderText route =
-    case route of
-        Home ->
-            "Dashboard"
-
-        Users ->
-            "Users"
-
-        _ ->
-            "Time Tracker"

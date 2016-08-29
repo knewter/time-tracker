@@ -9,6 +9,7 @@ import Html.Attributes exposing (href)
 import Material.List as List
 import Material.Button as Button
 import Material.Textfield as Textfield
+import Material.Options as Options
 import Material.Grid exposing (grid, size, cell, Device(..))
 
 
@@ -19,7 +20,7 @@ view model =
             [ nameField model ]
         , cell [ size All 12 ]
             [ submitButton model
-            , div [] [ a [ href <| Route.urlFor Users ] [ text "Cancel" ] ]
+            , cancelButton model
             ]
         ]
 
@@ -48,3 +49,16 @@ submitButton model =
         , Button.onClick CreateNewUser
         ]
         [ text "Submit" ]
+
+
+cancelButton : Model -> Html Msg
+cancelButton model =
+    Button.render Mdl
+        [ 1, 2 ]
+        model.mdl
+        [ Button.raised
+        , Button.ripple
+        , Button.onClick <| NavigateTo <| Just Users
+        , Options.css "margin-left" "1rem"
+        ]
+        [ text "Cancel" ]

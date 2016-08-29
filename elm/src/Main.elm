@@ -8,6 +8,7 @@ import Route
 import Msg exposing (Msg(..))
 import Material
 import Util
+import Types exposing (User)
 
 
 main : Program Never
@@ -30,7 +31,7 @@ urlUpdate : Maybe Route.Location -> Model -> ( Model, Cmd Msg )
 urlUpdate location oldModel =
     let
         newModel =
-            { oldModel | route = location }
+            { oldModel | route = location, newUser = User Nothing "" }
     in
         newModel ! (Util.cmdsForModelRoute newModel)
 

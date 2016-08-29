@@ -1,14 +1,17 @@
-module View.Users.Edit exposing (view)
+module View.Users.Edit exposing (view, header)
 
 import Model exposing (Model)
 import Types exposing (User)
 import Msg exposing (Msg(..))
-import Html exposing (Html, text, h2, div, a)
+import Html exposing (Html, text, h2, div, a, span)
 import Html.Attributes exposing (href)
 import Material.Button as Button
 import Material.Textfield as Textfield
+import Material.Options as Options
 import Material.Grid exposing (grid, size, cell, Device(..))
 import Route exposing (Location(..))
+import Material.Layout as Layout
+import View.Helpers as Helpers
 
 
 view : Model -> Int -> Html Msg
@@ -25,7 +28,7 @@ view model id =
                         [ nameField model ]
                     , cell [ size All 12 ]
                         [ submitButton model
-                        , div [] [ a [ href <| Route.urlFor Users ] [ text "Cancel" ] ]
+                        , cancelButton model
                         ]
                     ]
                 ]
@@ -55,3 +58,46 @@ submitButton model =
         , Button.onClick UpdateShownUser
         ]
         [ text "Submit" ]
+
+
+cancelButton : Model -> Html Msg
+cancelButton model =
+    Button.render Mdl
+        [ 2, 2 ]
+        model.mdl
+        [ Button.raised
+        , Button.ripple
+        , Button.onClick <| NavigateTo <| Just Users
+        , Options.css "margin-left" "1rem"
+        ]
+        [ text "Cancel" ]
+
+
+header : Model -> Int -> List (Html Msg)
+header model id =
+    case model.shownUser of
+        Nothing ->
+            Helpers.defaultHeader model "No such user"
+
+        Just user ->
+            let
+                links =
+                    [ { route = ShowUser id, linkText = "Show" }
+                    , { route = Users, linkText = "Users" }
+                    ]
+            in
+                [ Layout.row
+                    []
+                    [ Layout.title [] [ text user.name ]
+                    , Layout.spacer
+                    , Layout.navigation []
+                        (List.map
+                            (\{ route, linkText } ->
+                                Layout.link
+                                    [ Layout.href <| Route.urlFor route ]
+                                    [ span [] [ text linkText ] ]
+                            )
+                            links
+                        )
+                    ]
+                ]

@@ -1,11 +1,13 @@
-module View.Users.Show exposing (view)
+module View.Users.Show exposing (view, header)
 
 import Model exposing (Model)
 import Types exposing (User)
 import Msg exposing (Msg(..))
-import Html exposing (Html, text, h2, div, a)
+import Html exposing (Html, text, h2, div, a, span)
 import Html.Attributes exposing (href)
 import Route exposing (Location(..))
+import View.Helpers as Helpers
+import Material.Layout as Layout
 
 
 view : Model -> Int -> Html Msg
@@ -15,8 +17,34 @@ view model id =
             text "No user here, sorry bud."
 
         Just user ->
-            div []
-                [ h2 [] [ text user.name ]
-                , div [] [ a [ href <| Route.urlFor (EditUser id) ] [ text "Edit" ] ]
-                , div [] [ a [ href <| Route.urlFor Users ] [ text "Users" ] ]
+            text "so we will show non-name info here once it exists oops"
+
+
+header : Model -> Int -> List (Html Msg)
+header model id =
+    case model.shownUser of
+        Nothing ->
+            Helpers.defaultHeader model "No such user"
+
+        Just user ->
+            let
+                links =
+                    [ { route = EditUser id, linkText = "Edit" }
+                    , { route = Users, linkText = "Users" }
+                    ]
+            in
+                [ Layout.row
+                    []
+                    [ Layout.title [] [ text user.name ]
+                    , Layout.spacer
+                    , Layout.navigation []
+                        (List.map
+                            (\{ route, linkText } ->
+                                Layout.link
+                                    [ Layout.href <| Route.urlFor route ]
+                                    [ span [] [ text linkText ] ]
+                            )
+                            links
+                        )
+                    ]
                 ]
