@@ -1,7 +1,7 @@
 module Update exposing (update)
 
 import Model exposing (Model)
-import Msg exposing (Msg(..), UserMsg(..))
+import Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..))
 import Types exposing (User, UserSortableField(..), Sorted(..), Project, ProjectSortableField(..))
 import Material
 import Material.Snackbar as Snackbar
@@ -34,71 +34,8 @@ update msg model =
         UserMsg' msg ->
             updateUserMsg msg model
 
-        GotProjects projects ->
-            { model | projects = projects } ! []
-
-        SetNewProjectName name ->
-            let
-                oldNewProject =
-                    model.newProject
-            in
-                { model | newProject = { oldNewProject | name = name } } ! []
-
-        CreateNewProject ->
-            model ! [ API.createProject model model.newProject CreateProjectFailed CreateProjectSucceeded ]
-
-        CreateProjectSucceeded _ ->
-            { model | newProject = Project Nothing "" }
-                ! [ Navigation.newUrl (Route.urlFor Projects) ]
-
-        CreateProjectFailed error ->
-            model ! [] |> andLog "Create Project failed" error
-
-        DeleteProject project ->
-            model ! [ API.deleteProject model project DeleteProjectFailed DeleteProjectSucceeded ]
-
-        DeleteProjectFailed error ->
-            model ! [] |> andLog "Delete Project failed" error
-
-        DeleteProjectSucceeded project ->
-            model ! [ API.fetchProjects model (always NoOp) GotProjects ]
-
-        GotProject project ->
-            { model | shownProject = Just project } ! []
-
-        ReorderProjects field ->
-            reorderProjects field model ! []
-
-        SetShownProjectName name ->
-            case model.shownProject of
-                Nothing ->
-                    model ! []
-
-                Just project ->
-                    let
-                        updatedProject =
-                            { project | name = name }
-                    in
-                        { model | shownProject = (Just updatedProject) } ! []
-
-        UpdateShownProject ->
-            case model.shownProject of
-                Nothing ->
-                    model ! []
-
-                Just shownProject ->
-                    model ! [ API.updateProject model shownProject UpdateProjectFailed UpdateProjectSucceeded ]
-
-        UpdateProjectFailed error ->
-            model ! [] |> andLog "Update Project failed" error
-
-        UpdateProjectSucceeded project ->
-            case project.id of
-                Nothing ->
-                    { model | shownProject = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.Projects ]
-
-                Just id ->
-                    { model | shownProject = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowProject id ]
+        ProjectMsg' msg ->
+            updateProjectMsg msg model
 
         NoOp ->
             model ! []
@@ -251,6 +188,76 @@ updateUserMsg msg model =
 
                 Just id ->
                     { model | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowUser id ]
+
+
+updateProjectMsg : ProjectMsg -> Model -> ( Model, Cmd Msg )
+updateProjectMsg msg model =
+    case msg of
+        GotProjects projects ->
+            { model | projects = projects } ! []
+
+        SetNewProjectName name ->
+            let
+                oldNewProject =
+                    model.newProject
+            in
+                { model | newProject = { oldNewProject | name = name } } ! []
+
+        CreateProject ->
+            model ! [ API.createProject model model.newProject (ProjectMsg' << CreateProjectFailed) (ProjectMsg' << CreateProjectSucceeded) ]
+
+        CreateProjectSucceeded _ ->
+            { model | newProject = Project Nothing "" }
+                ! [ Navigation.newUrl (Route.urlFor Projects) ]
+
+        CreateProjectFailed error ->
+            model ! [] |> andLog "Create Project failed" error
+
+        DeleteProject project ->
+            model ! [ API.deleteProject model project (ProjectMsg' << DeleteProjectFailed) (ProjectMsg' << DeleteProjectSucceeded) ]
+
+        DeleteProjectFailed error ->
+            model ! [] |> andLog "Delete Project failed" error
+
+        DeleteProjectSucceeded project ->
+            model ! [ API.fetchProjects model (always NoOp) (ProjectMsg' << GotProjects) ]
+
+        GotProject project ->
+            { model | shownProject = Just project } ! []
+
+        ReorderProjects field ->
+            reorderProjects field model ! []
+
+        SetShownProjectName name ->
+            case model.shownProject of
+                Nothing ->
+                    model ! []
+
+                Just project ->
+                    let
+                        updatedProject =
+                            { project | name = name }
+                    in
+                        { model | shownProject = (Just updatedProject) } ! []
+
+        UpdateProject ->
+            case model.shownProject of
+                Nothing ->
+                    model ! []
+
+                Just shownProject ->
+                    model ! [ API.updateProject model shownProject (ProjectMsg' << UpdateProjectFailed) (ProjectMsg' << UpdateProjectSucceeded) ]
+
+        UpdateProjectFailed error ->
+            model ! [] |> andLog "Update Project failed" error
+
+        UpdateProjectSucceeded project ->
+            case project.id of
+                Nothing ->
+                    { model | shownProject = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.Projects ]
+
+                Just id ->
+                    { model | shownProject = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowProject id ]
 
 
 projectSortableFieldFun : ProjectSortableField -> (Project -> String)

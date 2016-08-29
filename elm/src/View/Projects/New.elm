@@ -2,7 +2,7 @@ module View.Projects.New exposing (view)
 
 import Model exposing (Model)
 import Types exposing (Project)
-import Msg exposing (Msg(..))
+import Msg exposing (Msg(..), ProjectMsg(..))
 import Route exposing (Location(..))
 import Html exposing (Html, text, div, form, a)
 import Html.Attributes exposing (href)
@@ -34,7 +34,7 @@ nameField model =
         , Textfield.floatingLabel
         , Textfield.text'
         , Textfield.value model.newProject.name
-        , Textfield.onInput SetNewProjectName
+        , Textfield.onInput <| ProjectMsg' << SetNewProjectName
         ]
 
 
@@ -46,7 +46,7 @@ submitButton model =
         [ Button.raised
         , Button.ripple
         , Button.colored
-        , Button.onClick CreateNewProject
+        , Button.onClick <| ProjectMsg' CreateProject
         ]
         [ text "Submit" ]
 

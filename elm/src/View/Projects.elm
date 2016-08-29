@@ -2,7 +2,7 @@ module View.Projects exposing (view, header)
 
 import Model exposing (Model)
 import Types exposing (Project, ProjectSortableField(..), Sorted(..))
-import Msg exposing (Msg(..))
+import Msg exposing (Msg(..), ProjectMsg(..))
 import Route exposing (Location(..))
 import Html exposing (Html, text, div, a, img, span)
 import Html.Attributes exposing (href, src, style)
@@ -85,7 +85,7 @@ deleteButton model index project =
         [ Button.minifab
         , Button.colored
         , Button.ripple
-        , Button.onClick <| DeleteProject project
+        , Button.onClick <| ProjectMsg' <| DeleteProject project
         ]
         [ Icon.i "delete" ]
 
@@ -110,7 +110,7 @@ editButton model index project =
 
 thOptions : ProjectSortableField -> Model -> List (Options.Property (Util.MaterialTableHeader Msg) Msg)
 thOptions sortableField model =
-    [ Table.onClick (ReorderProjects sortableField)
+    [ Table.onClick <| ProjectMsg' <| ReorderProjects sortableField
     , Options.css "cursor" "pointer"
     ]
         ++ case model.projectsSort of

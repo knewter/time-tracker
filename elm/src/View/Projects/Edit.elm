@@ -2,7 +2,7 @@ module View.Projects.Edit exposing (view, header)
 
 import Model exposing (Model)
 import Types exposing (Project)
-import Msg exposing (Msg(..))
+import Msg exposing (Msg(..), ProjectMsg(..))
 import Html exposing (Html, text, h2, div, a, span)
 import Html.Attributes exposing (href)
 import Material.Button as Button
@@ -40,7 +40,7 @@ nameField model =
         , Textfield.floatingLabel
         , Textfield.text'
         , Textfield.value <| Maybe.withDefault "" <| Maybe.map .name model.shownProject
-        , Textfield.onInput SetShownProjectName
+        , Textfield.onInput <| ProjectMsg' << SetShownProjectName
         ]
 
 
@@ -52,7 +52,7 @@ submitButton model =
         [ Button.raised
         , Button.ripple
         , Button.colored
-        , Button.onClick UpdateShownProject
+        , Button.onClick <| ProjectMsg' UpdateProject
         ]
         [ text "Submit" ]
 
