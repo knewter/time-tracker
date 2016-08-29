@@ -42,7 +42,7 @@ update msg model =
                 { model | newUser = { oldNewUser | name = name } } ! []
 
         CreateNewUser ->
-            model ! [ API.createUser model.newUser model ]
+            model ! [ API.createUser model model.newUser CreateUserFailed CreateUserSucceeded ]
 
         CreateUserSucceeded _ ->
             { model | newUser = User Nothing "" }
@@ -60,7 +60,7 @@ update msg model =
                 _ =
                     Debug.log "Deleting user: " user
             in
-                model ! [ API.deleteUser user model ]
+                model ! [ API.deleteUser model user DeleteUserFailed DeleteUserSucceeded ]
 
         DeleteUserFailed error ->
             let
@@ -70,7 +70,7 @@ update msg model =
                 model ! []
 
         DeleteUserSucceeded user ->
-            model ! [ API.fetchUsers model ]
+            model ! [ API.fetchUsers model (always NoOp) GotUsers ]
 
         GotUser user ->
             { model | shownUser = Just user } ! []
@@ -96,7 +96,7 @@ update msg model =
                     model ! []
 
                 Just shownUser ->
-                    model ! [ API.updateUser shownUser model ]
+                    model ! [ API.updateUser model shownUser UpdateUserFailed UpdateUserSucceeded ]
 
         UpdateUserFailed error ->
             let
@@ -124,7 +124,7 @@ update msg model =
                 { model | newProject = { oldNewProject | name = name } } ! []
 
         CreateNewProject ->
-            model ! [ API.createProject model.newProject model ]
+            model ! [ API.createProject model model.newProject CreateProjectFailed CreateProjectSucceeded ]
 
         CreateProjectSucceeded _ ->
             { model | newProject = Project Nothing "" }
@@ -142,7 +142,7 @@ update msg model =
                 _ =
                     Debug.log "Deleting project: " project
             in
-                model ! [ API.deleteProject project model ]
+                model ! [ API.deleteProject model project DeleteProjectFailed DeleteProjectSucceeded ]
 
         DeleteProjectFailed error ->
             let
@@ -152,7 +152,7 @@ update msg model =
                 model ! []
 
         DeleteProjectSucceeded project ->
-            model ! [ API.fetchProjects model ]
+            model ! [ API.fetchProjects model (always NoOp) GotProjects ]
 
         GotProject project ->
             { model | shownProject = Just project } ! []
@@ -178,7 +178,7 @@ update msg model =
                     model ! []
 
                 Just shownProject ->
-                    model ! [ API.updateProject shownProject model ]
+                    model ! [ API.updateProject model shownProject UpdateProjectFailed UpdateProjectSucceeded ]
 
         UpdateProjectFailed error ->
             let

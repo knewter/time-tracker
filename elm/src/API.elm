@@ -23,20 +23,20 @@ import Json.Encode as JE
 import Json.Decode as JD exposing ((:=))
 
 
-fetchUsers : Model -> Cmd Msg
-fetchUsers model =
+fetchUsers : Model -> (Http.Error -> Msg) -> (List User -> Msg) -> Cmd Msg
+fetchUsers model errorMsg msg =
     Http.get ("data" := Decoders.usersDecoder) (model.baseUrl ++ "/users")
-        |> Task.perform (always (GotUsers [])) GotUsers
+        |> Task.perform errorMsg msg
 
 
-fetchUser : Int -> Model -> Cmd Msg
-fetchUser id model =
+fetchUser : Model -> Int -> (Http.Error -> Msg) -> (User -> Msg) -> Cmd Msg
+fetchUser model id errorMsg msg =
     Http.get ("data" := Decoders.userDecoder) (model.baseUrl ++ "/users/" ++ (toString id))
-        |> Task.perform (always NoOp) GotUser
+        |> Task.perform errorMsg msg
 
 
-createUser : User -> Model -> Cmd Msg
-createUser user model =
+createUser : Model -> User -> (Http.Error -> Msg) -> (User -> Msg) -> Cmd Msg
+createUser model user errorMsg msg =
     Http.send Http.defaultSettings
         { verb = "POST"
         , url = model.baseUrl ++ "/users"
@@ -44,11 +44,11 @@ createUser user model =
         , headers = [ ( "Content-Type", "application/json" ) ]
         }
         |> Http.fromJson ("data" := Decoders.userDecoder)
-        |> Task.perform CreateUserFailed CreateUserSucceeded
+        |> Task.perform errorMsg msg
 
 
-deleteUser : User -> Model -> Cmd Msg
-deleteUser user model =
+deleteUser : Model -> User -> (Http.RawError -> Msg) -> (User -> Msg) -> Cmd Msg
+deleteUser model user errorMsg msg =
     case user.id of
         Nothing ->
             Cmd.none
@@ -60,11 +60,11 @@ deleteUser user model =
                 , body = Http.empty
                 , headers = [ ( "Content-Type", "application/json" ) ]
                 }
-                |> Task.perform DeleteUserFailed (always <| DeleteUserSucceeded user)
+                |> Task.perform errorMsg (always <| msg user)
 
 
-updateUser : User -> Model -> Cmd Msg
-updateUser user model =
+updateUser : Model -> User -> (Http.Error -> Msg) -> (User -> Msg) -> Cmd Msg
+updateUser model user errorMsg msg =
     case user.id of
         Nothing ->
             Cmd.none
@@ -77,7 +77,7 @@ updateUser user model =
                 , headers = [ ( "Content-Type", "application/json" ) ]
                 }
                 |> Http.fromJson ("data" := Decoders.userDecoder)
-                |> Task.perform UpdateUserFailed UpdateUserSucceeded
+                |> Task.perform errorMsg msg
 
 
 encodeUser : User -> JE.Value
@@ -91,20 +91,20 @@ encodeUser user =
         ]
 
 
-fetchProjects : Model -> Cmd Msg
-fetchProjects model =
+fetchProjects : Model -> (Http.Error -> Msg) -> (List Project -> Msg) -> Cmd Msg
+fetchProjects model errorMsg msg =
     Http.get ("data" := Decoders.projectsDecoder) (model.baseUrl ++ "/projects")
-        |> Task.perform (always (GotProjects [])) GotProjects
+        |> Task.perform errorMsg msg
 
 
-fetchProject : Int -> Model -> Cmd Msg
-fetchProject id model =
+fetchProject : Model -> Int -> (Http.Error -> Msg) -> (Project -> Msg) -> Cmd Msg
+fetchProject model id errorMsg msg =
     Http.get ("data" := Decoders.projectDecoder) (model.baseUrl ++ "/projects/" ++ (toString id))
-        |> Task.perform (always NoOp) GotProject
+        |> Task.perform errorMsg msg
 
 
-createProject : Project -> Model -> Cmd Msg
-createProject project model =
+createProject : Model -> Project -> (Http.Error -> Msg) -> (Project -> Msg) -> Cmd Msg
+createProject model project errorMsg msg =
     Http.send Http.defaultSettings
         { verb = "POST"
         , url = model.baseUrl ++ "/projects"
@@ -112,11 +112,11 @@ createProject project model =
         , headers = [ ( "Content-Type", "application/json" ) ]
         }
         |> Http.fromJson ("data" := Decoders.projectDecoder)
-        |> Task.perform CreateProjectFailed CreateProjectSucceeded
+        |> Task.perform errorMsg msg
 
 
-deleteProject : Project -> Model -> Cmd Msg
-deleteProject project model =
+deleteProject : Model -> Project -> (Http.RawError -> Msg) -> (Project -> Msg) -> Cmd Msg
+deleteProject model project errorMsg msg =
     case project.id of
         Nothing ->
             Cmd.none
@@ -128,11 +128,11 @@ deleteProject project model =
                 , body = Http.empty
                 , headers = [ ( "Content-Type", "application/json" ) ]
                 }
-                |> Task.perform DeleteProjectFailed (always <| DeleteProjectSucceeded project)
+                |> Task.perform errorMsg (always <| msg project)
 
 
-updateProject : Project -> Model -> Cmd Msg
-updateProject project model =
+updateProject : Model -> Project -> (Http.Error -> Msg) -> (Project -> Msg) -> Cmd Msg
+updateProject model project errorMsg msg =
     case project.id of
         Nothing ->
             Cmd.none
@@ -145,7 +145,7 @@ updateProject project model =
                 , headers = [ ( "Content-Type", "application/json" ) ]
                 }
                 |> Http.fromJson ("data" := Decoders.projectDecoder)
-                |> Task.perform UpdateProjectFailed UpdateProjectSucceeded
+                |> Task.perform errorMsg msg
 
 
 encodeProject : Project -> JE.Value
