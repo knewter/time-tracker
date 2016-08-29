@@ -31,12 +31,12 @@ view model =
             , Layout.fixedDrawer
             ]
             { header = header model
-            , drawer = viewDrawer model
+            , drawer = drawer model
             , tabs = ( [], [] )
             , main =
                 [ div
                     [ style [ ( "padding", "1rem" ) ] ]
-                    [ viewBody model
+                    [ body model
                     , Snackbar.view model.snackbar |> App.map Snackbar
                     ]
                 ]
@@ -80,22 +80,22 @@ menuItems =
     , { text = "Timesheets", iconName = "event", route = Nothing }
     , { text = "Reports", iconName = "list", route = Nothing }
     , { text = "Organizations", iconName = "store", route = Nothing }
-    , { text = "Project", iconName = "view_list", route = Nothing }
+    , { text = "Projects", iconName = "view_list", route = Nothing }
     ]
 
 
-viewDrawer : Model -> List (Html Msg)
-viewDrawer model =
+drawer : Model -> List (Html Msg)
+drawer model =
     [ Layout.title []
         [ text "Time Tracker" ]
     , Layout.navigation
         [ Options.css "flex-grow" "1" ]
-        (List.map (viewDrawerMenuItem model) menuItems)
+        (List.map (drawerMenuItem model) menuItems)
     ]
 
 
-viewDrawerMenuItem : Model -> MenuItem -> Html Msg
-viewDrawerMenuItem model menuItem =
+drawerMenuItem : Model -> MenuItem -> Html Msg
+drawerMenuItem model menuItem =
     Layout.link
         [ Layout.onClick (NavigateTo menuItem.route)
         , (Color.text <| Color.accent) `when` (model.route == menuItem.route)
@@ -112,8 +112,8 @@ viewDrawerMenuItem model menuItem =
         ]
 
 
-viewBody : Model -> Html Msg
-viewBody model =
+body : Model -> Html Msg
+body model =
     let
         _ =
             Debug.log "model: " model
