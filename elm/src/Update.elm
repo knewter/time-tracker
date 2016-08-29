@@ -113,8 +113,8 @@ update msg model =
                 Just id ->
                     { model | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowUser id ]
 
-        GotProjects users ->
-            { model | users = users } ! []
+        GotProjects projects ->
+            { model | projects = projects } ! []
 
         SetNewProjectName name ->
             let
@@ -137,12 +137,12 @@ update msg model =
             in
                 model ! []
 
-        DeleteProject user ->
+        DeleteProject project ->
             let
                 _ =
-                    Debug.log "Deleting user: " user
+                    Debug.log "Deleting project: " project
             in
-                model ! [ API.deleteProject user model ]
+                model ! [ API.deleteProject project model ]
 
         DeleteProjectFailed error ->
             let
@@ -151,11 +151,11 @@ update msg model =
             in
                 model ! []
 
-        DeleteProjectSucceeded user ->
+        DeleteProjectSucceeded project ->
             model ! [ API.fetchProjects model ]
 
-        GotProject user ->
-            { model | shownProject = Just user } ! []
+        GotProject project ->
+            { model | shownProject = Just project } ! []
 
         ReorderProjects field ->
             reorderProjects field model ! []
@@ -165,10 +165,10 @@ update msg model =
                 Nothing ->
                     model ! []
 
-                Just user ->
+                Just project ->
                     let
                         updatedProject =
-                            { user | name = name }
+                            { project | name = name }
                     in
                         { model | shownProject = (Just updatedProject) } ! []
 
@@ -187,8 +187,8 @@ update msg model =
             in
                 model ! []
 
-        UpdateProjectSucceeded user ->
-            case user.id of
+        UpdateProjectSucceeded project ->
+            case project.id of
                 Nothing ->
                     { model | shownProject = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.Projects ]
 

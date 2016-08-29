@@ -20,6 +20,15 @@ cmdsForModelRoute model =
         Just (EditUser id) ->
             [ API.fetchUser id model ]
 
+        Just Projects ->
+            [ API.fetchProjects model ]
+
+        Just (ShowProject id) ->
+            [ API.fetchProject id model ]
+
+        Just (EditProject id) ->
+            [ API.fetchProject id model ]
+
         _ ->
             []
 
