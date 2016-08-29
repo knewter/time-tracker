@@ -2,7 +2,7 @@ module View.Users.Show exposing (view, header)
 
 import Model exposing (Model)
 import Types exposing (User)
-import Msg exposing (Msg(..))
+import Msg exposing (Msg(..), UserMsg(..))
 import Html exposing (Html, text, h2, div, a, span)
 import Html.Attributes exposing (href)
 import Route exposing (Location(..))

@@ -1,7 +1,7 @@
 module Update exposing (update)
 
 import Model exposing (Model)
-import Msg exposing (Msg(..))
+import Msg exposing (Msg(..), UserMsg(..))
 import Types exposing (User, UserSortableField(..), Sorted(..), Project, ProjectSortableField(..))
 import Material
 import Material.Snackbar as Snackbar
@@ -31,71 +31,8 @@ update msg model =
                 Just location ->
                     model ! [ Navigation.newUrl (Route.urlFor location) ]
 
-        GotUsers users ->
-            { model | users = users } ! []
-
-        SetNewUserName name ->
-            let
-                oldNewUser =
-                    model.newUser
-            in
-                { model | newUser = { oldNewUser | name = name } } ! []
-
-        CreateNewUser ->
-            model ! [ API.createUser model model.newUser CreateUserFailed CreateUserSucceeded ]
-
-        CreateUserSucceeded _ ->
-            { model | newUser = User Nothing "" }
-                ! [ Navigation.newUrl (Route.urlFor Users) ]
-
-        CreateUserFailed error ->
-            model ! [] |> andLog "Create User failed" error
-
-        DeleteUser user ->
-            model ! [ API.deleteUser model user DeleteUserFailed DeleteUserSucceeded ]
-
-        DeleteUserFailed error ->
-            model ! [] |> andLog "Delete User failed" error
-
-        DeleteUserSucceeded user ->
-            model ! [ API.fetchUsers model (always NoOp) GotUsers ]
-
-        GotUser user ->
-            { model | shownUser = Just user } ! []
-
-        ReorderUsers field ->
-            reorderUsers field model ! []
-
-        SetShownUserName name ->
-            case model.shownUser of
-                Nothing ->
-                    model ! []
-
-                Just user ->
-                    let
-                        updatedUser =
-                            { user | name = name }
-                    in
-                        { model | shownUser = (Just updatedUser) } ! []
-
-        UpdateShownUser ->
-            case model.shownUser of
-                Nothing ->
-                    model ! []
-
-                Just shownUser ->
-                    model ! [ API.updateUser model shownUser UpdateUserFailed UpdateUserSucceeded ]
-
-        UpdateUserFailed error ->
-            model ! [] |> andLog "Update User failed" error
-
-        UpdateUserSucceeded user ->
-            case user.id of
-                Nothing ->
-                    { model | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.Users ]
-
-                Just id ->
-                    { model | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowUser id ]
+        UserMsg' msg ->
+            updateUserMsg msg model
 
         GotProjects projects ->
             { model | projects = projects } ! []
@@ -244,6 +181,76 @@ reorderProjects sortableField model =
                             | projectsSort = Just ( Ascending, sortableField )
                             , projects = List.sortBy fun model.projects
                         }
+
+
+updateUserMsg : UserMsg -> Model -> ( Model, Cmd Msg )
+updateUserMsg msg model =
+    case msg of
+        GotUsers users ->
+            { model | users = users } ! []
+
+        SetNewUserName name ->
+            let
+                oldNewUser =
+                    model.newUser
+            in
+                { model | newUser = { oldNewUser | name = name } } ! []
+
+        CreateUser ->
+            model ! [ API.createUser model model.newUser (UserMsg' << CreateUserFailed) (UserMsg' << CreateUserSucceeded) ]
+
+        CreateUserSucceeded _ ->
+            { model | newUser = User Nothing "" }
+                ! [ Navigation.newUrl (Route.urlFor Users) ]
+
+        CreateUserFailed error ->
+            model ! [] |> andLog "Create User failed" error
+
+        DeleteUser user ->
+            model ! [ API.deleteUser model user (UserMsg' << DeleteUserFailed) (UserMsg' << DeleteUserSucceeded) ]
+
+        DeleteUserFailed error ->
+            model ! [] |> andLog "Delete User failed" error
+
+        DeleteUserSucceeded user ->
+            model ! [ API.fetchUsers model (always NoOp) (UserMsg' << GotUsers) ]
+
+        GotUser user ->
+            { model | shownUser = Just user } ! []
+
+        ReorderUsers field ->
+            reorderUsers field model ! []
+
+        SetShownUserName name ->
+            case model.shownUser of
+                Nothing ->
+                    model ! []
+
+                Just user ->
+                    let
+                        updatedUser =
+                            { user | name = name }
+                    in
+                        { model | shownUser = (Just updatedUser) } ! []
+
+        UpdateUser ->
+            case model.shownUser of
+                Nothing ->
+                    model ! []
+
+                Just shownUser ->
+                    model ! [ API.updateUser model shownUser (UserMsg' << UpdateUserFailed) (UserMsg' << UpdateUserSucceeded) ]
+
+        UpdateUserFailed error ->
+            model ! [] |> andLog "Update User failed" error
+
+        UpdateUserSucceeded user ->
+            case user.id of
+                Nothing ->
+                    { model | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.Users ]
+
+                Just id ->
+                    { model | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowUser id ]
 
 
 projectSortableFieldFun : ProjectSortableField -> (Project -> String)

@@ -2,7 +2,7 @@ module View.Users.New exposing (view)
 
 import Model exposing (Model)
 import Types exposing (User)
-import Msg exposing (Msg(..))
+import Msg exposing (Msg(..), UserMsg(..))
 import Route exposing (Location(..))
 import Html exposing (Html, text, div, form, a)
 import Html.Attributes exposing (href)
@@ -34,7 +34,7 @@ nameField model =
         , Textfield.floatingLabel
         , Textfield.text'
         , Textfield.value model.newUser.name
-        , Textfield.onInput SetNewUserName
+        , Textfield.onInput <| UserMsg' << SetNewUserName
         ]
 
 
@@ -46,7 +46,7 @@ submitButton model =
         [ Button.raised
         , Button.ripple
         , Button.colored
-        , Button.onClick CreateNewUser
+        , Button.onClick <| UserMsg' CreateUser
         ]
         [ text "Submit" ]
 

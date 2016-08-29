@@ -2,7 +2,7 @@ module View.Users exposing (view, header)
 
 import Model exposing (Model)
 import Types exposing (User, UserSortableField(..), Sorted(..))
-import Msg exposing (Msg(..))
+import Msg exposing (Msg(..), UserMsg(..))
 import Route exposing (Location(..))
 import Html exposing (Html, text, div, a, img, span)
 import Html.Attributes exposing (href, src, style)
@@ -103,7 +103,7 @@ deleteButton model index user =
         [ Button.minifab
         , Button.colored
         , Button.ripple
-        , Button.onClick <| DeleteUser user
+        , Button.onClick <| UserMsg' <| DeleteUser user
         ]
         [ Icon.i "delete" ]
 
@@ -128,7 +128,7 @@ editButton model index user =
 
 thOptions : UserSortableField -> Model -> List (Options.Property (Util.MaterialTableHeader Msg) Msg)
 thOptions sortableField model =
-    [ Table.onClick (ReorderUsers sortableField)
+    [ Table.onClick <| UserMsg' <| ReorderUsers sortableField
     , Options.css "cursor" "pointer"
     ]
         ++ case model.usersSort of
