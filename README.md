@@ -6,7 +6,10 @@ ultimately provide a basic, quasi-full-featured time tracker application
 frontend in Elm.
 
 This is a project built with detailed explanations along the way, and
-incrementally, in the [DailyDrip](http://dailydrip.com) Elm topic.
+incrementally, in the [DailyDrip](http://dailydrip.com) Elm topic.  Here it is
+in action:
+
+![Example](https://raw.github.com/knewter/time-tracker/master/resources/TimeTrackerWalkthrough.gif)
 
 ## Detailed walkthroughs
 
