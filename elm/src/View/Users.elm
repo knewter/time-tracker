@@ -4,14 +4,14 @@ import Model exposing (Model)
 import Types exposing (User, UserSortableField(..), Sorted(..))
 import Msg exposing (Msg(..))
 import Route exposing (Location(..))
-import Html exposing (Html, text, div, a, img)
+import Html exposing (Html, text, div, a, img, span)
 import Html.Attributes exposing (href, src, style)
 import Material.List as List
 import Material.Button as Button
 import Material.Icon as Icon
 import Material.Table as Table
 import Material.Options as Options
-import Json.Decode as JD
+import Material.Layout as Layout
 
 
 view : Model -> Html Msg
@@ -125,6 +125,7 @@ editButton model index user =
                 [ Icon.i "edit" ]
 
 
+thOptions : UserSortableField -> Model -> List (Options.Property (Header Msg) Msg)
 thOptions sortableField model =
     [ Table.onClick (ReorderUsers sortableField)
     , Options.css "cursor" "pointer"
@@ -145,3 +146,16 @@ thOptions sortableField model =
 
                     False ->
                         []
+
+
+
+{- This is just so that we can annotate our thOptions function - I wish it
+   were exposed from Material.Table.  https://github.com/debois/elm-mdl/blob/7.5.0/src/Material/Table.elm#L178
+-}
+
+
+type alias Header m =
+    { numeric : Bool
+    , sorted : Maybe Table.Order
+    , onClick : Maybe (Html.Attribute m)
+    }

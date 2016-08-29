@@ -29,7 +29,7 @@ view model =
             [ Layout.fixedHeader
             , Layout.fixedDrawer
             ]
-            { header = [ viewHeader model ]
+            { header = header model
             , drawer = viewDrawer model
             , tabs = ( [], [] )
             , main =
@@ -42,32 +42,14 @@ view model =
             }
 
 
-viewHeader : Model -> Html Msg
-viewHeader model =
+header : Model -> List (Html Msg)
+header model =
     case model.route of
-        Just Users ->
-            Layout.row
-                []
-                [ Layout.title [] [ text "Users" ]
-                , Layout.spacer
-                , Layout.navigation []
-                    [ Layout.link
-                        [ Layout.href "https://github.com/knewter/time-tracker" ]
-                        [ span [] [ text "github" ] ]
-                    ]
-                ]
+        Just route ->
+            defaultHeader model <| routeHeaderText route
 
-        _ ->
-            Layout.row
-                []
-                [ Layout.title [] [ text "Time Tracker" ]
-                , Layout.spacer
-                , Layout.navigation []
-                    [ Layout.link
-                        [ Layout.href "https://github.com/knewter/time-tracker" ]
-                        [ span [] [ text "github" ] ]
-                    ]
-                ]
+        Nothing ->
+            defaultHeader model "Time Tracker"
 
 
 type alias MenuItem =
@@ -141,3 +123,31 @@ viewBody model =
 
             Nothing ->
                 text "404"
+
+
+defaultHeader : Model -> String -> List (Html Msg)
+defaultHeader model headerText =
+    [ Layout.row
+        []
+        [ Layout.title [] [ text headerText ]
+        , Layout.spacer
+        , Layout.navigation []
+            [ Layout.link
+                [ Layout.href "https://github.com/knewter/time-tracker" ]
+                [ span [] [ text "github" ] ]
+            ]
+        ]
+    ]
+
+
+routeHeaderText : Location -> String
+routeHeaderText route =
+    case route of
+        Home ->
+            "Dashboard"
+
+        Users ->
+            "Users"
+
+        _ ->
+            "Time Tracker"
