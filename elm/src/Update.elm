@@ -49,25 +49,13 @@ update msg model =
                 ! [ Navigation.newUrl (Route.urlFor Users) ]
 
         CreateUserFailed error ->
-            let
-                _ =
-                    Debug.log "Create User failed: " error
-            in
-                model ! []
+            model ! [] |> andLog "Create User failed" error
 
         DeleteUser user ->
-            let
-                _ =
-                    Debug.log "Deleting user: " user
-            in
-                model ! [ API.deleteUser model user DeleteUserFailed DeleteUserSucceeded ]
+            model ! [ API.deleteUser model user DeleteUserFailed DeleteUserSucceeded ]
 
         DeleteUserFailed error ->
-            let
-                _ =
-                    Debug.log "Delete User failed: " error
-            in
-                model ! []
+            model ! [] |> andLog "Delete User failed" error
 
         DeleteUserSucceeded user ->
             model ! [ API.fetchUsers model (always NoOp) GotUsers ]
@@ -99,11 +87,7 @@ update msg model =
                     model ! [ API.updateUser model shownUser UpdateUserFailed UpdateUserSucceeded ]
 
         UpdateUserFailed error ->
-            let
-                _ =
-                    Debug.log "Update User failed: " error
-            in
-                model ! []
+            model ! [] |> andLog "Update User failed" error
 
         UpdateUserSucceeded user ->
             case user.id of
@@ -131,25 +115,13 @@ update msg model =
                 ! [ Navigation.newUrl (Route.urlFor Projects) ]
 
         CreateProjectFailed error ->
-            let
-                _ =
-                    Debug.log "Create Project failed: " error
-            in
-                model ! []
+            model ! [] |> andLog "Create Project failed" error
 
         DeleteProject project ->
-            let
-                _ =
-                    Debug.log "Deleting project: " project
-            in
-                model ! [ API.deleteProject model project DeleteProjectFailed DeleteProjectSucceeded ]
+            model ! [ API.deleteProject model project DeleteProjectFailed DeleteProjectSucceeded ]
 
         DeleteProjectFailed error ->
-            let
-                _ =
-                    Debug.log "Delete Project failed: " error
-            in
-                model ! []
+            model ! [] |> andLog "Delete Project failed" error
 
         DeleteProjectSucceeded project ->
             model ! [ API.fetchProjects model (always NoOp) GotProjects ]
@@ -181,11 +153,7 @@ update msg model =
                     model ! [ API.updateProject model shownProject UpdateProjectFailed UpdateProjectSucceeded ]
 
         UpdateProjectFailed error ->
-            let
-                _ =
-                    Debug.log "Update Project failed: " error
-            in
-                model ! []
+            model ! [] |> andLog "Update Project failed" error
 
         UpdateProjectSucceeded project ->
             case project.id of
@@ -283,3 +251,12 @@ projectSortableFieldFun sortableField =
     case sortableField of
         ProjectName ->
             .name
+
+
+andLog : String -> a -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+andLog tag value ( model, cmds ) =
+    let
+        _ =
+            Debug.log (tag ++ ": ") value
+    in
+        ( model, cmds )
