@@ -3,7 +3,7 @@ module Msg exposing (Msg(..))
 import Material
 import Material.Snackbar as Snackbar
 import Route
-import Types exposing (User, UserSortableField)
+import Types exposing (User, UserSortableField, Project, ProjectSortableField)
 import Http
 
 
@@ -14,15 +14,29 @@ type Msg
     | GotUsers (List User)
     | SetNewUserName String
     | CreateNewUser
-    | CreateSucceeded User
-    | CreateFailed Http.Error
+    | CreateUserSucceeded User
+    | CreateUserFailed Http.Error
     | DeleteUser User
-    | DeleteSucceeded User
-    | DeleteFailed Http.RawError
+    | DeleteUserSucceeded User
+    | DeleteUserFailed Http.RawError
     | GotUser User
     | ReorderUsers UserSortableField
     | SetShownUserName String
     | UpdateShownUser
-    | UpdateFailed Http.Error
-    | UpdateSucceeded User
+    | UpdateUserFailed Http.Error
+    | UpdateUserSucceeded User
+    | GotProjects (List Project)
+    | SetNewProjectName String
+    | CreateNewProject
+    | CreateProjectSucceeded Project
+    | CreateProjectFailed Http.Error
+    | DeleteProject Project
+    | DeleteProjectSucceeded Project
+    | DeleteProjectFailed Http.RawError
+    | GotProject Project
+    | ReorderProjects ProjectSortableField
+    | SetShownProjectName String
+    | UpdateShownProject
+    | UpdateProjectFailed Http.Error
+    | UpdateProjectSucceeded Project
     | NoOp

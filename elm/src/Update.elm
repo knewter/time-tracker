@@ -2,7 +2,7 @@ module Update exposing (update)
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
-import Types exposing (User, UserSortableField(..), Sorted(..))
+import Types exposing (User, UserSortableField(..), Sorted(..), Project, ProjectSortableField(..))
 import Material
 import Material.Snackbar as Snackbar
 import Navigation
@@ -44,11 +44,11 @@ update msg model =
         CreateNewUser ->
             model ! [ API.createUser model.newUser model ]
 
-        CreateSucceeded _ ->
+        CreateUserSucceeded _ ->
             { model | newUser = User Nothing "" }
                 ! [ Navigation.newUrl (Route.urlFor Users) ]
 
-        CreateFailed error ->
+        CreateUserFailed error ->
             let
                 _ =
                     Debug.log "Create User failed: " error
@@ -62,14 +62,14 @@ update msg model =
             in
                 model ! [ API.deleteUser user model ]
 
-        DeleteFailed error ->
+        DeleteUserFailed error ->
             let
                 _ =
                     Debug.log "Delete User failed: " error
             in
                 model ! []
 
-        DeleteSucceeded user ->
+        DeleteUserSucceeded user ->
             model ! [ API.fetchUsers model ]
 
         GotUser user ->
@@ -98,20 +98,102 @@ update msg model =
                 Just shownUser ->
                     model ! [ API.updateUser shownUser model ]
 
-        UpdateFailed error ->
+        UpdateUserFailed error ->
             let
                 _ =
-                    Debug.log "Create User failed: " error
+                    Debug.log "Update User failed: " error
             in
                 model ! []
 
-        UpdateSucceeded user ->
+        UpdateUserSucceeded user ->
             case user.id of
                 Nothing ->
                     { model | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.Users ]
 
                 Just id ->
                     { model | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowUser id ]
+
+        GotProjects users ->
+            { model | users = users } ! []
+
+        SetNewProjectName name ->
+            let
+                oldNewProject =
+                    model.newProject
+            in
+                { model | newProject = { oldNewProject | name = name } } ! []
+
+        CreateNewProject ->
+            model ! [ API.createProject model.newProject model ]
+
+        CreateProjectSucceeded _ ->
+            { model | newProject = Project Nothing "" }
+                ! [ Navigation.newUrl (Route.urlFor Projects) ]
+
+        CreateProjectFailed error ->
+            let
+                _ =
+                    Debug.log "Create Project failed: " error
+            in
+                model ! []
+
+        DeleteProject user ->
+            let
+                _ =
+                    Debug.log "Deleting user: " user
+            in
+                model ! [ API.deleteProject user model ]
+
+        DeleteProjectFailed error ->
+            let
+                _ =
+                    Debug.log "Delete Project failed: " error
+            in
+                model ! []
+
+        DeleteProjectSucceeded user ->
+            model ! [ API.fetchProjects model ]
+
+        GotProject user ->
+            { model | shownProject = Just user } ! []
+
+        ReorderProjects field ->
+            reorderProjects field model ! []
+
+        SetShownProjectName name ->
+            case model.shownProject of
+                Nothing ->
+                    model ! []
+
+                Just user ->
+                    let
+                        updatedProject =
+                            { user | name = name }
+                    in
+                        { model | shownProject = (Just updatedProject) } ! []
+
+        UpdateShownProject ->
+            case model.shownProject of
+                Nothing ->
+                    model ! []
+
+                Just shownProject ->
+                    model ! [ API.updateProject shownProject model ]
+
+        UpdateProjectFailed error ->
+            let
+                _ =
+                    Debug.log "Update Project failed: " error
+            in
+                model ! []
+
+        UpdateProjectSucceeded user ->
+            case user.id of
+                Nothing ->
+                    { model | shownProject = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.Projects ]
+
+                Just id ->
+                    { model | shownProject = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowProject id ]
 
         NoOp ->
             model ! []
@@ -156,5 +238,48 @@ reorderUsers sortableField model =
 userSortableFieldFun : UserSortableField -> (User -> String)
 userSortableFieldFun sortableField =
     case sortableField of
-        Name ->
+        UserName ->
+            .name
+
+
+reorderProjects : ProjectSortableField -> Model -> Model
+reorderProjects sortableField model =
+    let
+        fun =
+            projectSortableFieldFun sortableField
+    in
+        case model.projectsSort of
+            Nothing ->
+                { model
+                    | projectsSort = Just ( Ascending, sortableField )
+                    , projects = List.sortBy fun model.projects
+                }
+
+            Just ( sortOrder, currentSortableField ) ->
+                case currentSortableField == sortableField of
+                    True ->
+                        case sortOrder of
+                            Ascending ->
+                                { model
+                                    | projectsSort = Just ( Descending, sortableField )
+                                    , projects = List.sortBy fun model.projects |> List.reverse
+                                }
+
+                            Descending ->
+                                { model
+                                    | projectsSort = Just ( Ascending, sortableField )
+                                    , projects = List.sortBy fun model.projects
+                                }
+
+                    False ->
+                        { model
+                            | projectsSort = Just ( Ascending, sortableField )
+                            , projects = List.sortBy fun model.projects
+                        }
+
+
+projectSortableFieldFun : ProjectSortableField -> (Project -> String)
+projectSortableFieldFun sortableField =
+    case sortableField of
+        ProjectName ->
             .name

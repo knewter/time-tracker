@@ -19,6 +19,10 @@ import View.Users
 import View.Users.New
 import View.Users.Show
 import View.Users.Edit
+import View.Projects
+import View.Projects.New
+import View.Projects.Show
+import View.Projects.Edit
 import View.Helpers as Helpers
 
 
@@ -55,6 +59,15 @@ header model =
         Just Users ->
             View.Users.header model
 
+        Just (ShowProject id) ->
+            View.Projects.Show.header model id
+
+        Just (EditProject id) ->
+            View.Projects.Edit.header model id
+
+        Just Projects ->
+            View.Projects.header model
+
         Just Home ->
             Helpers.defaultHeaderWithGitHubLink model "Dashboard"
 
@@ -80,7 +93,7 @@ menuItems =
     , { text = "Timesheets", iconName = "event", route = Nothing }
     , { text = "Reports", iconName = "list", route = Nothing }
     , { text = "Organizations", iconName = "store", route = Nothing }
-    , { text = "Projects", iconName = "view_list", route = Nothing }
+    , { text = "Projects", iconName = "view_list", route = Just Projects }
     ]
 
 
@@ -133,6 +146,18 @@ body model =
 
             Just (Route.EditUser id) ->
                 View.Users.Edit.view model id
+
+            Just (Route.Projects) ->
+                View.Projects.view model
+
+            Just (Route.NewProject) ->
+                View.Projects.New.view model
+
+            Just (Route.ShowProject id) ->
+                View.Projects.Show.view model id
+
+            Just (Route.EditProject id) ->
+                View.Projects.Edit.view model id
 
             Nothing ->
                 text "404"
