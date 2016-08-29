@@ -37,7 +37,7 @@ defmodule TimeTrackerBackend.Web do
       import TimeTrackerBackend.Router.Helpers
       import TimeTrackerBackend.Gettext
 
-      alias TimeTrackerBackend.User
+      alias TimeTrackerBackend.{User, Project}
     end
   end
 

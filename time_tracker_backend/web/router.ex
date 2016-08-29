@@ -9,5 +9,6 @@ defmodule TimeTrackerBackend.Router do
     pipe_through :api
 
     resources "/users", UserController
+    resources "/projects", ProjectController, except: [:new, :edit]
   end
 end
