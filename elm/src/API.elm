@@ -10,11 +10,16 @@ module API
         , deleteProject
         , fetchProject
         , updateProject
+        , fetchOrganizations
+        , createOrganization
+        , deleteOrganization
+        , fetchOrganization
+        , updateOrganization
         )
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
-import Types exposing (User, Project)
+import Types exposing (User, Project, Organization)
 import Http
 import Decoders
 import Json.Decode exposing ((:=))
@@ -110,6 +115,52 @@ encodeProject project =
         [ ( "project"
           , JE.object
                 [ ( "name", JE.string project.name )
+                ]
+          )
+        ]
+
+
+fetchOrganizations : Model -> (Http.Error -> Msg) -> (List Organization -> Msg) -> Cmd Msg
+fetchOrganizations model errorMsg msg =
+    get model "/organizations" Decoders.organizationsDecoder errorMsg msg
+
+
+fetchOrganization : Model -> Int -> (Http.Error -> Msg) -> (Organization -> Msg) -> Cmd Msg
+fetchOrganization model id errorMsg msg =
+    get model ("/organizations/" ++ (toString id)) Decoders.organizationDecoder errorMsg msg
+
+
+createOrganization : Model -> Organization -> (Http.Error -> Msg) -> (Organization -> Msg) -> Cmd Msg
+createOrganization model organization errorMsg msg =
+    post model "/organizations" (encodeOrganization organization) Decoders.organizationDecoder errorMsg msg
+
+
+deleteOrganization : Model -> Organization -> (Http.RawError -> Msg) -> (Organization -> Msg) -> Cmd Msg
+deleteOrganization model organization errorMsg msg =
+    case organization.id of
+        Nothing ->
+            Cmd.none
+
+        Just id ->
+            delete model ("/organizations/" ++ (toString id)) errorMsg (msg organization)
+
+
+updateOrganization : Model -> Organization -> (Http.Error -> Msg) -> (Organization -> Msg) -> Cmd Msg
+updateOrganization model organization errorMsg msg =
+    case organization.id of
+        Nothing ->
+            Cmd.none
+
+        Just id ->
+            put model ("/organizations/" ++ (toString id)) (encodeOrganization organization) Decoders.userDecoder errorMsg msg
+
+
+encodeOrganization : Organization -> JE.Value
+encodeOrganization organization =
+    JE.object
+        [ ( "organization"
+          , JE.object
+                [ ( "name", JE.string organization.name )
                 ]
           )
         ]

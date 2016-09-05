@@ -23,6 +23,10 @@ import View.Projects
 import View.Projects.New
 import View.Projects.Show
 import View.Projects.Edit
+import View.Organizations
+import View.Organizations.New
+import View.Organizations.Show
+import View.Organizations.Edit
 import View.Helpers as Helpers
 
 
@@ -68,6 +72,15 @@ header model =
         Just Projects ->
             View.Projects.header model
 
+        Just (ShowOrganization id) ->
+            View.Organizations.Show.header model id
+
+        Just (EditOrganization id) ->
+            View.Organizations.Edit.header model id
+
+        Just Organizations ->
+            View.Organizations.header model
+
         Just Home ->
             Helpers.defaultHeaderWithGitHubLink model "Dashboard"
 
@@ -92,7 +105,7 @@ menuItems =
     , { text = "Last Activity", iconName = "alarm", route = Nothing }
     , { text = "Timesheets", iconName = "event", route = Nothing }
     , { text = "Reports", iconName = "list", route = Nothing }
-    , { text = "Organizations", iconName = "store", route = Nothing }
+    , { text = "Organizations", iconName = "store", route = Just Organizations }
     , { text = "Projects", iconName = "view_list", route = Just Projects }
     ]
 
@@ -158,6 +171,18 @@ body model =
 
             Just (Route.EditProject id) ->
                 View.Projects.Edit.view model id
+
+            Just (Route.Organizations) ->
+                View.Organizations.view model
+
+            Just (Route.NewOrganization) ->
+                View.Organizations.New.view model
+
+            Just (Route.ShowOrganization id) ->
+                View.Organizations.Show.view model id
+
+            Just (Route.EditOrganization id) ->
+                View.Organizations.Edit.view model id
 
             Nothing ->
                 text "404"

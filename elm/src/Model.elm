@@ -4,7 +4,7 @@ import Msg exposing (Msg)
 import Material
 import Material.Snackbar as Snackbar
 import Route
-import Types exposing (User, Sorted, UserSortableField, Project, ProjectSortableField)
+import Types exposing (User, Sorted, UserSortableField, Project, ProjectSortableField, Organization, OrganizationSortableField)
 
 
 type alias Model =
@@ -20,6 +20,10 @@ type alias Model =
     , newProject : Project
     , shownProject : Maybe Project
     , projectsSort : Maybe ( Sorted, ProjectSortableField )
+    , organizations : List Organization
+    , newOrganization : Organization
+    , shownOrganization : Maybe Organization
+    , organizationsSort : Maybe ( Sorted, OrganizationSortableField )
     }
 
 
@@ -37,4 +41,8 @@ initialModel location =
     , newProject = Project Nothing ""
     , shownProject = Nothing
     , projectsSort = Nothing
+    , organizations = []
+    , newOrganization = Organization Nothing ""
+    , shownOrganization = Nothing
+    , organizationsSort = Nothing
     }

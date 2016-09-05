@@ -14,6 +14,10 @@ type Location
     | NewProject
     | ShowProject Int
     | EditProject Int
+    | Organizations
+    | NewOrganization
+    | ShowOrganization Int
+    | EditOrganization Int
 
 
 type alias Model =
@@ -56,6 +60,18 @@ urlFor loc =
 
                 EditProject id ->
                     "/projects/" ++ (toString id) ++ "/edit"
+
+                Organizations ->
+                    "/organizations"
+
+                NewOrganization ->
+                    "/organizations/new"
+
+                ShowOrganization id ->
+                    "/organizations/" ++ (toString id)
+
+                EditOrganization id ->
+                    "/organizations/" ++ (toString id) ++ "/edit"
     in
         "#" ++ url
 
@@ -109,6 +125,25 @@ locFor path =
                 String.toInt stringId
                     |> Result.toMaybe
                     |> Maybe.map EditProject
+
+            [ "organizations" ] ->
+                Just Organizations
+
+            [ "organizations", "new" ] ->
+                Just NewOrganization
+
+            [ "organizations", stringId ] ->
+                case String.toInt stringId of
+                    Ok id ->
+                        Just (ShowOrganization id)
+
+                    Err _ ->
+                        Nothing
+
+            [ "organizations", stringId, "edit" ] ->
+                String.toInt stringId
+                    |> Result.toMaybe
+                    |> Maybe.map EditOrganization
 
             _ ->
                 Nothing

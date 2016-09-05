@@ -3,7 +3,7 @@ module Util exposing (cmdsForModelRoute, MaterialTableHeader)
 import Route exposing (Location(..))
 import API
 import Model exposing (Model)
-import Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..))
+import Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..), OrganizationMsg(..))
 import Material.Table as Table
 import Html exposing (Html)
 
@@ -28,6 +28,15 @@ cmdsForModelRoute model =
 
         Just (EditProject id) ->
             [ API.fetchProject model id (always NoOp) <| ProjectMsg' << GotProject ]
+
+        Just Organizations ->
+            [ API.fetchOrganizations model (always NoOp) <| OrganizationMsg' << GotOrganizations ]
+
+        Just (ShowOrganization id) ->
+            [ API.fetchOrganization model id (always NoOp) <| OrganizationMsg' << GotOrganization ]
+
+        Just (EditOrganization id) ->
+            [ API.fetchOrganization model id (always NoOp) <| OrganizationMsg' << GotOrganization ]
 
         _ ->
             []
