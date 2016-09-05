@@ -1,4 +1,13 @@
-module Types exposing (User, UserSortableField(..), Sorted(..), Project, ProjectSortableField(..))
+module Types
+    exposing
+        ( User
+        , UserSortableField(..)
+        , Sorted(..)
+        , Project
+        , ProjectSortableField(..)
+        , Organization
+        , OrganizationSortableField(..)
+        )
 
 
 type alias User =
@@ -13,12 +22,22 @@ type alias Project =
     }
 
 
+type alias Organization =
+    { id : Maybe Int
+    , name : String
+    }
+
+
 type UserSortableField
     = UserName
 
 
 type ProjectSortableField
     = ProjectName
+
+
+type OrganizationSortableField
+    = OrganizationName
 
 
 type Sorted

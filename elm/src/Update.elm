@@ -1,8 +1,8 @@
 module Update exposing (update)
 
 import Model exposing (Model)
-import Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..))
-import Types exposing (User, UserSortableField(..), Sorted(..), Project, ProjectSortableField(..))
+import Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..), OrganizationMsg(..))
+import Types exposing (User, UserSortableField(..), Sorted(..), Project, ProjectSortableField(..), Organization, OrganizationSortableField(..))
 import Material
 import Material.Snackbar as Snackbar
 import Navigation
@@ -36,6 +36,9 @@ update msg model =
 
         ProjectMsg' msg ->
             updateProjectMsg msg model
+
+        OrganizationMsg' msg ->
+            updateOrganizationMsg msg model
 
         NoOp ->
             model ! []
@@ -265,6 +268,119 @@ projectSortableFieldFun sortableField =
     case sortableField of
         ProjectName ->
             .name
+
+
+updateOrganizationMsg : OrganizationMsg -> Model -> ( Model, Cmd Msg )
+updateOrganizationMsg msg model =
+    case msg of
+        GotOrganizations organizations ->
+            { model | organizations = organizations } ! []
+
+        SetNewOrganizationName name ->
+            let
+                oldNewOrganization =
+                    model.newOrganization
+            in
+                { model | newOrganization = { oldNewOrganization | name = name } } ! []
+
+        CreateOrganization ->
+            model ! [ API.createOrganization model model.newOrganization (OrganizationMsg' << CreateOrganizationFailed) (OrganizationMsg' << CreateOrganizationSucceeded) ]
+
+        CreateOrganizationSucceeded _ ->
+            { model | newOrganization = Organization Nothing "" }
+                ! [ Navigation.newUrl (Route.urlFor Organizations) ]
+
+        CreateOrganizationFailed error ->
+            model ! [] |> andLog "Create Organization failed" error
+
+        DeleteOrganization organization ->
+            model ! [ API.deleteOrganization model organization (OrganizationMsg' << DeleteOrganizationFailed) (OrganizationMsg' << DeleteOrganizationSucceeded) ]
+
+        DeleteOrganizationFailed error ->
+            model ! [] |> andLog "Delete Organization failed" error
+
+        DeleteOrganizationSucceeded organization ->
+            model ! [ API.fetchOrganizations model (always NoOp) (OrganizationMsg' << GotOrganizations) ]
+
+        GotOrganization organization ->
+            { model | shownOrganization = Just organization } ! []
+
+        ReorderOrganizations field ->
+            reorderOrganizations field model ! []
+
+        SetShownOrganizationName name ->
+            case model.shownOrganization of
+                Nothing ->
+                    model ! []
+
+                Just organization ->
+                    let
+                        updatedOrganization =
+                            { organization | name = name }
+                    in
+                        { model | shownOrganization = (Just updatedOrganization) } ! []
+
+        UpdateOrganization ->
+            case model.shownOrganization of
+                Nothing ->
+                    model ! []
+
+                Just shownOrganization ->
+                    model ! [ API.updateOrganization model shownOrganization (OrganizationMsg' << UpdateOrganizationFailed) (OrganizationMsg' << UpdateOrganizationSucceeded) ]
+
+        UpdateOrganizationFailed error ->
+            model ! [] |> andLog "Update Organization failed" error
+
+        UpdateOrganizationSucceeded organization ->
+            case organization.id of
+                Nothing ->
+                    { model | shownOrganization = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.Organizations ]
+
+                Just id ->
+                    { model | shownOrganization = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowOrganization id ]
+
+
+organizationSortableFieldFun : OrganizationSortableField -> (Organization -> String)
+organizationSortableFieldFun sortableField =
+    case sortableField of
+        OrganizationName ->
+            .name
+
+
+reorderOrganizations : OrganizationSortableField -> Model -> Model
+reorderOrganizations sortableField model =
+    let
+        fun =
+            organizationSortableFieldFun sortableField
+    in
+        case model.organizationsSort of
+            Nothing ->
+                { model
+                    | organizationsSort = Just ( Ascending, sortableField )
+                    , organizations = List.sortBy fun model.organizations
+                }
+
+            Just ( sortOrder, currentSortableField ) ->
+                case currentSortableField == sortableField of
+                    True ->
+                        case sortOrder of
+                            Ascending ->
+                                { model
+                                    | organizationsSort = Just ( Descending, sortableField )
+                                    , organizations = List.sortBy fun model.organizations |> List.reverse
+                                }
+
+                            Descending ->
+                                { model
+                                    | organizationsSort = Just ( Ascending, sortableField )
+                                    , organizations = List.sortBy fun model.organizations
+                                }
+
+                    False ->
+                        { model
+                            | organizationsSort = Just ( Ascending, sortableField )
+                            , organizations = List.sortBy fun model.organizations
+                        }
 
 
 andLog : String -> a -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )

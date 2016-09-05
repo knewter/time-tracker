@@ -1,9 +1,9 @@
-module Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..))
+module Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..), OrganizationMsg(..))
 
 import Material
 import Material.Snackbar as Snackbar
 import Route
-import Types exposing (User, UserSortableField, Project, ProjectSortableField)
+import Types exposing (User, UserSortableField, Project, ProjectSortableField, Organization, OrganizationSortableField)
 import Http
 
 
@@ -12,6 +12,7 @@ type Msg
     | Snackbar (Snackbar.Msg (Maybe Msg))
     | UserMsg' UserMsg
     | ProjectMsg' ProjectMsg
+    | OrganizationMsg' OrganizationMsg
     | NavigateTo (Maybe Route.Location)
     | NoOp
 
@@ -48,3 +49,20 @@ type ProjectMsg
     | UpdateProject
     | UpdateProjectFailed Http.Error
     | UpdateProjectSucceeded Project
+
+
+type OrganizationMsg
+    = GotOrganization Organization
+    | GotOrganizations (List Organization)
+    | SetNewOrganizationName String
+    | CreateOrganization
+    | CreateOrganizationSucceeded Organization
+    | CreateOrganizationFailed Http.Error
+    | DeleteOrganization Organization
+    | DeleteOrganizationSucceeded Organization
+    | DeleteOrganizationFailed Http.RawError
+    | ReorderOrganizations OrganizationSortableField
+    | SetShownOrganizationName String
+    | UpdateOrganization
+    | UpdateOrganizationFailed Http.Error
+    | UpdateOrganizationSucceeded Organization

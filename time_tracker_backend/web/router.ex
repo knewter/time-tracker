@@ -8,7 +8,8 @@ defmodule TimeTrackerBackend.Router do
   scope "/", TimeTrackerBackend do
     pipe_through :api
 
-    resources "/users", UserController
+    resources "/users", UserController, except: [:new, :edit]
     resources "/projects", ProjectController, except: [:new, :edit]
+    resources "/organizations", OrganizationController, except: [:new, :edit]
   end
 end
