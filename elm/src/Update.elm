@@ -144,7 +144,10 @@ updateUserMsg msg model =
             model ! [ API.createUser model model.newUser (UserMsg' << CreateUserFailed) (UserMsg' << CreateUserSucceeded) ]
 
         CreateUserSucceeded _ ->
-            { model | newUser = User Nothing "" }
+            { model
+                | newUser = initialModel.newUser
+                , newUserForm = initialModel.newUserForm
+            }
                 ! [ Navigation.newUrl (Route.urlFor Users) ]
 
         CreateUserFailed error ->
@@ -431,3 +434,11 @@ andLog tag value ( model, cmd ) =
             , Cmd.map Snackbar snackCmd
             ]
         )
+
+
+{-| Just `Model.initialModel`, but applies a `Nothing` for the `Maybe
+    Route.Location` argument so we can get a 0-arity version for convenience
+-}
+initialModel : Model
+initialModel =
+    Model.initialModel Nothing
