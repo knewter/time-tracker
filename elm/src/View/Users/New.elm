@@ -15,6 +15,7 @@ import Material.Options as Options
 import Material.Grid exposing (grid, size, cell, Device(..))
 import Form exposing (Form)
 import Form.Input as Input
+import Form.Field
 import Material.Form.Textfield
 
 
@@ -74,12 +75,19 @@ nameField model =
             [ Textfield.label "Name"
             , Textfield.floatingLabel
             , Textfield.text'
-            , Textfield.value model.newUser.name
-            , Textfield.onInput <| UserMsg' << SetNewUserName
+            , Textfield.value (name.value ?= "")
+            , Textfield.onInput <| UserMsg' << NewUserFormMsg << (Form.Field.Text >> Form.Input name.path)
+            , Textfield.onFocus <| UserMsg' << NewUserFormMsg <| (Form.Focus name.path)
+            , Textfield.onBlur <| UserMsg' << NewUserFormMsg <| (Form.Blur name.path)
             ]
 
 
 
+-- ++ [ value (state.value ?= "")
+--    , onInput <| formMsgConstructor (Form.Field.Text >> (Form.Input state.path))
+--    , onFocus <| formMsgConstructor (Form.Focus state.path)
+--    , onBlur <| formMsgConstructor (Form.Blur state.path)
+--    ]
 -- [ 1, 0 ]
 -- model.mdl
 -- [ Textfield.label "Name"
@@ -108,7 +116,7 @@ submitButton model =
         [ Button.raised
         , Button.ripple
         , Button.colored
-        , Button.onClick <| UserMsg' CreateUser
+        , Button.onClick <| UserMsg' <| NewUserFormMsg <| Form.Submit
         ]
         [ text "Submit" ]
 
@@ -123,3 +131,7 @@ cancelButton model =
         , Options.css "margin-left" "1rem"
         ]
         [ text "Cancel" ]
+
+
+(?=) =
+    flip Maybe.withDefault

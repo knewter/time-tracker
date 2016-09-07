@@ -97,6 +97,10 @@ render model mdlMsg mdl index properties =
         )
 
 
+formMsgConstructor =
+    Msg.NewUserFormMsg
+
+
 
 -- render :
 --     (a -> Msg)
