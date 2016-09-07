@@ -15,19 +15,23 @@ import Material.Options as Options
 import Material.Grid exposing (grid, size, cell, Device(..))
 import Form exposing (Form)
 import Form.Input as Input
+import Material.Form.Textfield
 
 
 view : Model -> Html Msg
-view { newUserForm } =
-    -- grid []
-    --     [ cell [ size All 12 ]
-    --         [ nameField model ]
-    --     , cell [ size All 12 ]
-    --         [ submitButton model
-    --         , cancelButton model
-    --         ]
-    --     ]
-    Html.App.map (UserMsg' << NewUserFormMsg) <| viewForm newUserForm
+view model =
+    grid []
+        [ cell [ size All 12 ]
+            [ nameField model ]
+        , cell [ size All 12 ]
+            [ submitButton model
+            , cancelButton model
+            ]
+        ]
+
+
+
+-- Html.App.map (UserMsg' << NewUserFormMsg) <| viewForm newUserForm
 
 
 viewForm : Form () User -> Html Form.Msg
@@ -58,15 +62,33 @@ viewForm form =
 
 nameField : Model -> Html Msg
 nameField model =
-    Textfield.render Mdl
-        [ 1, 0 ]
-        model.mdl
-        [ Textfield.label "Name"
-        , Textfield.floatingLabel
-        , Textfield.text'
-        , Textfield.value model.newUser.name
-        , Textfield.onInput <| UserMsg' << SetNewUserName
-        ]
+    let
+        name =
+            Form.getFieldAsString "name" model.newUserForm
+    in
+        Material.Form.Textfield.render
+            model
+
+
+
+-- [ 1, 0 ]
+-- model.mdl
+-- [ Textfield.label "Name"
+-- , Textfield.floatingLabel
+-- , Textfield.text'
+-- , Textfield.value model.newUser.name
+-- , Textfield.onInput <| UserMsg' << SetNewUserName
+-- ]
+--
+-- Textfield.render Mdl
+--     [ 1, 0 ]
+--     model.mdl
+--     [ Textfield.label "Name"
+--     , Textfield.floatingLabel
+--     , Textfield.text'
+--     , Textfield.value model.newUser.name
+--     , Textfield.onInput <| UserMsg' << SetNewUserName
+--     ]
 
 
 submitButton : Model -> Html Msg
