@@ -1,6 +1,6 @@
 module Update exposing (update)
 
-import Model exposing (Model)
+import Model exposing (Model, initialModelNoRoute)
 import Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..), OrganizationMsg(..))
 import Types exposing (User, UserSortableField(..), Sorted(..), Project, ProjectSortableField(..), Organization, OrganizationSortableField(..))
 import Material
@@ -133,21 +133,8 @@ updateUserMsg msg model =
         GotUsers users ->
             { model | users = users } ! []
 
-        SetNewUserName name ->
-            let
-                oldNewUser =
-                    model.newUser
-            in
-                { model | newUser = { oldNewUser | name = name } } ! []
-
-        CreateUser ->
-            model ! [ API.createUser model model.newUser (UserMsg' << CreateUserFailed) (UserMsg' << CreateUserSucceeded) ]
-
         CreateUserSucceeded _ ->
-            { model
-                | newUser = initialModel.newUser
-                , newUserForm = initialModel.newUserForm
-            }
+            { model | newUserForm = initialModelNoRoute.newUserForm }
                 ! [ Navigation.newUrl (Route.urlFor Users) ]
 
         CreateUserFailed error ->
@@ -434,11 +421,3 @@ andLog tag value ( model, cmd ) =
             , Cmd.map Snackbar snackCmd
             ]
         )
-
-
-{-| Just `Model.initialModel`, but applies a `Nothing` for the `Maybe
-    Route.Location` argument so we can get a 0-arity version for convenience
--}
-initialModel : Model
-initialModel =
-    Model.initialModel Nothing

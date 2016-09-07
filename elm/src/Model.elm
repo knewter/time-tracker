@@ -1,4 +1,4 @@
-module Model exposing (Model, initialModel)
+module Model exposing (Model, initialModel, initialModelNoRoute)
 
 import Msg exposing (Msg)
 import Material
@@ -15,7 +15,6 @@ type alias Model =
     , baseUrl : String
     , route : Route.Model
     , users : List User
-    , newUser : User
     , newUserForm : Form () User
     , shownUser : Maybe User
     , usersSort : Maybe ( Sorted, UserSortableField )
@@ -37,7 +36,6 @@ initialModel location =
     , baseUrl = "http://localhost:4000"
     , route = Route.init location
     , users = []
-    , newUser = User Nothing ""
     , newUserForm = Form.initial [] validateNewUser
     , shownUser = Nothing
     , usersSort = Nothing
@@ -50,6 +48,14 @@ initialModel location =
     , shownOrganization = Nothing
     , organizationsSort = Nothing
     }
+
+
+{-| Just `Model.initialModel`, but applies a `Nothing` for the `Maybe
+    Route.Location` argument so we can get a 0-arity version for convenience
+-}
+initialModelNoRoute : Model
+initialModelNoRoute =
+    initialModel Nothing
 
 
 validateNewUser : Validation () User

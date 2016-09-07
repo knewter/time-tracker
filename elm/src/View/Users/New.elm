@@ -98,32 +98,6 @@ nameField model =
             )
 
 
-
--- ++ [ value (state.value ?= "")
---    , onInput <| formMsgConstructor (Form.Field.Text >> (Form.Input state.path))
---    , onFocus <| formMsgConstructor (Form.Focus state.path)
---    , onBlur <| formMsgConstructor (Form.Blur state.path)
---    ]
--- [ 1, 0 ]
--- model.mdl
--- [ Textfield.label "Name"
--- , Textfield.floatingLabel
--- , Textfield.text'
--- , Textfield.value model.newUser.name
--- , Textfield.onInput <| UserMsg' << SetNewUserName
--- ]
---
--- Textfield.render Mdl
---     [ 1, 0 ]
---     model.mdl
---     [ Textfield.label "Name"
---     , Textfield.floatingLabel
---     , Textfield.text'
---     , Textfield.value model.newUser.name
---     , Textfield.onInput <| UserMsg' << SetNewUserName
---     ]
-
-
 submitButton : Model -> Html Msg
 submitButton model =
     Button.render Mdl

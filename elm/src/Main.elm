@@ -3,7 +3,7 @@ module Main exposing (..)
 import Navigation
 import View
 import Update
-import Model exposing (Model)
+import Model exposing (Model, initialModelNoRoute)
 import Route
 import Msg exposing (Msg(..))
 import Material
@@ -31,7 +31,7 @@ urlUpdate : Maybe Route.Location -> Model -> ( Model, Cmd Msg )
 urlUpdate location oldModel =
     let
         newModel =
-            { oldModel | route = location, newUser = User Nothing "" }
+            { oldModel | route = location, newUserForm = initialModelNoRoute.newUserForm }
     in
         newModel ! (Util.cmdsForModelRoute newModel)
 
