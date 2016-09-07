@@ -17,7 +17,6 @@ import Form exposing (Form)
 import Form.Error
 import Form.Input as Input
 import Form.Field
-import Material.Form.Textfield
 
 
 view : Model -> Html Msg
@@ -84,11 +83,9 @@ nameField model =
                 Nothing ->
                     []
     in
-        Material.Form.Textfield.render
-            model
-            Mdl
-            model.mdl
+        Textfield.render Mdl
             [ 1, 0 ]
+            model.mdl
             ([ Textfield.label "Name"
              , Textfield.floatingLabel
              , Textfield.text'
