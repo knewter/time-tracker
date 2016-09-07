@@ -68,6 +68,8 @@ nameField model =
     in
         Material.Form.Textfield.render
             model
+            model.mdl
+            [ 1, 0 ]
 
 
 

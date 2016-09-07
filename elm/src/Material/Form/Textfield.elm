@@ -3,6 +3,7 @@ module Material.Form.Textfield exposing (render)
 import Html exposing (Html)
 import Html.Attributes exposing (value)
 import Html.Events exposing (onInput, onFocus, onBlur)
+import Material
 import Material.Textfield
 import Material.Options exposing (Property)
 import Msg exposing (Msg)
@@ -80,11 +81,11 @@ We'll also make it a little less 'generic' because we don't need to, so don't
 think you can immediately take this and turn it into a genericizable(-ifiable)
 module without a bit more work, mnkay?
 -}
-render : Model -> Parts.Index -> Html Msg
-render model index =
+render : Model -> Material.Model -> Parts.Index -> Html Msg
+render model mdl index =
     Material.Textfield.render Msg.Mdl
         index
-        model.mdl
+        mdl
         [ Material.Textfield.label "Name"
         , Material.Textfield.floatingLabel
         , Material.Textfield.text'
