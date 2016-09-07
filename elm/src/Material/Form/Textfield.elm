@@ -81,9 +81,14 @@ We'll also make it a little less 'generic' because we don't need to, so don't
 think you can immediately take this and turn it into a genericizable(-ifiable)
 module without a bit more work, mnkay?
 -}
-render : Model -> Material.Model -> Parts.Index -> Html Msg
-render model mdl index =
-    Material.Textfield.render Msg.Mdl
+render :
+    Model
+    -> (Parts.Msg (Container Material.Model) Msg -> Msg)
+    -> Material.Model
+    -> Parts.Index
+    -> Html Msg
+render model mdlMsg mdl index =
+    Material.Textfield.render mdlMsg
         index
         mdl
         [ Material.Textfield.label "Name"
@@ -117,3 +122,7 @@ render model mdl index =
 
 (?=) =
     flip Maybe.withDefault
+
+
+type alias Container c =
+    { c | textfield : Parts.Indexed Material.Textfield.Model }
