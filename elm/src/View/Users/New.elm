@@ -14,6 +14,7 @@ import Material.Textfield as Textfield
 import Material.Options as Options
 import Material.Grid exposing (grid, size, cell, Device(..))
 import Form exposing (Form)
+import Form.Error
 import Form.Input as Input
 import Form.Field
 import Material.Form.Textfield
@@ -66,20 +67,38 @@ nameField model =
     let
         name =
             Form.getFieldAsString "name" model.newUserForm
+
+        conditionalProperties =
+            case name.liveError of
+                Just error ->
+                    case error of
+                        Form.Error.InvalidString ->
+                            [ Textfield.error "Cannot be blank" ]
+
+                        Form.Error.Empty ->
+                            [ Textfield.error "Cannot be blank" ]
+
+                        _ ->
+                            [ Textfield.error <| toString error ]
+
+                Nothing ->
+                    []
     in
         Material.Form.Textfield.render
             model
             Mdl
             model.mdl
             [ 1, 0 ]
-            [ Textfield.label "Name"
-            , Textfield.floatingLabel
-            , Textfield.text'
-            , Textfield.value (name.value ?= "")
-            , Textfield.onInput <| UserMsg' << NewUserFormMsg << (Form.Field.Text >> Form.Input name.path)
-            , Textfield.onFocus <| UserMsg' << NewUserFormMsg <| (Form.Focus name.path)
-            , Textfield.onBlur <| UserMsg' << NewUserFormMsg <| (Form.Blur name.path)
-            ]
+            ([ Textfield.label "Name"
+             , Textfield.floatingLabel
+             , Textfield.text'
+             , Textfield.value (name.value ?= "")
+             , Textfield.onInput <| UserMsg' << NewUserFormMsg << (Form.Field.Text >> Form.Input name.path)
+             , Textfield.onFocus <| UserMsg' << NewUserFormMsg <| (Form.Focus name.path)
+             , Textfield.onBlur <| UserMsg' << NewUserFormMsg <| (Form.Blur name.path)
+             ]
+                ++ conditionalProperties
+            )
 
 
 
