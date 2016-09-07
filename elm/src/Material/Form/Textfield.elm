@@ -86,17 +86,15 @@ render :
     -> (Parts.Msg (Container Material.Model) Msg -> Msg)
     -> Material.Model
     -> Parts.Index
+    -> List (Property (Config Msg) Msg)
     -> Html Msg
-render model mdlMsg mdl index =
+render model mdlMsg mdl index properties =
     Material.Textfield.render mdlMsg
         index
         mdl
-        [ Material.Textfield.label "Name"
-        , Material.Textfield.floatingLabel
-        , Material.Textfield.text'
-        , Material.Textfield.value model.newUser.name
-        , Material.Textfield.onInput <| Msg.UserMsg' << Msg.SetNewUserName
-        ]
+        (properties
+            ++ []
+        )
 
 
 
@@ -126,3 +124,19 @@ render model mdlMsg mdl index =
 
 type alias Container c =
     { c | textfield : Parts.Indexed Material.Textfield.Model }
+
+
+type alias Config m =
+    { labelText : Maybe String
+    , labelFloat : Bool
+    , error : Maybe String
+    , value : Maybe String
+    , disabled : Bool
+    , kind : Material.Textfield.Kind
+    , rows : Maybe Int
+    , cols : Maybe Int
+    , autofocus : Bool
+    , maxlength : Maybe Int
+    , inner : List (Material.Options.Style m)
+    , listeners : List (Html.Attribute m)
+    }

@@ -71,6 +71,12 @@ nameField model =
             Mdl
             model.mdl
             [ 1, 0 ]
+            [ Textfield.label "Name"
+            , Textfield.floatingLabel
+            , Textfield.text'
+            , Textfield.value model.newUser.name
+            , Textfield.onInput <| UserMsg' << SetNewUserName
+            ]
 
 
 
