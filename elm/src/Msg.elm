@@ -5,6 +5,7 @@ import Material.Snackbar as Snackbar
 import Route
 import Types exposing (User, UserSortableField, Project, ProjectSortableField, Organization, OrganizationSortableField)
 import Http
+import OurHttp
 
 
 type Msg
@@ -23,14 +24,14 @@ type UserMsg
     | SetNewUserName String
     | CreateUser
     | CreateUserSucceeded User
-    | CreateUserFailed Http.Error
+    | CreateUserFailed OurHttp.Error
     | DeleteUser User
     | DeleteUserSucceeded User
     | DeleteUserFailed Http.RawError
     | ReorderUsers UserSortableField
     | SetShownUserName String
     | UpdateUser
-    | UpdateUserFailed Http.Error
+    | UpdateUserFailed OurHttp.Error
     | UpdateUserSucceeded User
 
 
@@ -40,14 +41,14 @@ type ProjectMsg
     | SetNewProjectName String
     | CreateProject
     | CreateProjectSucceeded Project
-    | CreateProjectFailed Http.Error
+    | CreateProjectFailed OurHttp.Error
     | DeleteProject Project
     | DeleteProjectSucceeded Project
     | DeleteProjectFailed Http.RawError
     | ReorderProjects ProjectSortableField
     | SetShownProjectName String
     | UpdateProject
-    | UpdateProjectFailed Http.Error
+    | UpdateProjectFailed OurHttp.Error
     | UpdateProjectSucceeded Project
 
 
@@ -57,12 +58,12 @@ type OrganizationMsg
     | SetNewOrganizationName String
     | CreateOrganization
     | CreateOrganizationSucceeded Organization
-    | CreateOrganizationFailed Http.Error
+    | CreateOrganizationFailed OurHttp.Error
     | DeleteOrganization Organization
     | DeleteOrganizationSucceeded Organization
     | DeleteOrganizationFailed Http.RawError
     | ReorderOrganizations OrganizationSortableField
     | SetShownOrganizationName String
     | UpdateOrganization
-    | UpdateOrganizationFailed Http.Error
+    | UpdateOrganizationFailed OurHttp.Error
     | UpdateOrganizationSucceeded Organization

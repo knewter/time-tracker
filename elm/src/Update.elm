@@ -7,6 +7,9 @@ import Material
 import Material.Snackbar as Snackbar
 import Navigation
 import Route exposing (Location(..))
+import Json.Decode as JD exposing ((:=))
+import OurHttp exposing (Error(..))
+import Http exposing (Value(..))
 import API
 
 
@@ -144,7 +147,28 @@ updateUserMsg msg model =
                 ! [ Navigation.newUrl (Route.urlFor Users) ]
 
         CreateUserFailed error ->
-            model ! [] |> andLog "Create User failed" error
+            let
+                decodeError : OurHttp.Error -> String
+                decodeError error =
+                    case error of
+                        BadResponse code text value ->
+                            "error! - "
+                                ++ case value of
+                                    Text responseBody ->
+                                        case JD.decodeString JD.value responseBody of
+                                            Ok val ->
+                                                toString val
+
+                                            Err str ->
+                                                str
+
+                                    e ->
+                                        toString e
+
+                        e ->
+                            toString e
+            in
+                model ! [] |> andLog "Create User failed" (decodeError error)
 
         DeleteUser user ->
             model ! [ API.deleteUser model user (UserMsg' << DeleteUserFailed) (UserMsg' << DeleteUserSucceeded) ]

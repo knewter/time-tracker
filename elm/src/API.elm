@@ -20,9 +20,10 @@ module API
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Types exposing (User, Project, Organization)
-import Http
 import Decoders
 import Json.Decode exposing ((:=))
+import OurHttp exposing (Error)
+import Http
 import Task
 import Json.Encode as JE
 import Json.Decode as JD exposing ((:=))
@@ -38,7 +39,7 @@ fetchUser model id errorMsg msg =
     get model ("/users/" ++ (toString id)) Decoders.userDecoder errorMsg msg
 
 
-createUser : Model -> User -> (Http.Error -> Msg) -> (User -> Msg) -> Cmd Msg
+createUser : Model -> User -> (Error -> Msg) -> (User -> Msg) -> Cmd Msg
 createUser model user errorMsg msg =
     post model "/users" (encodeUser user) Decoders.userDecoder errorMsg msg
 
@@ -53,7 +54,7 @@ deleteUser model user errorMsg msg =
             delete model ("/users/" ++ (toString id)) errorMsg (msg user)
 
 
-updateUser : Model -> User -> (Http.Error -> Msg) -> (User -> Msg) -> Cmd Msg
+updateUser : Model -> User -> (Error -> Msg) -> (User -> Msg) -> Cmd Msg
 updateUser model user errorMsg msg =
     case user.id of
         Nothing ->
@@ -84,7 +85,7 @@ fetchProject model id errorMsg msg =
     get model ("/projects/" ++ (toString id)) Decoders.projectDecoder errorMsg msg
 
 
-createProject : Model -> Project -> (Http.Error -> Msg) -> (Project -> Msg) -> Cmd Msg
+createProject : Model -> Project -> (Error -> Msg) -> (Project -> Msg) -> Cmd Msg
 createProject model project errorMsg msg =
     post model "/projects" (encodeProject project) Decoders.projectDecoder errorMsg msg
 
@@ -99,7 +100,7 @@ deleteProject model project errorMsg msg =
             delete model ("/projects/" ++ (toString id)) errorMsg (msg project)
 
 
-updateProject : Model -> Project -> (Http.Error -> Msg) -> (Project -> Msg) -> Cmd Msg
+updateProject : Model -> Project -> (Error -> Msg) -> (Project -> Msg) -> Cmd Msg
 updateProject model project errorMsg msg =
     case project.id of
         Nothing ->
@@ -130,7 +131,7 @@ fetchOrganization model id errorMsg msg =
     get model ("/organizations/" ++ (toString id)) Decoders.organizationDecoder errorMsg msg
 
 
-createOrganization : Model -> Organization -> (Http.Error -> Msg) -> (Organization -> Msg) -> Cmd Msg
+createOrganization : Model -> Organization -> (Error -> Msg) -> (Organization -> Msg) -> Cmd Msg
 createOrganization model organization errorMsg msg =
     post model "/organizations" (encodeOrganization organization) Decoders.organizationDecoder errorMsg msg
 
@@ -145,7 +146,7 @@ deleteOrganization model organization errorMsg msg =
             delete model ("/organizations/" ++ (toString id)) errorMsg (msg organization)
 
 
-updateOrganization : Model -> Organization -> (Http.Error -> Msg) -> (Organization -> Msg) -> Cmd Msg
+updateOrganization : Model -> Organization -> (Error -> Msg) -> (Organization -> Msg) -> Cmd Msg
 updateOrganization model organization errorMsg msg =
     case organization.id of
         Nothing ->
@@ -172,7 +173,7 @@ get model path decoder errorMsg msg =
         |> Task.perform errorMsg msg
 
 
-post : Model -> String -> JE.Value -> JD.Decoder a -> (Http.Error -> Msg) -> (a -> Msg) -> Cmd Msg
+post : Model -> String -> JE.Value -> JD.Decoder a -> (OurHttp.Error -> Msg) -> (a -> Msg) -> Cmd Msg
 post model path encoded decoder errorMsg msg =
     Http.send Http.defaultSettings
         { verb = "POST"
@@ -180,7 +181,7 @@ post model path encoded decoder errorMsg msg =
         , body = Http.string (encoded |> JE.encode 0)
         , headers = [ ( "Content-Type", "application/json" ) ]
         }
-        |> Http.fromJson ("data" := decoder)
+        |> OurHttp.fromJson ("data" := decoder)
         |> Task.perform errorMsg msg
 
 
@@ -195,7 +196,7 @@ delete model path errorMsg msg =
         |> Task.perform errorMsg (always msg)
 
 
-put : Model -> String -> JE.Value -> JD.Decoder a -> (Http.Error -> Msg) -> (a -> Msg) -> Cmd Msg
+put : Model -> String -> JE.Value -> JD.Decoder a -> (OurHttp.Error -> Msg) -> (a -> Msg) -> Cmd Msg
 put model path encoded decoder errorMsg msg =
     Http.send Http.defaultSettings
         { verb = "PUT"
@@ -203,5 +204,5 @@ put model path encoded decoder errorMsg msg =
         , body = Http.string (encoded |> JE.encode 0)
         , headers = [ ( "Content-Type", "application/json" ) ]
         }
-        |> Http.fromJson ("data" := decoder)
+        |> OurHttp.fromJson ("data" := decoder)
         |> Task.perform errorMsg msg

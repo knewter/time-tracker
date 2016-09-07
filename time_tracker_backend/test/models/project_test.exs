@@ -4,7 +4,7 @@ defmodule TimeTrackerBackend.ProjectTest do
   alias TimeTrackerBackend.Project
 
   @valid_attrs %{name: "some content"}
-  @invalid_attrs %{}
+  @invalid_attrs %{name: ""}
 
   test "changeset with valid attributes" do
     changeset = Project.changeset(%Project{}, @valid_attrs)
