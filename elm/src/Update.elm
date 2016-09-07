@@ -408,9 +408,17 @@ reorderOrganizations sortableField model =
 
 
 andLog : String -> a -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
-andLog tag value ( model, cmds ) =
+andLog tag value ( model, cmd ) =
     let
         _ =
-            Debug.log (tag ++ ": ") value
+            Debug.log tag value
+
+        ( snackbar, snackCmd ) =
+            Snackbar.add (Snackbar.toast Nothing (toString value)) model.snackbar
     in
-        ( model, cmds )
+        ( { model | snackbar = snackbar }
+        , Cmd.batch
+            [ cmd
+            , Cmd.map Snackbar snackCmd
+            ]
+        )
