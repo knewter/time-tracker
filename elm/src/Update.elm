@@ -218,7 +218,12 @@ updateUserMsg msg model =
                     { model | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowUser id ]
 
         NewUserFormMsg formMsg ->
-            { model | newUserForm = Form.update formMsg model.newUserForm } ! []
+            case ( formMsg, Form.getOutput model.newUserForm ) of
+                ( Form.Submit, Just user ) ->
+                    model ! [ API.createUser model user (UserMsg' << CreateUserFailed) (UserMsg' << CreateUserSucceeded) ]
+
+                _ ->
+                    { model | newUserForm = Form.update formMsg model.newUserForm } ! []
 
 
 updateProjectMsg : ProjectMsg -> Model -> ( Model, Cmd Msg )
