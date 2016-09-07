@@ -11,6 +11,7 @@ import Json.Decode as JD exposing ((:=))
 import OurHttp exposing (Error(..))
 import Http exposing (Value(..))
 import API
+import Form
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -215,6 +216,9 @@ updateUserMsg msg model =
 
                 Just id ->
                     { model | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowUser id ]
+
+        NewUserFormMsg formMsg ->
+            { model | newUserForm = Form.update formMsg model.newUserForm } ! []
 
 
 updateProjectMsg : ProjectMsg -> Model -> ( Model, Cmd Msg )

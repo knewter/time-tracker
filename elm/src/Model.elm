@@ -5,6 +5,8 @@ import Material
 import Material.Snackbar as Snackbar
 import Route
 import Types exposing (User, Sorted, UserSortableField, Project, ProjectSortableField, Organization, OrganizationSortableField)
+import Form exposing (Form)
+import Form.Validate exposing (Validation, form1, get, string)
 
 
 type alias Model =
@@ -14,6 +16,7 @@ type alias Model =
     , route : Route.Model
     , users : List User
     , newUser : User
+    , newUserForm : Form () User
     , shownUser : Maybe User
     , usersSort : Maybe ( Sorted, UserSortableField )
     , projects : List Project
@@ -35,6 +38,7 @@ initialModel location =
     , route = Route.init location
     , users = []
     , newUser = User Nothing ""
+    , newUserForm = Form.initial [] validateNewUser
     , shownUser = Nothing
     , usersSort = Nothing
     , projects = []
@@ -46,3 +50,9 @@ initialModel location =
     , shownOrganization = Nothing
     , organizationsSort = Nothing
     }
+
+
+validateNewUser : Validation () User
+validateNewUser =
+    form1 (User Nothing)
+        (get "name" string)

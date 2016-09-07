@@ -6,6 +6,7 @@ import Route
 import Types exposing (User, UserSortableField, Project, ProjectSortableField, Organization, OrganizationSortableField)
 import Http
 import OurHttp
+import Form
 
 
 type Msg
@@ -33,6 +34,7 @@ type UserMsg
     | UpdateUser
     | UpdateUserFailed OurHttp.Error
     | UpdateUserSucceeded User
+    | NewUserFormMsg Form.Msg
 
 
 type ProjectMsg
