@@ -15,7 +15,6 @@ type alias Model =
     , baseUrl : String
     , route : Route.Model
     , users : List User
-    , newUser : User
     , newUserForm : Form () User
     , shownUser : Maybe User
     , usersSort : Maybe ( Sorted, UserSortableField )
@@ -37,7 +36,6 @@ initialModel location =
     , baseUrl = "http://localhost:4000"
     , route = Route.init location
     , users = []
-    , newUser = User Nothing ""
     , newUserForm = Form.initial [] validateNewUser
     , shownUser = Nothing
     , usersSort = Nothing

@@ -31,7 +31,7 @@ urlUpdate : Maybe Route.Location -> Model -> ( Model, Cmd Msg )
 urlUpdate location oldModel =
     let
         newModel =
-            { oldModel | route = location, newUser = User Nothing "" }
+            { oldModel | route = location, newUserForm = (Model.initialModel Nothing).newUserForm }
     in
         newModel ! (Util.cmdsForModelRoute newModel)
 

@@ -22,8 +22,8 @@ type Msg
 type UserMsg
     = GotUser User
     | GotUsers (List User)
-    | SetNewUserName String
-    | CreateUser
+      -- | SetNewUserName String
+      -- | CreateUser
     | CreateUserSucceeded User
     | CreateUserFailed OurHttp.Error
     | DeleteUser User

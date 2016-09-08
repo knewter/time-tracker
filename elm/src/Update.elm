@@ -133,20 +133,19 @@ updateUserMsg msg model =
         GotUsers users ->
             { model | users = users } ! []
 
-        SetNewUserName name ->
-            let
-                oldNewUser =
-                    model.newUser
-            in
-                { model | newUser = { oldNewUser | name = name } } ! []
-
-        CreateUser ->
-            model ! [ API.createUser model model.newUser (UserMsg' << CreateUserFailed) (UserMsg' << CreateUserSucceeded) ]
-
+        -- SetNewUserName name ->
+        --     let
+        --         oldNewUser =
+        --             model.newUser
+        --     in
+        --         { model | newUser = { oldNewUser | name = name } } ! []
+        --
+        -- CreateUser ->
+        --     model ! [ API.createUser model model.newUser (UserMsg' << CreateUserFailed) (UserMsg' << CreateUserSucceeded) ]
         CreateUserSucceeded _ ->
             { model
-                | newUser = initialModel.newUser
-                , newUserForm = initialModel.newUserForm
+              -- | newUser = initialModel.newUser
+                | newUserForm = initialModel.newUserForm
             }
                 ! [ Navigation.newUrl (Route.urlFor Users) ]
 
