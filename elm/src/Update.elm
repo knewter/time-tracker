@@ -2,7 +2,7 @@ module Update exposing (update)
 
 import Model exposing (Model)
 import Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..), OrganizationMsg(..))
-import Types exposing (User, UserSortableField(..), Sorted(..), Project, ProjectSortableField(..), Organization, OrganizationSortableField(..))
+import Types exposing (User, UserSortableField(..), Sorted(..), Project, ProjectSortableField(..), Organization, OrganizationSortableField(..), APIFieldErrors)
 import Material
 import Material.Snackbar as Snackbar
 import Navigation
@@ -12,6 +12,8 @@ import OurHttp exposing (Error(..))
 import Http exposing (Value(..))
 import API
 import Form
+import Dict
+import Decoders
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -133,45 +135,46 @@ updateUserMsg msg model =
         GotUsers users ->
             { model | users = users } ! []
 
-        -- SetNewUserName name ->
-        --     let
-        --         oldNewUser =
-        --             model.newUser
-        --     in
-        --         { model | newUser = { oldNewUser | name = name } } ! []
-        --
-        -- CreateUser ->
-        --     model ! [ API.createUser model model.newUser (UserMsg' << CreateUserFailed) (UserMsg' << CreateUserSucceeded) ]
         CreateUserSucceeded _ ->
             { model
-              -- | newUser = initialModel.newUser
                 | newUserForm = initialModel.newUserForm
             }
                 ! [ Navigation.newUrl (Route.urlFor Users) ]
 
         CreateUserFailed error ->
             let
-                decodeError : OurHttp.Error -> String
+                decodeError : OurHttp.Error -> APIFieldErrors
                 decodeError error =
                     case error of
                         BadResponse code text value ->
-                            "error! - "
-                                ++ case value of
-                                    Text responseBody ->
-                                        case JD.decodeString JD.value responseBody of
-                                            Ok val ->
-                                                toString val
+                            case value of
+                                Text responseBody ->
+                                    JD.decodeString Decoders.apiFieldErrorsDecoder (Debug.log "r" responseBody)
+                                        |> Result.withDefault
+                                            ((Debug.log <|
+                                                "derp didn't get an api field errors decodable response back, instead got "
+                                                    ++ responseBody
+                                             )
+                                                Dict.empty
+                                            )
 
-                                            Err str ->
-                                                str
-
-                                    e ->
-                                        toString e
+                                e ->
+                                    Dict.empty
+                                        |> (Debug.log <|
+                                                "this is a blob how did that hapen? "
+                                                    ++ (toString error)
+                                           )
 
                         e ->
-                            toString e
+                            Dict.empty
+                                |> (Debug.log <|
+                                        "this is a blob how did that hapen? "
+                                            ++ (toString e)
+                                   )
             in
-                model ! [] |> andLog "Create User failed" (decodeError error)
+                { model | newUserForm = ( fst model.newUserForm, Just (decodeError error) ) }
+                    ! []
+                    |> andLog "Create User failed" (toString <| decodeError error)
 
         DeleteUser user ->
             model ! [ API.deleteUser model user (UserMsg' << DeleteUserFailed) (UserMsg' << DeleteUserSucceeded) ]
@@ -220,12 +223,18 @@ updateUserMsg msg model =
                     { model | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowUser id ]
 
         NewUserFormMsg formMsg ->
-            case ( formMsg, Form.getOutput model.newUserForm ) of
+            case ( formMsg, Form.getOutput (fst model.newUserForm) ) of
                 ( Form.Submit, Just user ) ->
                     model ! [ API.createUser model user (UserMsg' << CreateUserFailed) (UserMsg' << CreateUserSucceeded) ]
 
                 _ ->
-                    { model | newUserForm = Form.update formMsg model.newUserForm } ! []
+                    { model
+                        | newUserForm =
+                            ( Form.update formMsg (fst model.newUserForm)
+                            , snd model.newUserForm
+                            )
+                    }
+                        ! []
 
 
 updateProjectMsg : ProjectMsg -> Model -> ( Model, Cmd Msg )

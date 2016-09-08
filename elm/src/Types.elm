@@ -7,7 +7,10 @@ module Types
         , ProjectSortableField(..)
         , Organization
         , OrganizationSortableField(..)
+        , APIFieldErrors
         )
+
+import Dict exposing (Dict)
 
 
 type alias User =
@@ -43,3 +46,7 @@ type OrganizationSortableField
 type Sorted
     = Ascending
     | Descending
+
+
+type alias APIFieldErrors =
+    Dict String (List String)

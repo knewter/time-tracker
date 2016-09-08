@@ -17,6 +17,8 @@ import Form exposing (Form)
 import Form.Field
 import Form.Input
 import Form.Error
+import String
+import Dict
 
 
 view : Model -> Html Msg
@@ -31,41 +33,42 @@ view model =
         ]
 
 
-
---Html.App.map (UserMsg' << NewUserFormMsg) <| viewForm newUserForm
--- viewForm : Form () User -> Html Form.Msg
--- viewForm form =
---     let
---         -- error presenter
---         errorFor field =
---             case field.liveError of
---                 Just error ->
---                     -- replace toString with your own translations
---                     div [ class "error" ] [ text (toString error) ]
---
---                 Nothing ->
---                     text ""
---
---         -- fields states
---         name =
---             Form.getFieldAsString "name" form
---     in
---         div []
---             [ label [] [ text "Name" ]
---             , Input.textInput name []
---             , errorFor name
---             , button [ onClick Form.Submit ]
---                 [ text "Submit" ]
---             ]
---
-
-
 nameField : Model -> Html Msg
 nameField model =
     let
-        name =
-            Form.getFieldAsString "name" model.newUserForm
+        rawName =
+            Form.getFieldAsString "name" (fst model.newUserForm)
+                |> Debug.log "rawName"
 
+        apiErrors =
+            (snd model.newUserForm)
+
+        name =
+            case apiErrors of
+                Nothing ->
+                    rawName
+
+                Just errorDict ->
+                    case ( rawName.isDirty, rawName.liveError /= Nothing ) of
+                        ( True, True ) ->
+                            rawName
+
+                        ( False, True ) ->
+                            rawName
+
+                        ( True, False ) ->
+                            rawName
+
+                        ( _, False ) ->
+                            case Dict.get "name" errorDict of
+                                Nothing ->
+                                    rawName
+
+                                Just errorList ->
+                                    { rawName | liveError = Just <| Form.Error.CustomError (String.join ", " errorList) }
+
+        -- We have an api field error thing
+        -- we want to be able to merge those here
         conditionalProperties =
             case name.liveError of
                 Just error ->
@@ -75,6 +78,9 @@ nameField model =
 
                         Form.Error.Empty ->
                             [ Textfield.error "Cannot be blank" ]
+
+                        Form.Error.CustomError errString ->
+                            [ Textfield.error errString ]
 
                         _ ->
                             [ Textfield.error <| toString error ]

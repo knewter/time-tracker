@@ -37,6 +37,12 @@ defmodule TimeTrackerBackend.UserControllerTest do
     assert json_response(conn, 422)["errors"] != %{}
   end
 
+  # test "does not create resource and renders errors when username already exists", %{conn: conn} do
+  #   %User{name: "foo"} |> Repo.insert!
+  #   conn = post conn, user_path(conn, :create), user: %{"name" => "foo"}
+  #   assert json_response(conn, 422)["errors"] != %{"name" => ["already exists"]}
+  # end
+
   test "updates and renders chosen resource when data is valid", %{conn: conn} do
     user = Repo.insert! %User{}
     conn = put conn, user_path(conn, :update, user), user: @valid_attrs

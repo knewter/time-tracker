@@ -4,7 +4,7 @@ import Msg exposing (Msg)
 import Material
 import Material.Snackbar as Snackbar
 import Route
-import Types exposing (User, Sorted, UserSortableField, Project, ProjectSortableField, Organization, OrganizationSortableField)
+import Types exposing (User, Sorted, UserSortableField, Project, ProjectSortableField, Organization, OrganizationSortableField, APIFieldErrors)
 import Form exposing (Form)
 import Form.Validate exposing (Validation, form1, get, string)
 
@@ -15,7 +15,7 @@ type alias Model =
     , baseUrl : String
     , route : Route.Model
     , users : List User
-    , newUserForm : Form () User
+    , newUserForm : ( Form String User, Maybe APIFieldErrors )
     , shownUser : Maybe User
     , usersSort : Maybe ( Sorted, UserSortableField )
     , projects : List Project
@@ -36,7 +36,7 @@ initialModel location =
     , baseUrl = "http://localhost:4000"
     , route = Route.init location
     , users = []
-    , newUserForm = Form.initial [] validateNewUser
+    , newUserForm = ( Form.initial [] validateNewUser, Nothing )
     , shownUser = Nothing
     , usersSort = Nothing
     , projects = []
@@ -50,7 +50,7 @@ initialModel location =
     }
 
 
-validateNewUser : Validation () User
+validateNewUser : Validation String User
 validateNewUser =
     form1 (User Nothing)
         (get "name" string)

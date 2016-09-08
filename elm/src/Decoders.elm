@@ -6,10 +6,12 @@ module Decoders
         , projectDecoder
         , organizationsDecoder
         , organizationDecoder
+        , apiFieldErrorsDecoder
         )
 
 import Json.Decode as JD exposing ((:=))
-import Types exposing (User, Project, Organization)
+import Types exposing (User, Project, Organization, APIFieldErrors)
+import Dict
 
 
 usersDecoder : JD.Decoder (List User)
@@ -46,3 +48,8 @@ organizationDecoder =
     JD.object2 Organization
         (JD.maybe ("id" := JD.int))
         ("name" := JD.string)
+
+
+apiFieldErrorsDecoder : JD.Decoder APIFieldErrors
+apiFieldErrorsDecoder =
+    "errors" := (JD.dict <| JD.list JD.string)
