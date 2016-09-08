@@ -31,35 +31,6 @@ view model =
         ]
 
 
-
---Html.App.map (UserMsg' << NewUserFormMsg) <| viewForm newUserForm
--- viewForm : Form () User -> Html Form.Msg
--- viewForm form =
---     let
---         -- error presenter
---         errorFor field =
---             case field.liveError of
---                 Just error ->
---                     -- replace toString with your own translations
---                     div [ class "error" ] [ text (toString error) ]
---
---                 Nothing ->
---                     text ""
---
---         -- fields states
---         name =
---             Form.getFieldAsString "name" form
---     in
---         div []
---             [ label [] [ text "Name" ]
---             , Input.textInput name []
---             , errorFor name
---             , button [ onClick Form.Submit ]
---                 [ text "Submit" ]
---             ]
---
-
-
 nameField : Model -> Html Msg
 nameField model =
     let
