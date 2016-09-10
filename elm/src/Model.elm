@@ -6,7 +6,7 @@ import Material.Snackbar as Snackbar
 import Route
 import Types exposing (User, Sorted, UserSortableField, Project, ProjectSortableField, Organization, OrganizationSortableField, APIFieldErrors)
 import Form exposing (Form)
-import Form.Validate exposing (Validation, form1, get, string)
+import Validators
 
 
 type alias FormWithErrors a =
@@ -40,7 +40,7 @@ initialModel location =
     , baseUrl = "http://localhost:4000"
     , route = Route.init location
     , users = []
-    , newUserForm = ( Form.initial [] validateNewUser, Nothing )
+    , newUserForm = ( Form.initial [] Validators.validateNewUser, Nothing )
     , shownUser = Nothing
     , usersSort = Nothing
     , projects = []
@@ -52,9 +52,3 @@ initialModel location =
     , shownOrganization = Nothing
     , organizationsSort = Nothing
     }
-
-
-validateNewUser : Validation String User
-validateNewUser =
-    form1 (User Nothing)
-        (get "name" string)
