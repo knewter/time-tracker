@@ -19,6 +19,7 @@ import Form.Input
 import Form.Error
 import String
 import Dict
+import OurForm
 
 
 view : Model -> Html Msg
@@ -66,25 +67,6 @@ nameField model =
 
                                 Just errorList ->
                                     { rawName | liveError = Just <| Form.Error.CustomError (String.join ", " errorList) }
-
-        conditionalProperties =
-            case name.liveError of
-                Just error ->
-                    case error of
-                        Form.Error.InvalidString ->
-                            [ Textfield.error "Cannot be blank" ]
-
-                        Form.Error.Empty ->
-                            [ Textfield.error "Cannot be blank" ]
-
-                        Form.Error.CustomError errString ->
-                            [ Textfield.error errString ]
-
-                        _ ->
-                            [ Textfield.error <| toString error ]
-
-                Nothing ->
-                    []
     in
         Textfield.render Mdl
             [ 1, 0 ]
@@ -97,7 +79,7 @@ nameField model =
              , Textfield.onFocus <| tagged <| Form.Focus name.path
              , Textfield.onBlur <| tagged <| Form.Blur name.path
              ]
-                ++ conditionalProperties
+                ++ OurForm.errorMessageTranslator name
             )
 
 

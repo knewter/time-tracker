@@ -8,7 +8,6 @@ import Route
 import Msg exposing (Msg(..))
 import Material
 import Util
-import Types exposing (User)
 
 
 main : Program Never
