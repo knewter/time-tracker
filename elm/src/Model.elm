@@ -9,13 +9,17 @@ import Form exposing (Form)
 import Form.Validate exposing (Validation, form1, get, string)
 
 
+type alias FormWithErrors a =
+    ( Form String a, Maybe APIFieldErrors )
+
+
 type alias Model =
     { mdl : Material.Model
     , snackbar : Snackbar.Model (Maybe Msg)
     , baseUrl : String
     , route : Route.Model
     , users : List User
-    , newUserForm : ( Form String User, Maybe APIFieldErrors )
+    , newUserForm : FormWithErrors User
     , shownUser : Maybe User
     , usersSort : Maybe ( Sorted, UserSortableField )
     , projects : List Project
