@@ -67,8 +67,6 @@ nameField model =
                                 Just errorList ->
                                     { rawName | liveError = Just <| Form.Error.CustomError (String.join ", " errorList) }
 
-        -- We have an api field error thing
-        -- we want to be able to merge those here
         conditionalProperties =
             case name.liveError of
                 Just error ->
@@ -95,9 +93,9 @@ nameField model =
              , Textfield.floatingLabel
              , Textfield.text'
              , Textfield.value <| Maybe.withDefault "" name.value
-             , Textfield.onInput <| UserMsg' << NewUserFormMsg << (Form.Field.Text >> Form.Input name.path)
-             , Textfield.onFocus <| UserMsg' << NewUserFormMsg <| Form.Focus name.path
-             , Textfield.onBlur <| UserMsg' << NewUserFormMsg <| Form.Blur name.path
+             , Textfield.onInput <| tagged << (Form.Field.Text >> Form.Input name.path)
+             , Textfield.onFocus <| tagged <| Form.Focus name.path
+             , Textfield.onBlur <| tagged <| Form.Blur name.path
              ]
                 ++ conditionalProperties
             )
@@ -111,8 +109,7 @@ submitButton model =
         [ Button.raised
         , Button.ripple
         , Button.colored
-          --, Button.onClick <| UserMsg' CreateUser
-        , Button.onClick <| UserMsg' <| NewUserFormMsg <| Form.Submit
+        , Button.onClick <| tagged Form.Submit
         ]
         [ text "Submit" ]
 
@@ -127,3 +124,8 @@ cancelButton model =
         , Options.css "margin-left" "1rem"
         ]
         [ text "Cancel" ]
+
+
+tagged : Form.Msg -> Msg
+tagged =
+    UserMsg' << NewUserFormMsg
