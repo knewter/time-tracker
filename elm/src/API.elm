@@ -181,42 +181,59 @@ encodeOrganization organization =
         ]
 
 
+defaultRequest : Model -> String -> Http.Request
+defaultRequest model path =
+    { verb = "GET"
+    , url = model.baseUrl ++ path
+    , body = Http.empty
+    , headers = [ ( "Content-Type", "application/json" ) ]
+    }
+
+
 get : Model -> String -> JD.Decoder a -> (Http.Error -> Msg) -> (a -> Msg) -> Cmd Msg
 get model path decoder errorMsg msg =
-    Http.get ("data" := decoder) (model.baseUrl ++ path)
+    Http.send Http.defaultSettings
+        (defaultRequest model path)
+        |> Http.fromJson ("data" := decoder)
         |> Task.perform errorMsg msg
 
 
 post : Model -> String -> JE.Value -> JD.Decoder a -> (OurHttp.Error -> Msg) -> (a -> Msg) -> Cmd Msg
 post model path encoded decoder errorMsg msg =
-    Http.send Http.defaultSettings
-        { verb = "POST"
-        , url = model.baseUrl ++ path
-        , body = Http.string (encoded |> JE.encode 0)
-        , headers = [ ( "Content-Type", "application/json" ) ]
-        }
-        |> OurHttp.fromJson ("data" := decoder)
-        |> Task.perform errorMsg msg
+    let
+        request =
+            defaultRequest model path
+    in
+        Http.send Http.defaultSettings
+            { request
+                | verb = "POST"
+                , body = Http.string (encoded |> JE.encode 0)
+            }
+            |> OurHttp.fromJson ("data" := decoder)
+            |> Task.perform errorMsg msg
 
 
 delete : Model -> String -> (Http.RawError -> Msg) -> Msg -> Cmd Msg
 delete model path errorMsg msg =
-    Http.send Http.defaultSettings
-        { verb = "DELETE"
-        , url = model.baseUrl ++ path
-        , body = Http.empty
-        , headers = [ ( "Content-Type", "application/json" ) ]
-        }
-        |> Task.perform errorMsg (always msg)
+    let
+        request =
+            defaultRequest model path
+    in
+        Http.send Http.defaultSettings
+            { request | verb = "DELETE" }
+            |> Task.perform errorMsg (always msg)
 
 
 put : Model -> String -> JE.Value -> JD.Decoder a -> (OurHttp.Error -> Msg) -> (a -> Msg) -> Cmd Msg
 put model path encoded decoder errorMsg msg =
-    Http.send Http.defaultSettings
-        { verb = "PUT"
-        , url = model.baseUrl ++ path
-        , body = Http.string (encoded |> JE.encode 0)
-        , headers = [ ( "Content-Type", "application/json" ) ]
-        }
-        |> OurHttp.fromJson ("data" := decoder)
-        |> Task.perform errorMsg msg
+    let
+        request =
+            defaultRequest model path
+    in
+        Http.send Http.defaultSettings
+            { request
+                | verb = "PUT"
+                , body = Http.string (encoded |> JE.encode 0)
+            }
+            |> OurHttp.fromJson ("data" := decoder)
+            |> Task.perform errorMsg msg
