@@ -7,17 +7,11 @@ module Decoders
         , organizationsDecoder
         , organizationDecoder
         , apiFieldErrorsDecoder
-        , loginDecoder
         )
 
 import Json.Decode as JD exposing ((:=))
 import Types exposing (User, Project, Organization, APIFieldErrors)
 import Dict
-
-
-loginDecoder : JD.Decoder String
-loginDecoder =
-    JD.succeed "foo"
 
 
 usersDecoder : JD.Decoder (List User)
