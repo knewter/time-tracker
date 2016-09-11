@@ -4,14 +4,18 @@ import Model exposing (Model)
 import Types exposing (User, UserSortableField(..), Sorted(..))
 import Msg exposing (Msg(..), UserMsg(..))
 import Route exposing (Location(..))
-import Html exposing (Html, text, div, a, img, span)
+import Html exposing (Html, text, div, a, img, span, h3)
 import Html.Attributes exposing (href, src, style)
 import Material.List as List
 import Material.Button as Button
 import Material.Icon as Icon
 import Material.Table as Table
+import Material.Card as Card
+import Material.Elevation as Elevation
+import Material.Color as Color
 import Material.Options as Options
 import Material.Layout as Layout
+import Material.Grid exposing (grid, size, cell, Device(..))
 import View.Helpers as Helpers
 import Util
 
@@ -19,8 +23,41 @@ import Util
 view : Model -> Html Msg
 view model =
     div []
-        [ usersTable model
+        [ usersCards model
+        , usersTable model
         ]
+
+
+usersCards : Model -> Html Msg
+usersCards model =
+    grid [] <|
+        List.map
+            (\user -> cell [ size All 3 ] [ userCard user ])
+            model.users
+
+
+userCard : User -> Html Msg
+userCard user =
+    let
+        userPhotoUrl =
+            "https://api.adorable.io/avatars/400/" ++ user.name ++ ".png"
+    in
+        Card.view
+            [ Options.css "width" "100%"
+            , Elevation.e2
+            ]
+            [ Card.title
+                [ Options.css "background" ("url('" ++ userPhotoUrl ++ "') center / cover")
+                , Options.css "min-height" "300px"
+                , Options.css "padding" "0"
+                  -- Clear default padding to encompass scrim
+                ]
+                []
+            , Card.text []
+                [ h3 [] [ text user.name ]
+                , text "Software Zealot"
+                ]
+            ]
 
 
 usersTable : Model -> Html Msg
