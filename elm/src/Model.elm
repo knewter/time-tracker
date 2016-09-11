@@ -17,6 +17,7 @@ type alias Model =
     { mdl : Material.Model
     , snackbar : Snackbar.Model (Maybe Msg)
     , baseUrl : String
+    , apiKey : Maybe String
     , route : Route.Model
     , users : List User
     , newUserForm : FormWithErrors User
@@ -38,6 +39,7 @@ initialModel location =
     { mdl = Material.model
     , snackbar = Snackbar.model
     , baseUrl = "http://localhost:4000"
+    , apiKey = Nothing
     , route = Route.init location
     , users = []
     , newUserForm = ( Form.initial [] Validators.validateNewUser, Nothing )

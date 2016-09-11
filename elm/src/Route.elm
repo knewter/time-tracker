@@ -5,7 +5,8 @@ import Navigation
 
 
 type Location
-    = Home
+    = Login
+    | Home
     | Users
     | NewUser
     | ShowUser Int
@@ -34,6 +35,9 @@ urlFor loc =
     let
         url =
             case loc of
+                Login ->
+                    "/login"
+
                 Home ->
                     "/"
 
@@ -85,6 +89,9 @@ locFor path =
                 |> List.filter (\seg -> seg /= "" && seg /= "#")
     in
         case segments of
+            [ "login" ] ->
+                Just Login
+
             [] ->
                 Just Home
 

@@ -4,7 +4,7 @@ import Navigation
 import View
 import Update
 import Model exposing (Model)
-import Route
+import Route exposing (Location(Login))
 import Msg exposing (Msg(..))
 import Material
 import Util
@@ -29,16 +29,20 @@ subscriptions model =
 urlUpdate : Maybe Route.Location -> Model -> ( Model, Cmd Msg )
 urlUpdate location oldModel =
     let
-        newModel =
+        newModelWithClearedForms =
             { oldModel | route = location, newUserForm = (Model.initialModel Nothing).newUserForm }
+
+        newModel =
+            case newModelWithClearedForms.apiKey of
+                Nothing ->
+                    { newModelWithClearedForms | route = Just Login }
+
+                Just apiKey ->
+                    newModelWithClearedForms
     in
         newModel ! (Util.cmdsForModelRoute newModel)
 
 
 init : Maybe Route.Location -> ( Model, Cmd Msg )
 init location =
-    let
-        model =
-            Model.initialModel location
-    in
-        model ! Util.cmdsForModelRoute model
+    urlUpdate location <| Model.initialModel location

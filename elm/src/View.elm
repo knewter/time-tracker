@@ -14,6 +14,7 @@ import Material.List as List
 import Material.Icon as Icon
 import Material.Options as Options exposing (when)
 import Route exposing (Location(..))
+import View.Login
 import View.Home
 import View.Users
 import View.Users.New
@@ -145,6 +146,9 @@ body model =
             Debug.log "model: " model
     in
         case model.route of
+            Just (Route.Login) ->
+                View.Login.view model
+
             Just (Route.Home) ->
                 View.Home.view model
 
