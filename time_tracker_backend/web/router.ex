@@ -11,5 +11,6 @@ defmodule TimeTrackerBackend.Router do
     resources "/users", UserController, except: [:new, :edit]
     resources "/projects", ProjectController, except: [:new, :edit]
     resources "/organizations", OrganizationController, except: [:new, :edit]
+    resources "/sessions", SessionController, only: [:create]
   end
 end
