@@ -32,15 +32,22 @@ urlUpdate location oldModel =
         newModelWithClearedForms =
             { oldModel | route = location, newUserForm = (Model.initialModel Nothing).newUserForm }
 
-        newModel =
+        ( newModel, loginRedirectCmd ) =
             case newModelWithClearedForms.apiKey of
                 Nothing ->
-                    { newModelWithClearedForms | route = Just Login }
+                    case newModelWithClearedForms.route of
+                        Just Login ->
+                            newModelWithClearedForms ! []
+
+                        _ ->
+                            { newModelWithClearedForms | route = Just Login } ! [ Navigation.modifyUrl (Route.urlFor Login) ]
 
                 Just apiKey ->
-                    newModelWithClearedForms
+                    newModelWithClearedForms ! []
     in
-        newModel ! (Util.cmdsForModelRoute newModel)
+        ( newModel
+        , Cmd.batch <| loginRedirectCmd :: (Util.cmdsForModelRoute newModel)
+        )
 
 
 init : Maybe Route.Location -> ( Model, Cmd Msg )
