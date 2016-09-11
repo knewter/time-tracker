@@ -8,6 +8,17 @@ import Html.Attributes exposing (href)
 import Route exposing (Location(..))
 import View.Helpers as Helpers
 import Material.Layout as Layout
+import MultiwayTree
+
+
+type alias Task =
+    { id : Maybe Int
+    , name : String
+    }
+
+
+type Tasks
+    = MultiwayTree.Tree Task
 
 
 view : Model -> Int -> Html Msg
