@@ -32,7 +32,7 @@ import Json.Decode as JD exposing ((:=))
 
 login : Model -> ( String, String ) -> (Error -> Msg) -> (String -> Msg) -> Cmd Msg
 login model loginForm errorMsg msg =
-    post model "/sessions" (encodeLoginForm loginForm) (JD.succeed "foo") errorMsg msg
+    post model "/sessions" (encodeLoginForm loginForm) ("token" := JD.string) errorMsg msg
 
 
 fetchUsers : Model -> (Http.Error -> Msg) -> (List User -> Msg) -> Cmd Msg
