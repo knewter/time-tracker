@@ -1,7 +1,7 @@
 module Update exposing (update)
 
 import Model exposing (Model)
-import Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..), OrganizationMsg(..))
+import Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..), OrganizationMsg(..), LoginMsg(..))
 import Types exposing (User, UserSortableField(..), Sorted(..), Project, ProjectSortableField(..), Organization, OrganizationSortableField(..), APIFieldErrors)
 import Material
 import Material.Snackbar as Snackbar
@@ -36,6 +36,9 @@ update msg model =
 
                 Just location ->
                     model ! [ Navigation.newUrl (Route.urlFor location) ]
+
+        LoginMsg' msg ->
+            updateLoginMsg msg model
 
         UserMsg' msg ->
             updateUserMsg msg model
@@ -127,6 +130,30 @@ reorderProjects sortableField model =
                             | projectsSort = Just ( Ascending, sortableField )
                             , projects = List.sortBy fun model.projects
                         }
+
+
+updateLoginMsg : LoginMsg -> Model -> ( Model, Cmd Msg )
+updateLoginMsg msg model =
+    case msg of
+        LoginFormMsg formMsg ->
+            case ( formMsg, Form.getOutput (fst model.loginForm) ) of
+                ( Form.Submit, Just ( username, password ) ) ->
+                    model ! [ API.login model ( username, password ) (LoginMsg' << LoginFailed) (LoginMsg' << LoginSucceeded) ]
+
+                _ ->
+                    { model
+                        | loginForm =
+                            ( Form.update formMsg (fst model.loginForm)
+                            , snd model.loginForm
+                            )
+                    }
+                        ! []
+
+        LoginSucceeded apiKey ->
+            model ! [] |> andLog "Login success" apiKey
+
+        LoginFailed error ->
+            model ! [] |> andLog "Login failed" (toString <| decodeError error)
 
 
 updateUserMsg : UserMsg -> Model -> ( Model, Cmd Msg )

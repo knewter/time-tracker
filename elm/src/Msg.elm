@@ -1,4 +1,4 @@
-module Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..), OrganizationMsg(..))
+module Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..), OrganizationMsg(..), LoginMsg(..))
 
 import Material
 import Material.Snackbar as Snackbar
@@ -15,8 +15,15 @@ type Msg
     | UserMsg' UserMsg
     | ProjectMsg' ProjectMsg
     | OrganizationMsg' OrganizationMsg
+    | LoginMsg' LoginMsg
     | NavigateTo (Maybe Route.Location)
     | NoOp
+
+
+type LoginMsg
+    = LoginFormMsg Form.Msg
+    | LoginSucceeded String
+    | LoginFailed OurHttp.Error
 
 
 type UserMsg

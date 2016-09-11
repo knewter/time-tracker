@@ -1,6 +1,7 @@
 module API
     exposing
-        ( fetchUsers
+        ( login
+        , fetchUsers
         , createUser
         , deleteUser
         , fetchUser
@@ -27,6 +28,11 @@ import Http
 import Task
 import Json.Encode as JE
 import Json.Decode as JD exposing ((:=))
+
+
+login : Model -> ( String, String ) -> (Error -> Msg) -> (String -> Msg) -> Cmd Msg
+login model loginForm errorMsg msg =
+    post model "/sessions" (encodeLoginForm loginForm) Decoders.loginDecoder errorMsg msg
 
 
 fetchUsers : Model -> (Http.Error -> Msg) -> (List User -> Msg) -> Cmd Msg
@@ -62,6 +68,14 @@ updateUser model user errorMsg msg =
 
         Just id ->
             put model ("/users/" ++ (toString id)) (encodeUser user) Decoders.userDecoder errorMsg msg
+
+
+encodeLoginForm : ( String, String ) -> JE.Value
+encodeLoginForm ( username, password ) =
+    JE.object
+        [ ( "username", JE.string username )
+        , ( "password", JE.string password )
+        ]
 
 
 encodeUser : User -> JE.Value
