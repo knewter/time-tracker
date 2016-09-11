@@ -7,7 +7,6 @@ import Route exposing (Location(..))
 import Html exposing (Html, text, div, form, a, button, label)
 import Html.Attributes exposing (href, class)
 import Html.Events exposing (onClick)
-import Html.App
 import Material.List as List
 import Material.Button as Button
 import Material.Textfield as Textfield
