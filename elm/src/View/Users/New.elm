@@ -79,7 +79,7 @@ nameField model =
              , Textfield.onFocus <| tagged <| Form.Focus name.path
              , Textfield.onBlur <| tagged <| Form.Blur name.path
              ]
-                ++ OurForm.errorMessageTranslator name
+                ++ OurForm.errorMessagesForTextfield name
             )
 
 
