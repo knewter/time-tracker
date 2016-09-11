@@ -10,4 +10,8 @@ defmodule TimeTrackerBackend.SessionControllerTest do
     assert json_response(conn, 200)
     assert Regex.match?(~r/Bearer/, get_resp_header(conn, "authorization") |> hd)
   end
+  test "logs in as someone else", %{conn: conn} do
+    conn = post conn, session_path(conn, :create), %{ username: "asdfsdf", password: "secret" }
+    assert json_response(conn, 401)
+  end
 end

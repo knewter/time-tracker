@@ -26,4 +26,9 @@ defmodule TimeTrackerBackend.SessionController do
       |> put_resp_header("x-expires", "#{exp}")
       |> json(%{ "token" => jwt })
   end
+  def create(conn, _) do
+    conn
+      |> put_status(:unauthorized)
+      |> json("UNAUTHORIZED")
+  end
 end
