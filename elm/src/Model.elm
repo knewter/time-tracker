@@ -16,9 +16,10 @@ type alias FormWithErrors a =
 type alias Model =
     { mdl : Material.Model
     , snackbar : Snackbar.Model (Maybe Msg)
+    , route : Route.Model
     , baseUrl : String
     , apiKey : Maybe String
-    , route : Route.Model
+    , loginForm : FormWithErrors ( String, String )
     , users : List User
     , newUserForm : FormWithErrors User
     , shownUser : Maybe User
@@ -38,9 +39,10 @@ initialModel : Maybe Route.Location -> Model
 initialModel location =
     { mdl = Material.model
     , snackbar = Snackbar.model
+    , route = Route.init location
     , baseUrl = "http://localhost:4000"
     , apiKey = Nothing
-    , route = Route.init location
+    , loginForm = ( Form.initial [] Validators.validateLoginForm, Nothing )
     , users = []
     , newUserForm = ( Form.initial [] Validators.validateNewUser, Nothing )
     , shownUser = Nothing
