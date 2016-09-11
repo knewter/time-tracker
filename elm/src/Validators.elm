@@ -1,12 +1,18 @@
-module Validators exposing (validateNewUser, validateNewOrganization)
+module Validators exposing (validateNewUser, validateNewOrganization, validateNewProject)
 
 import Form.Validate exposing (Validation, form1, get, string)
-import Types exposing (User, Organization, APIFieldErrors)
+import Types exposing (User, Organization, Project, APIFieldErrors)
 
 
 validateNewUser : Validation String User
 validateNewUser =
     form1 (User Nothing)
+        (get "name" string)
+
+
+validateNewProject : Validation String Project
+validateNewProject =
+    form1 (Project Nothing)
         (get "name" string)
 
 

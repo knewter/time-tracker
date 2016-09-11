@@ -213,22 +213,16 @@ updateProjectMsg msg model =
         GotProjects projects ->
             { model | projects = projects } ! []
 
-        SetNewProjectName name ->
-            let
-                oldNewProject =
-                    model.newProject
-            in
-                { model | newProject = { oldNewProject | name = name } } ! []
-
-        CreateProject ->
-            model ! [ API.createProject model model.newProject (ProjectMsg' << CreateProjectFailed) (ProjectMsg' << CreateProjectSucceeded) ]
-
         CreateProjectSucceeded _ ->
-            { model | newProject = Project Nothing "" }
+            { model
+                | newProjectForm = initialModel.newProjectForm
+            }
                 ! [ Navigation.newUrl (Route.urlFor Projects) ]
 
         CreateProjectFailed error ->
-            model ! [] |> andLog "Create Project failed" error
+            { model | newProjectForm = ( fst model.newProjectForm, Just (decodeError error) ) }
+                ! []
+                |> andLog "Create Project failed" (toString <| decodeError error)
 
         DeleteProject project ->
             model ! [ API.deleteProject model project (ProjectMsg' << DeleteProjectFailed) (ProjectMsg' << DeleteProjectSucceeded) ]
@@ -275,6 +269,20 @@ updateProjectMsg msg model =
 
                 Just id ->
                     { model | shownProject = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowProject id ]
+
+        NewProjectFormMsg formMsg ->
+            case ( formMsg, Form.getOutput (fst model.newProjectForm) ) of
+                ( Form.Submit, Just user ) ->
+                    model ! [ API.createProject model user (ProjectMsg' << CreateProjectFailed) (ProjectMsg' << CreateProjectSucceeded) ]
+
+                _ ->
+                    { model
+                        | newProjectForm =
+                            ( Form.update formMsg (fst model.newProjectForm)
+                            , snd model.newProjectForm
+                            )
+                    }
+                        ! []
 
 
 projectSortableFieldFun : ProjectSortableField -> (Project -> String)

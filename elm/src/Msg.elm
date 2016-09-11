@@ -38,8 +38,6 @@ type UserMsg
 type ProjectMsg
     = GotProject Project
     | GotProjects (List Project)
-    | SetNewProjectName String
-    | CreateProject
     | CreateProjectSucceeded Project
     | CreateProjectFailed OurHttp.Error
     | DeleteProject Project
@@ -50,6 +48,7 @@ type ProjectMsg
     | UpdateProject
     | UpdateProjectFailed OurHttp.Error
     | UpdateProjectSucceeded Project
+    | NewProjectFormMsg Form.Msg
 
 
 type OrganizationMsg

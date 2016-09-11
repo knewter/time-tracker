@@ -34,7 +34,7 @@ view model id =
 nameField : Model -> Html Msg
 nameField model =
     Textfield.render Mdl
-        [ 2, 0 ]
+        [ 3, 0 ]
         model.mdl
         [ Textfield.label "Name"
         , Textfield.floatingLabel
@@ -47,7 +47,7 @@ nameField model =
 submitButton : Model -> Html Msg
 submitButton model =
     Button.render Mdl
-        [ 2, 1 ]
+        [ 3, 1 ]
         model.mdl
         [ Button.raised
         , Button.ripple
@@ -60,7 +60,7 @@ submitButton model =
 cancelButton : Model -> Html Msg
 cancelButton model =
     Button.render Mdl
-        [ 2, 2 ]
+        [ 3, 2 ]
         model.mdl
         [ Button.ripple
         , Button.onClick <| NavigateTo <| Just Projects

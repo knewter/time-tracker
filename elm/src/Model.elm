@@ -23,7 +23,7 @@ type alias Model =
     , shownUser : Maybe User
     , usersSort : Maybe ( Sorted, UserSortableField )
     , projects : List Project
-    , newProject : Project
+    , newProjectForm : FormWithErrors Project
     , shownProject : Maybe Project
     , projectsSort : Maybe ( Sorted, ProjectSortableField )
     , organizations : List Organization
@@ -44,7 +44,7 @@ initialModel location =
     , shownUser = Nothing
     , usersSort = Nothing
     , projects = []
-    , newProject = Project Nothing ""
+    , newProjectForm = ( Form.initial [] Validators.validateNewProject, Nothing )
     , shownProject = Nothing
     , projectsSort = Nothing
     , organizations = []
