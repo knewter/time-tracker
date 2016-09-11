@@ -15,9 +15,4 @@ defmodule TimeTrackerBackend.UserTest do
     changeset = User.changeset(%User{}, @invalid_attrs)
     refute changeset.valid?
   end
-
-  test "names are unique" do
-    IO.inspect User.changeset(%User{}, @valid_attrs) |> Repo.insert!
-    IO.inspect User.changeset(%User{}, @valid_attrs) |> Repo.insert!
-  end
 end
