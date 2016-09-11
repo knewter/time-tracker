@@ -4,7 +4,7 @@ import Msg exposing (Msg)
 import Material
 import Material.Snackbar as Snackbar
 import Route
-import Types exposing (User, Sorted, UserSortableField, Project, ProjectSortableField, Organization, OrganizationSortableField, APIFieldErrors)
+import Types exposing (User, Sorted, UserSortableField, Project, ProjectSortableField, Organization, OrganizationSortableField, APIFieldErrors, UsersListView(..))
 import Form exposing (Form)
 import Validators
 
@@ -21,6 +21,7 @@ type alias Model =
     , apiKey : Maybe String
     , loginForm : FormWithErrors ( String, String )
     , users : List User
+    , usersListView : UsersListView
     , newUserForm : FormWithErrors User
     , shownUser : Maybe User
     , usersSort : Maybe ( Sorted, UserSortableField )
@@ -43,6 +44,7 @@ initialModel location =
     , baseUrl = "http://localhost:4000"
     , apiKey = Nothing
     , loginForm = ( Form.initial [] Validators.validateLoginForm, Nothing )
+    , usersListView = UsersTable
     , users = []
     , newUserForm = ( Form.initial [] Validators.validateNewUser, Nothing )
     , shownUser = Nothing

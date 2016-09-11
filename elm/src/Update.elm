@@ -233,6 +233,9 @@ updateUserMsg msg model =
                     }
                         ! []
 
+        SwitchUsersListView usersListView ->
+            { model | usersListView = usersListView } ! []
+
 
 updateProjectMsg : ProjectMsg -> Model -> ( Model, Cmd Msg )
 updateProjectMsg msg model =

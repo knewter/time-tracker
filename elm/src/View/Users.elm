@@ -1,11 +1,12 @@
 module View.Users exposing (view, header)
 
 import Model exposing (Model)
-import Types exposing (User, UserSortableField(..), Sorted(..))
+import Types exposing (User, UserSortableField(..), Sorted(..), UsersListView(..))
 import Msg exposing (Msg(..), UserMsg(..))
 import Route exposing (Location(..))
 import Html exposing (Html, text, div, a, img, span, h3)
 import Html.Attributes exposing (href, src, style)
+import Html.Events exposing (onClick)
 import Material.List as List
 import Material.Button as Button
 import Material.Icon as Icon
@@ -22,10 +23,16 @@ import Util
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ usersCards model
-        , usersTable model
-        ]
+    let
+        body =
+            case model.usersListView of
+                UsersTable ->
+                    usersTable model
+
+                UsersCards ->
+                    usersCards model
+    in
+        div [] [ body ]
 
 
 usersCards : Model -> Html Msg
@@ -44,13 +51,14 @@ userCard user =
     in
         Card.view
             [ Options.css "width" "100%"
+            , Options.css "cursor" "pointer"
+            , Options.attribute <| onClick <| NavigateTo <| Maybe.map ShowUser user.id
             , Elevation.e2
             ]
             [ Card.title
                 [ Options.css "background" ("url('" ++ userPhotoUrl ++ "') center / cover")
-                , Options.css "min-height" "300px"
+                , Options.css "min-height" "250px"
                 , Options.css "padding" "0"
-                  -- Clear default padding to encompass scrim
                 ]
                 []
             , Card.text []
@@ -188,4 +196,30 @@ thOptions sortableField model =
 
 header : Model -> List (Html Msg)
 header model =
-    Helpers.defaultHeaderWithNavigation model "Users" [ addUserButton model ]
+    Helpers.defaultHeaderWithNavigation model
+        "Users"
+        [ switchViewButton model
+        , addUserButton model
+        ]
+
+
+switchViewButton : Model -> Html Msg
+switchViewButton model =
+    let
+        ( msg, icon ) =
+            case model.usersListView of
+                UsersTable ->
+                    ( SwitchUsersListView UsersCards, "insert_photo" )
+
+                UsersCards ->
+                    ( SwitchUsersListView UsersTable, "list" )
+    in
+        Button.render Mdl
+            [ 0, 3 ]
+            model.mdl
+            [ Button.icon
+            , Button.ripple
+            , Button.onClick <| UserMsg' msg
+            , Options.css "margin-right" "6rem"
+            ]
+            [ Icon.i icon ]

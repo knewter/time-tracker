@@ -8,6 +8,7 @@ module Types
         , Organization
         , OrganizationSortableField(..)
         , APIFieldErrors
+        , UsersListView(..)
         )
 
 import Dict exposing (Dict)
@@ -50,3 +51,8 @@ type Sorted
 
 type alias APIFieldErrors =
     Dict String (List String)
+
+
+type UsersListView
+    = UsersTable
+    | UsersCards
