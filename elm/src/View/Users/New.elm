@@ -17,8 +17,6 @@ import Form exposing (Form)
 import Form.Field
 import Form.Input
 import Form.Error
-import String
-import Dict
 import OurForm
 
 
@@ -37,36 +35,12 @@ view model =
 nameField : Model -> Html Msg
 nameField model =
     let
-        rawName =
-            Form.getFieldAsString "name" (fst model.newUserForm)
-                |> Debug.log "rawName"
-
-        apiErrors =
-            (snd model.newUserForm)
+        ( form, apiErrors ) =
+            model.newUserForm
 
         name =
-            case apiErrors of
-                Nothing ->
-                    rawName
-
-                Just errorDict ->
-                    case ( rawName.isDirty, rawName.liveError /= Nothing ) of
-                        ( True, True ) ->
-                            rawName
-
-                        ( False, True ) ->
-                            rawName
-
-                        ( True, False ) ->
-                            rawName
-
-                        ( _, False ) ->
-                            case Dict.get "name" errorDict of
-                                Nothing ->
-                                    rawName
-
-                                Just errorList ->
-                                    { rawName | liveError = Just <| Form.Error.CustomError (String.join ", " errorList) }
+            Form.getFieldAsString "name" form
+                |> OurForm.handleAPIErrors apiErrors
     in
         Textfield.render Mdl
             [ 1, 0 ]

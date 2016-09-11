@@ -1,8 +1,11 @@
-module OurForm exposing (errorMessagesForTextfield)
+module OurForm exposing (errorMessagesForTextfield, handleAPIErrors)
 
 import Material.Textfield as Textfield
 import Form.Error
 import Form exposing (FieldState)
+import Dict
+import String
+import Types exposing (APIFieldErrors)
 
 
 errorMessageTranslator : FieldState String String -> Maybe String
@@ -34,3 +37,29 @@ errorMessagesForTextfield field =
 
         Nothing ->
             []
+
+
+handleAPIErrors : Maybe APIFieldErrors -> FieldState String String -> FieldState String String
+handleAPIErrors apiErrors field =
+    case apiErrors of
+        Nothing ->
+            field
+
+        Just errorDict ->
+            case ( field.isDirty, field.liveError /= Nothing ) of
+                ( True, True ) ->
+                    field
+
+                ( False, True ) ->
+                    field
+
+                ( True, False ) ->
+                    field
+
+                ( _, False ) ->
+                    case Dict.get "name" errorDict of
+                        Nothing ->
+                            field
+
+                        Just errorList ->
+                            { field | liveError = Just <| Form.Error.CustomError (String.join ", " errorList) }
