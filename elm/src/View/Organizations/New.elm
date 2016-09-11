@@ -11,6 +11,11 @@ import Material.Button as Button
 import Material.Textfield as Textfield
 import Material.Options as Options
 import Material.Grid exposing (grid, size, cell, Device(..))
+import Form exposing (Form)
+import Form.Field
+import Form.Input
+import Form.Error
+import OurForm
 
 
 view : Model -> Html Msg
@@ -27,15 +32,27 @@ view model =
 
 nameField : Model -> Html Msg
 nameField model =
-    Textfield.render Mdl
-        [ 6, 0 ]
-        model.mdl
-        [ Textfield.label "Name"
-        , Textfield.floatingLabel
-        , Textfield.text'
-        , Textfield.value model.newOrganization.name
-        , Textfield.onInput <| OrganizationMsg' << SetNewOrganizationName
-        ]
+    let
+        ( form, apiErrors ) =
+            model.newOrganizationForm
+
+        name =
+            Form.getFieldAsString "name" form
+                |> OurForm.handleAPIErrors apiErrors
+    in
+        Textfield.render Mdl
+            [ 6, 0 ]
+            model.mdl
+            ([ Textfield.label "Name"
+             , Textfield.floatingLabel
+             , Textfield.text'
+             , Textfield.value <| Maybe.withDefault "" name.value
+             , Textfield.onInput <| tagged << (Form.Field.Text >> Form.Input name.path)
+             , Textfield.onFocus <| tagged <| Form.Focus name.path
+             , Textfield.onBlur <| tagged <| Form.Blur name.path
+             ]
+                ++ OurForm.errorMessagesForTextfield name
+            )
 
 
 submitButton : Model -> Html Msg
@@ -46,7 +63,7 @@ submitButton model =
         [ Button.raised
         , Button.ripple
         , Button.colored
-        , Button.onClick <| OrganizationMsg' CreateOrganization
+        , Button.onClick <| tagged Form.Submit
         ]
         [ text "Submit" ]
 
@@ -61,3 +78,8 @@ cancelButton model =
         , Options.css "margin-left" "1rem"
         ]
         [ text "Cancel" ]
+
+
+tagged : Form.Msg -> Msg
+tagged =
+    OrganizationMsg' << NewOrganizationFormMsg

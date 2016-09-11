@@ -142,39 +142,9 @@ updateUserMsg msg model =
                 ! [ Navigation.newUrl (Route.urlFor Users) ]
 
         CreateUserFailed error ->
-            let
-                decodeError : OurHttp.Error -> APIFieldErrors
-                decodeError error =
-                    case error of
-                        BadResponse code text value ->
-                            case value of
-                                Text responseBody ->
-                                    JD.decodeString Decoders.apiFieldErrorsDecoder (Debug.log "r" responseBody)
-                                        |> Result.withDefault
-                                            ((Debug.log <|
-                                                "derp didn't get an api field errors decodable response back, instead got "
-                                                    ++ responseBody
-                                             )
-                                                Dict.empty
-                                            )
-
-                                e ->
-                                    Dict.empty
-                                        |> (Debug.log <|
-                                                "this is a blob how did that hapen? "
-                                                    ++ (toString error)
-                                           )
-
-                        e ->
-                            Dict.empty
-                                |> (Debug.log <|
-                                        "this is a blob how did that hapen? "
-                                            ++ (toString e)
-                                   )
-            in
-                { model | newUserForm = ( fst model.newUserForm, Just (decodeError error) ) }
-                    ! []
-                    |> andLog "Create User failed" (toString <| decodeError error)
+            { model | newUserForm = ( fst model.newUserForm, Just (decodeError error) ) }
+                ! []
+                |> andLog "Create User failed" (toString <| decodeError error)
 
         DeleteUser user ->
             model ! [ API.deleteUser model user (UserMsg' << DeleteUserFailed) (UserMsg' << DeleteUserSucceeded) ]
@@ -320,22 +290,16 @@ updateOrganizationMsg msg model =
         GotOrganizations organizations ->
             { model | organizations = organizations } ! []
 
-        SetNewOrganizationName name ->
-            let
-                oldNewOrganization =
-                    model.newOrganization
-            in
-                { model | newOrganization = { oldNewOrganization | name = name } } ! []
-
-        CreateOrganization ->
-            model ! [ API.createOrganization model model.newOrganization (OrganizationMsg' << CreateOrganizationFailed) (OrganizationMsg' << CreateOrganizationSucceeded) ]
-
         CreateOrganizationSucceeded _ ->
-            { model | newOrganization = Organization Nothing "" }
+            { model
+                | newOrganizationForm = initialModel.newOrganizationForm
+            }
                 ! [ Navigation.newUrl (Route.urlFor Organizations) ]
 
         CreateOrganizationFailed error ->
-            model ! [] |> andLog "Create Organization failed" error
+            { model | newOrganizationForm = ( fst model.newOrganizationForm, Just (decodeError error) ) }
+                ! []
+                |> andLog "Create Organization failed" (toString <| decodeError error)
 
         DeleteOrganization organization ->
             model ! [ API.deleteOrganization model organization (OrganizationMsg' << DeleteOrganizationFailed) (OrganizationMsg' << DeleteOrganizationSucceeded) ]
@@ -382,6 +346,20 @@ updateOrganizationMsg msg model =
 
                 Just id ->
                     { model | shownOrganization = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowOrganization id ]
+
+        NewOrganizationFormMsg formMsg ->
+            case ( formMsg, Form.getOutput (fst model.newOrganizationForm) ) of
+                ( Form.Submit, Just organization ) ->
+                    model ! [ API.createOrganization model organization (OrganizationMsg' << CreateOrganizationFailed) (OrganizationMsg' << CreateOrganizationSucceeded) ]
+
+                _ ->
+                    { model
+                        | newOrganizationForm =
+                            ( Form.update formMsg (fst model.newOrganizationForm)
+                            , snd model.newOrganizationForm
+                            )
+                    }
+                        ! []
 
 
 organizationSortableFieldFun : OrganizationSortableField -> (Organization -> String)
@@ -450,3 +428,33 @@ andLog tag value ( model, cmd ) =
 initialModel : Model
 initialModel =
     Model.initialModel Nothing
+
+
+decodeError : OurHttp.Error -> APIFieldErrors
+decodeError error =
+    case error of
+        BadResponse code text value ->
+            case value of
+                Text responseBody ->
+                    JD.decodeString Decoders.apiFieldErrorsDecoder (Debug.log "r" responseBody)
+                        |> Result.withDefault
+                            ((Debug.log <|
+                                "derp didn't get an api field errors decodable response back, instead got "
+                                    ++ responseBody
+                             )
+                                Dict.empty
+                            )
+
+                e ->
+                    Dict.empty
+                        |> (Debug.log <|
+                                "this is a blob how did that happen?: "
+                                    ++ (toString error)
+                           )
+
+        e ->
+            Dict.empty
+                |> (Debug.log <|
+                        "Something other than a BadResponse: "
+                            ++ (toString e)
+                   )

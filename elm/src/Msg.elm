@@ -55,8 +55,6 @@ type ProjectMsg
 type OrganizationMsg
     = GotOrganization Organization
     | GotOrganizations (List Organization)
-    | SetNewOrganizationName String
-    | CreateOrganization
     | CreateOrganizationSucceeded Organization
     | CreateOrganizationFailed OurHttp.Error
     | DeleteOrganization Organization
@@ -67,3 +65,4 @@ type OrganizationMsg
     | UpdateOrganization
     | UpdateOrganizationFailed OurHttp.Error
     | UpdateOrganizationSucceeded Organization
+    | NewOrganizationFormMsg Form.Msg
