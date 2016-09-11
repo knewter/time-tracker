@@ -183,11 +183,20 @@ encodeOrganization organization =
 
 defaultRequest : Model -> String -> Http.Request
 defaultRequest model path =
-    { verb = "GET"
-    , url = model.baseUrl ++ path
-    , body = Http.empty
-    , headers = [ ( "Content-Type", "application/json" ) ]
-    }
+    let
+        conditionalHeaders =
+            case model.apiKey of
+                Nothing ->
+                    []
+
+                Just apiKey ->
+                    [ ( "Authorization", "Bearer " ++ apiKey ) ]
+    in
+        { verb = "GET"
+        , url = model.baseUrl ++ path
+        , body = Http.empty
+        , headers = [ ( "Content-Type", "application/json" ) ] ++ conditionalHeaders
+        }
 
 
 get : Model -> String -> JD.Decoder a -> (Http.Error -> Msg) -> (a -> Msg) -> Cmd Msg
