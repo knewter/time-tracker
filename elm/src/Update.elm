@@ -150,7 +150,7 @@ updateLoginMsg msg model =
                         ! []
 
         LoginSucceeded apiKey ->
-            model ! [] |> andLog "Login success" apiKey
+            { model | apiKey = Just apiKey } ! [] |> andLog "Login success" apiKey
 
         LoginFailed error ->
             model ! [] |> andLog "Login failed" (toString <| decodeError error)
