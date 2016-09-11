@@ -24,6 +24,6 @@ defmodule TimeTrackerBackend.SessionController do
     new_conn
       |> put_resp_header("authorization", "Bearer #{jwt}")
       |> put_resp_header("x-expires", "#{exp}")
-      |> json("IGNORE THE BODY AUTH IS THE AUTHORIZATION HEADER MNKAY?")
+      |> json(%{ "token" => jwt })
   end
 end
