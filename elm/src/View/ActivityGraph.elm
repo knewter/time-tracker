@@ -31,6 +31,76 @@ type alias Metadata =
     }
 
 
+type Week
+    = Week Box Box Box Box Box Box Box
+
+
+view : Html Msg
+view =
+    div [] <| List.map viewWeek mockWeeks
+
+
+viewWeek : Week -> Html Msg
+viewWeek (Week b1 b2 b3 b4 b5 b6 b7) =
+    div [ style [ ( "display", "inline-block" ) ] ]
+        [ viewBox b1
+        , viewBox b2
+        , viewBox b3
+        , viewBox b4
+        , viewBox b5
+        , viewBox b6
+        , viewBox b7
+        ]
+
+
+hueColor : Hue -> ( String, String )
+hueColor boxHue =
+    let
+        bg =
+            case boxHue of
+                H0 ->
+                    "rgba(0, 0, 0, 0.06)"
+
+                H1 ->
+                    "rgba(34, 74, 155, 0.2)"
+
+                H2 ->
+                    "rgba(34, 74, 155, 0.3)"
+
+                H3 ->
+                    "rgba(34, 74, 155, 0.4)"
+
+                H4 ->
+                    "rgba(34, 74, 155, 0.5)"
+
+                H5 ->
+                    "rgba(34, 74, 155, 0.6)"
+    in
+        ( "background-color", bg )
+
+
+viewBox : Box -> Html Msg
+viewBox (Box metadata) =
+    let
+        boxHue =
+            hue metadata
+
+        titleText =
+            (toString metadata.consumptions) ++ " drips consumed"
+    in
+        div
+            [ title titleText
+            , style <|
+                (hueColor boxHue)
+                    :: [ ( "width", "14px" )
+                       , ( "height", "14px" )
+                       , ( "margin-right", "2px" )
+                       , ( "margin-bottom", "2px" )
+                       ]
+            ]
+            []
+
+
 hue : Metadata -> Hue
 hue metadata =
     let
@@ -57,8 +127,8 @@ hue metadata =
                 H5
 
 
-type Week
-    = Week Box Box Box Box Box Box Box
+
+-- MOCK DATA
 
 
 mockWeek :
@@ -151,69 +221,3 @@ mockWeeks =
         , mockWeek w2m1 w2m2 w2m3 w2m4 w2m5 w2m6 w2m7
         , mockWeek w3m1 w3m2 w3m3 w3m4 w3m5 w3m6 w3m7
         ]
-
-
-view : Html Msg
-view =
-    div [] <| List.map viewWeek mockWeeks
-
-
-viewWeek : Week -> Html Msg
-viewWeek (Week b1 b2 b3 b4 b5 b6 b7) =
-    div [ style [ ( "display", "inline-block" ) ] ]
-        [ viewBox b1
-        , viewBox b2
-        , viewBox b3
-        , viewBox b4
-        , viewBox b5
-        , viewBox b6
-        , viewBox b7
-        ]
-
-
-hueColor : Hue -> ( String, String )
-hueColor boxHue =
-    let
-        bg =
-            case boxHue of
-                H0 ->
-                    "rgba(0, 0, 0, 0.06)"
-
-                H1 ->
-                    "rgba(34, 74, 155, 0.2)"
-
-                H2 ->
-                    "rgba(34, 74, 155, 0.3)"
-
-                H3 ->
-                    "rgba(34, 74, 155, 0.4)"
-
-                H4 ->
-                    "rgba(34, 74, 155, 0.5)"
-
-                H5 ->
-                    "rgba(34, 74, 155, 0.6)"
-    in
-        ( "background-color", bg )
-
-
-viewBox : Box -> Html Msg
-viewBox (Box metadata) =
-    let
-        boxHue =
-            hue metadata
-
-        titleText =
-            (toString metadata.consumptions) ++ " drips consumed"
-    in
-        div
-            [ title titleText
-            , style <|
-                (hueColor boxHue)
-                    :: [ ( "width", "14px" )
-                       , ( "height", "14px" )
-                       , ( "margin-right", "2px" )
-                       , ( "margin-bottom", "2px" )
-                       ]
-            ]
-            []
