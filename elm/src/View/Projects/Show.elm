@@ -7,17 +7,19 @@ import Html exposing (Html, text, h2, div, a, span)
 import Html.Attributes exposing (href)
 import Route exposing (Location(..))
 import View.Helpers as Helpers
+import View.ActivityGraph as ActivityGraph
 import Material.Layout as Layout
 
 
 view : Model -> Int -> Html Msg
 view model id =
-    case model.shownProject of
-        Nothing ->
-            text "No project here, sorry bud."
-
-        Just project ->
-            text "so we will show non-name info here once it exists oops"
+    -- case model.shownProject of
+    --     Nothing ->
+    --         text "No project here, sorry bud."
+    --
+    --     Just project ->
+    --         text "so we will show non-name info here once it exists oops"
+    ActivityGraph.view
 
 
 header : Model -> Int -> List (Html Msg)

@@ -35,12 +35,13 @@ urlUpdate location oldModel =
         ( newModel, loginRedirectCmd ) =
             case newModelWithClearedForms.apiKey of
                 Nothing ->
-                    case newModelWithClearedForms.route of
-                        Just Login ->
-                            newModelWithClearedForms ! []
-
-                        _ ->
-                            { newModelWithClearedForms | route = Just Login } ! [ Navigation.modifyUrl (Route.urlFor Login) ]
+                    -- case newModelWithClearedForms.route of
+                    --     Just Login ->
+                    --         newModelWithClearedForms ! []
+                    --
+                    --     _ ->
+                    --         { newModelWithClearedForms | route = Just Login } ! [ Navigation.modifyUrl (Route.urlFor Login) ]
+                    newModelWithClearedForms ! []
 
                 Just apiKey ->
                     newModelWithClearedForms ! []
