@@ -2,7 +2,9 @@ module View.ActivityGraph exposing (view)
 
 import Msg exposing (Msg(..))
 import Html exposing (Html, text, h2, div, a, span)
-import Html.Attributes exposing (href, style)
+import Html.Attributes exposing (href, style, title)
+import Date exposing (Month(..), Date)
+import Date.Extra as Date
 
 
 -- a box per day
@@ -21,31 +23,112 @@ type Hue
 
 
 type Box
-    = Box Hue
+    = Box Metadata
+
+
+type alias Metadata =
+    { consumptions : Int
+    }
+
+
+hue : Metadata -> Hue
+hue metadata =
+    let
+        step =
+            1
+    in
+        case metadata.consumptions // step of
+            0 ->
+                H0
+
+            1 ->
+                H1
+
+            2 ->
+                H1
+
+            3 ->
+                H1
+
+            4 ->
+                H1
+
+            _ ->
+                H5
 
 
 type Week
     = Week Box Box Box Box Box Box Box
 
 
-mockWeek : Hue -> Hue -> Hue -> Hue -> Hue -> Hue -> Hue -> Week
-mockWeek h1 h2 h3 h4 h5 h6 h7 =
+mockWeek :
+    Metadata
+    -> Metadata
+    -> Metadata
+    -> Metadata
+    -> Metadata
+    -> Metadata
+    -> Metadata
+    -> Week
+mockWeek m1 m2 m3 m4 m5 m6 m7 =
     Week
-        (Box h1)
-        (Box h2)
-        (Box h3)
-        (Box h4)
-        (Box h5)
-        (Box h6)
-        (Box h7)
+        (Box m1)
+        (Box m2)
+        (Box m3)
+        (Box m4)
+        (Box m5)
+        (Box m6)
+        (Box m7)
 
 
 mockWeeks : List Week
 mockWeeks =
-    [ mockWeek H1 H2 H4 H0 H1 H3 H2
-    , mockWeek H3 H2 H3 H3 H2 H3 H1
-    , mockWeek H2 H3 H3 H2 H0 H1 H2
-    ]
+    let
+        w1m1 =
+            { consumptions = 3 }
+
+        w1m2 =
+            { consumptions = 4 }
+
+        w1m3 =
+            { consumptions = 0 }
+
+        w1m4 =
+            { consumptions = 2 }
+
+        w1m5 =
+            { consumptions = 3 }
+
+        w1m6 =
+            { consumptions = 8 }
+
+        w1m7 =
+            { consumptions = 1 }
+
+        w2m1 =
+            { consumptions = 1 }
+
+        w2m2 =
+            { consumptions = 2 }
+
+        w2m3 =
+            { consumptions = 9 }
+
+        w2m4 =
+            { consumptions = 4 }
+
+        w2m5 =
+            { consumptions = 5 }
+
+        w2m6 =
+            { consumptions = 0 }
+
+        w2m7 =
+            { consumptions = 0 }
+    in
+        [ mockWeek w1m1 w1m2 w1m3 w1m4 w1m5 w1m6 w1m7
+        , mockWeek w2m1 w2m2 w2m3 w2m4 w2m5 w2m6 w2m7
+        ]
 
 
 view : Html Msg
@@ -66,41 +149,49 @@ viewWeek (Week b1 b2 b3 b4 b5 b6 b7) =
         ]
 
 
-boxBackgroundColor : Box -> ( String, String )
-boxBackgroundColor box =
+hueColor : Hue -> ( String, String )
+hueColor boxHue =
     let
         bg =
-            case box of
-                Box H0 ->
-                    "rgba(255, 0, 0, 0)"
+            case boxHue of
+                H0 ->
+                    "rgba(0, 0, 0, 0.06)"
 
-                Box H1 ->
-                    "rgba(255, 0, 0, 0.1)"
+                H1 ->
+                    "rgba(34, 74, 155, 0.2)"
 
-                Box H2 ->
-                    "rgba(255, 0, 0, 0.2)"
+                H2 ->
+                    "rgba(34, 74, 155, 0.3)"
 
-                Box H3 ->
-                    "rgba(255, 0, 0, 0.3)"
+                H3 ->
+                    "rgba(34, 74, 155, 0.4)"
 
-                Box H4 ->
-                    "rgba(255, 0, 0, 0.4)"
+                H4 ->
+                    "rgba(34, 74, 155, 0.5)"
 
-                Box H5 ->
-                    "rgba(255, 0, 0, 0.5)"
+                H5 ->
+                    "rgba(34, 74, 155, 0.6)"
     in
         ( "background-color", bg )
 
 
 viewBox : Box -> Html Msg
-viewBox box =
-    div
-        [ style <|
-            (boxBackgroundColor box)
-                :: [ ( "width", "1rem" )
-                   , ( "height", "1rem" )
-                   , ( "margin-right", "0.1rem" )
-                   , ( "margin-bottom", "0.1rem" )
-                   ]
-        ]
-        []
+viewBox (Box metadata) =
+    let
+        boxHue =
+            hue metadata
+
+        titleText =
+            (toString metadata.consumptions) ++ " drips consumed"
+    in
+        div
+            [ title titleText
+            , style <|
+                (hueColor boxHue)
+                    :: [ ( "width", "14px" )
+                       , ( "height", "14px" )
+                       , ( "margin-right", "2px" )
+                       , ( "margin-bottom", "2px" )
+                       ]
+            ]
+            []
