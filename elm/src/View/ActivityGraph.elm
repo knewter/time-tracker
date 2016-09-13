@@ -125,9 +125,31 @@ mockWeeks =
 
         w2m7 =
             { consumptions = 0 }
+
+        w3m1 =
+            { consumptions = 0 }
+
+        w3m2 =
+            { consumptions = 0 }
+
+        w3m3 =
+            { consumptions = 3 }
+
+        w3m4 =
+            { consumptions = 2 }
+
+        w3m5 =
+            { consumptions = 1 }
+
+        w3m6 =
+            { consumptions = 2 }
+
+        w3m7 =
+            { consumptions = 5 }
     in
         [ mockWeek w1m1 w1m2 w1m3 w1m4 w1m5 w1m6 w1m7
         , mockWeek w2m1 w2m2 w2m3 w2m4 w2m5 w2m6 w2m7
+        , mockWeek w3m1 w3m2 w3m3 w3m4 w3m5 w3m6 w3m7
         ]
 
 
