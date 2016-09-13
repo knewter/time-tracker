@@ -13,6 +13,10 @@ import Date.Extra as Date
 -- hues for the boxes (0..10)
 
 
+type DayActivity
+    = DayActivity Date.Date Int
+
+
 type Hue
     = H0
     | H1
@@ -23,16 +27,16 @@ type Hue
 
 
 type Box
-    = Box Metadata
+    = Box Hue Metadata
 
 
 type alias Metadata =
-    { consumptions : Int
+    { text : String
     }
 
 
-type Week
-    = Week Box Box Box Box Box Box Box
+type WeekActivity
+    = WeekActivity DayActivity DayActivity DayActivity DayActivity DayActivity DayActivity DayActivity
 
 
 view : Html Msg
@@ -40,16 +44,16 @@ view =
     div [] <| List.map viewWeek mockWeeks
 
 
-viewWeek : Week -> Html Msg
-viewWeek (Week b1 b2 b3 b4 b5 b6 b7) =
+viewWeek : WeekActivity -> Html Msg
+viewWeek (WeekActivity d1 d2 d3 d4 d5 d6 d7) =
     div [ style [ ( "display", "inline-block" ) ] ]
-        [ viewBox b1
-        , viewBox b2
-        , viewBox b3
-        , viewBox b4
-        , viewBox b5
-        , viewBox b6
-        , viewBox b7
+        [ viewDay d1
+        , viewDay d2
+        , viewDay d3
+        , viewDay d4
+        , viewDay d5
+        , viewDay d6
+        , viewDay d7
         ]
 
 
@@ -79,35 +83,45 @@ hueColor boxHue =
         ( "background-color", bg )
 
 
-viewBox : Box -> Html Msg
-viewBox (Box metadata) =
+viewDay : DayActivity -> Html Msg
+viewDay dayActivity =
+    viewBox (toBox dayActivity)
+
+
+toBox : DayActivity -> Box
+toBox (DayActivity date count) =
     let
         boxHue =
-            hue metadata
+            hue count
 
         titleText =
-            (toString metadata.consumptions) ++ " drips consumed"
+            (toString count) ++ " drips consumed on " ++ (toString date)
     in
-        div
-            [ title titleText
-            , style <|
-                (hueColor boxHue)
-                    :: [ ( "width", "14px" )
-                       , ( "height", "14px" )
-                       , ( "margin-right", "2px" )
-                       , ( "margin-bottom", "2px" )
-                       ]
-            ]
-            []
+        Box boxHue { text = titleText }
 
 
-hue : Metadata -> Hue
-hue metadata =
+viewBox : Box -> Html Msg
+viewBox (Box boxHue { text }) =
+    div
+        [ title text
+        , style <|
+            (hueColor boxHue)
+                :: [ ( "width", "14px" )
+                   , ( "height", "14px" )
+                   , ( "margin-right", "2px" )
+                   , ( "margin-bottom", "2px" )
+                   ]
+        ]
+        []
+
+
+hue : Int -> Hue
+hue count =
     let
         step =
             1
     in
-        case metadata.consumptions // step of
+        case count // step of
             0 ->
                 H0
 
@@ -131,93 +145,73 @@ hue metadata =
 -- MOCK DATA
 
 
-mockWeek :
-    Metadata
-    -> Metadata
-    -> Metadata
-    -> Metadata
-    -> Metadata
-    -> Metadata
-    -> Metadata
-    -> Week
-mockWeek m1 m2 m3 m4 m5 m6 m7 =
-    Week
-        (Box m1)
-        (Box m2)
-        (Box m3)
-        (Box m4)
-        (Box m5)
-        (Box m6)
-        (Box m7)
-
-
-mockWeeks : List Week
+mockWeeks : List WeekActivity
 mockWeeks =
     let
-        w1m1 =
-            { consumptions = 3 }
+        w1d1 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 1) 3
 
-        w1m2 =
-            { consumptions = 4 }
+        w1d2 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 2) 4
 
-        w1m3 =
-            { consumptions = 0 }
+        w1d3 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 3) 0
 
-        w1m4 =
-            { consumptions = 2 }
+        w1d4 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 4) 2
 
-        w1m5 =
-            { consumptions = 3 }
+        w1d5 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 5) 3
 
-        w1m6 =
-            { consumptions = 8 }
+        w1d6 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 6) 8
 
-        w1m7 =
-            { consumptions = 1 }
+        w1d7 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 7) 1
 
-        w2m1 =
-            { consumptions = 1 }
+        w2d1 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 8) 1
 
-        w2m2 =
-            { consumptions = 2 }
+        w2d2 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 9) 2
 
-        w2m3 =
-            { consumptions = 9 }
+        w2d3 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 10) 9
 
-        w2m4 =
-            { consumptions = 4 }
+        w2d4 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 11) 4
 
-        w2m5 =
-            { consumptions = 5 }
+        w2d5 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 12) 5
 
-        w2m6 =
-            { consumptions = 0 }
+        w2d6 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 13) 0
 
-        w2m7 =
-            { consumptions = 0 }
+        w2d7 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 14) 0
 
-        w3m1 =
-            { consumptions = 0 }
+        w3d1 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 15) 0
 
-        w3m2 =
-            { consumptions = 0 }
+        w3d2 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 16) 0
 
-        w3m3 =
-            { consumptions = 3 }
+        w3d3 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 17) 3
 
-        w3m4 =
-            { consumptions = 2 }
+        w3d4 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 18) 2
 
-        w3m5 =
-            { consumptions = 1 }
+        w3d5 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 19) 1
 
-        w3m6 =
-            { consumptions = 2 }
+        w3d6 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 20) 2
 
-        w3m7 =
-            { consumptions = 5 }
+        w3d7 =
+            DayActivity (Date.fromCalendarDate 2016 Jul 21) 5
     in
-        [ mockWeek w1m1 w1m2 w1m3 w1m4 w1m5 w1m6 w1m7
-        , mockWeek w2m1 w2m2 w2m3 w2m4 w2m5 w2m6 w2m7
-        , mockWeek w3m1 w3m2 w3m3 w3m4 w3m5 w3m6 w3m7
+        [ WeekActivity w1d1 w1d2 w1d3 w1d4 w1d5 w1d6 w1d7
+        , WeekActivity w2d1 w2d2 w2d3 w2d4 w2d5 w2d6 w2d7
+        , WeekActivity w3d1 w3d2 w3d3 w3d4 w3d5 w3d6 w3d7
         ]
