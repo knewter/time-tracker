@@ -7,10 +7,12 @@ module Decoders
         , organizationsDecoder
         , organizationDecoder
         , apiFieldErrorsDecoder
+        , dayActivityDecoder
         )
 
 import Json.Decode as JD exposing ((:=))
-import Types exposing (User, Project, Organization, APIFieldErrors)
+import Json.Decode.Extra as JDE
+import Types exposing (User, Project, Organization, APIFieldErrors, DayActivity(..))
 import Dict
 
 
@@ -53,3 +55,10 @@ organizationDecoder =
 apiFieldErrorsDecoder : JD.Decoder APIFieldErrors
 apiFieldErrorsDecoder =
     "errors" := (JD.dict <| JD.list JD.string)
+
+
+dayActivityDecoder : JD.Decoder DayActivity
+dayActivityDecoder =
+    JD.object2 DayActivity
+        ("date" := JDE.date)
+        ("count" := JD.int)

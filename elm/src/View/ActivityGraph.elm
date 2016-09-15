@@ -5,6 +5,7 @@ import Html exposing (Html, text, h2, div, a, span, strong)
 import Html.Attributes exposing (href, style, title)
 import Date exposing (Month(..), Date)
 import Date.Extra as Date
+import Types exposing (DayActivity(..), WeekActivity(..))
 
 
 -- a box per day
@@ -13,8 +14,12 @@ import Date.Extra as Date
 -- hues for the boxes (0..10)
 
 
-type DayActivity
-    = DayActivity Date.Date Int
+type alias ActivityBlock =
+    List ActivityChunk
+
+
+type ActivityChunk
+    = ActivityChunk String (List WeekActivity)
 
 
 type Hue
@@ -27,24 +32,12 @@ type Hue
 
 
 type Box
-    = Box Hue Metadata
+    = Box Hue BoxMetadata
 
 
-type alias Metadata =
+type alias BoxMetadata =
     { text : String
     }
-
-
-type WeekActivity
-    = WeekActivity DayActivity DayActivity DayActivity DayActivity DayActivity DayActivity DayActivity
-
-
-type alias ActivityBlock =
-    List ActivityChunk
-
-
-type ActivityChunk
-    = ActivityChunk String (List WeekActivity)
 
 
 toActivityBlock : List WeekActivity -> ActivityBlock

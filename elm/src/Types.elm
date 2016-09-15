@@ -9,9 +9,12 @@ module Types
         , OrganizationSortableField(..)
         , APIFieldErrors
         , UsersListView(..)
+        , DayActivity(..)
+        , WeekActivity(..)
         )
 
 import Dict exposing (Dict)
+import Date exposing (Date)
 
 
 type alias User =
@@ -56,3 +59,11 @@ type alias APIFieldErrors =
 type UsersListView
     = UsersTable
     | UsersCards
+
+
+type DayActivity
+    = DayActivity Date Int
+
+
+type WeekActivity
+    = WeekActivity DayActivity DayActivity DayActivity DayActivity DayActivity DayActivity DayActivity
