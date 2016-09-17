@@ -25,7 +25,7 @@ view : Model -> Html Msg
 view model =
     let
         body =
-            case model.usersListView of
+            case model.usersModel.usersListView of
                 UsersTable ->
                     usersTable model
 
@@ -40,7 +40,7 @@ usersCards model =
     grid [] <|
         List.map
             (\user -> cell [ size All 3 ] [ userCard user ])
-            model.users
+            model.usersModel.users
 
 
 userCard : User -> Html Msg
@@ -85,7 +85,7 @@ usersTable model =
             , Table.th [] [ text "Actions" ]
             ]
         , Table.tbody []
-            (List.indexedMap (viewUserRow model) model.users)
+            (List.indexedMap (viewUserRow model) model.usersModel.users)
         ]
 
 
@@ -176,7 +176,7 @@ thOptions sortableField model =
     [ Table.onClick <| UserMsg' <| ReorderUsers sortableField
     , Options.css "cursor" "pointer"
     ]
-        ++ case model.usersSort of
+        ++ case model.usersModel.usersSort of
             Nothing ->
                 []
 
@@ -207,7 +207,7 @@ switchViewButton : Model -> Html Msg
 switchViewButton model =
     let
         ( msg, icon ) =
-            case model.usersListView of
+            case model.usersModel.usersListView of
                 UsersTable ->
                     ( SwitchUsersListView UsersCards, "insert_photo" )
 

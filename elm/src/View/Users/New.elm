@@ -35,7 +35,7 @@ nameField : Model -> Html Msg
 nameField model =
     let
         ( form, apiErrors ) =
-            model.newUserForm
+            model.usersModel.newUserForm
 
         name =
             Form.getFieldAsString "name" form

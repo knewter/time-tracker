@@ -16,7 +16,7 @@ import View.Helpers as Helpers
 
 view : Model -> Int -> Html Msg
 view model id =
-    case model.shownUser of
+    case model.usersModel.shownUser of
         Nothing ->
             text "No user here, sorry bud."
 
@@ -39,7 +39,7 @@ nameField model =
         [ Textfield.label "Name"
         , Textfield.floatingLabel
         , Textfield.text'
-        , Textfield.value <| Maybe.withDefault "" <| Maybe.map .name model.shownUser
+        , Textfield.value <| Maybe.withDefault "" <| Maybe.map .name model.usersModel.shownUser
         , Textfield.onInput <| UserMsg' << SetShownUserName
         ]
 
@@ -71,7 +71,7 @@ cancelButton model =
 
 header : Model -> Int -> List (Html Msg)
 header model id =
-    case model.shownUser of
+    case model.usersModel.shownUser of
         Nothing ->
             Helpers.defaultHeader model "No such user"
 

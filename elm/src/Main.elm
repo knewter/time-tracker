@@ -29,19 +29,27 @@ subscriptions model =
 urlUpdate : Maybe Route.Location -> Model -> ( Model, Cmd Msg )
 urlUpdate location oldModel =
     let
+        newUserForm =
+            (Model.initialModel Nothing).usersModel.newUserForm
+
+        oldUsersModel =
+            oldModel.usersModel
+
+        newUsersModel =
+            { oldUsersModel | newUserForm = newUserForm }
+
         newModelWithClearedForms =
-            { oldModel | route = location, newUserForm = (Model.initialModel Nothing).newUserForm }
+            { oldModel | route = location, usersModel = newUsersModel }
 
         ( newModel, loginRedirectCmd ) =
             case newModelWithClearedForms.apiKey of
                 Nothing ->
-                    -- case newModelWithClearedForms.route of
-                    --     Just Login ->
-                    --         newModelWithClearedForms ! []
-                    --
-                    --     _ ->
-                    --         { newModelWithClearedForms | route = Just Login } ! [ Navigation.modifyUrl (Route.urlFor Login) ]
-                    newModelWithClearedForms ! []
+                    case newModelWithClearedForms.route of
+                        Just Login ->
+                            newModelWithClearedForms ! []
+
+                        _ ->
+                            { newModelWithClearedForms | route = Just Login } ! [ Navigation.modifyUrl (Route.urlFor Login) ]
 
                 Just apiKey ->
                     newModelWithClearedForms ! []
