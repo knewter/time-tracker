@@ -41,7 +41,21 @@ update msg model =
             updateLoginMsg msg model
 
         UserMsg' msg ->
-            updateUserMsg msg model
+            let
+                ( usersModel, cmd, maybeLog ) =
+                    updateUserMsg model msg model.usersModel
+            in
+                case maybeLog of
+                    Nothing ->
+                        ( { model | usersModel = usersModel }
+                        , cmd
+                        )
+
+                    Just ( tag, value ) ->
+                        ( { model | usersModel = usersModel }
+                        , cmd
+                        )
+                            |> andLog tag value
 
         ProjectMsg' msg ->
             updateProjectMsg msg model
@@ -156,124 +170,134 @@ updateLoginMsg msg model =
             model ! [] |> andLog "Login failed" (toString <| decodeError error)
 
 
-updateUserMsg : UserMsg -> Model -> ( Model, Cmd Msg )
-updateUserMsg msg model =
-    let
-        usersModel =
-            model.usersModel
-    in
-        case msg of
-            GotUsers users ->
-                let
-                    newUsersModel =
-                        { usersModel | users = users }
-                in
-                    { model | usersModel = newUsersModel } ! []
+{-| Returns a 3-tuple where the third element is maybe something to log
+-}
+updateUserMsg : Model -> UserMsg -> UsersModel -> ( UsersModel, Cmd Msg, Maybe ( String, String ) )
+updateUserMsg model msg usersModel =
+    case msg of
+        GotUsers users ->
+            ( { usersModel | users = users }, Cmd.none, Nothing )
 
-            CreateUserSucceeded _ ->
-                let
-                    newUsersModel =
-                        { usersModel
-                            | newUserForm = initialModel.usersModel.newUserForm
-                        }
-                in
-                    { model | usersModel = newUsersModel } ! [ Navigation.newUrl (Route.urlFor Users) ]
+        CreateUserSucceeded _ ->
+            ( { usersModel
+                | newUserForm = initialModel.usersModel.newUserForm
+              }
+            , Navigation.newUrl (Route.urlFor Users)
+            , Nothing
+            )
 
-            CreateUserFailed error ->
-                let
-                    newUsersModel =
-                        { usersModel | newUserForm = ( fst usersModel.newUserForm, Just (decodeError error) ) }
-                in
-                    { model | usersModel = newUsersModel }
-                        ! []
-                        |> andLog "Create User failed" (toString <| decodeError error)
+        CreateUserFailed error ->
+            ( { usersModel | newUserForm = ( fst usersModel.newUserForm, Just (decodeError error) ) }
+            , Cmd.none
+            , Just ( "Create User failed", toString <| decodeError error )
+            )
 
-            DeleteUser user ->
-                model ! [ API.deleteUser model user (UserMsg' << DeleteUserFailed) (UserMsg' << DeleteUserSucceeded) ]
+        DeleteUser user ->
+            ( usersModel
+            , API.deleteUser model user (UserMsg' << DeleteUserFailed) (UserMsg' << DeleteUserSucceeded)
+            , Nothing
+            )
 
-            DeleteUserFailed error ->
-                model ! [] |> andLog "Delete User failed" error
+        DeleteUserFailed error ->
+            ( usersModel
+            , Cmd.none
+            , Just ( "Delete User failed", toString error )
+            )
 
-            DeleteUserSucceeded user ->
-                model ! [ API.fetchUsers model (always NoOp) (UserMsg' << GotUsers) ]
+        DeleteUserSucceeded user ->
+            ( usersModel
+            , API.fetchUsers model (always NoOp) (UserMsg' << GotUsers)
+            , Nothing
+            )
 
-            GotUser user ->
-                let
-                    newUsersModel =
-                        { usersModel | shownUser = Just user }
-                in
-                    { model | usersModel = newUsersModel } ! []
+        GotUser user ->
+            ( { usersModel | shownUser = Just user }
+            , Cmd.none
+            , Nothing
+            )
 
-            ReorderUsers field ->
-                let
-                    newUsersModel =
-                        reorderUsers field model.usersModel
-                in
-                    { model | usersModel = newUsersModel } ! []
+        ReorderUsers field ->
+            ( reorderUsers field model.usersModel
+            , Cmd.none
+            , Nothing
+            )
 
-            SetShownUserName name ->
-                let
-                    newUsersModel =
-                        case usersModel.shownUser of
-                            Nothing ->
-                                usersModel
+        SetShownUserName name ->
+            case usersModel.shownUser of
+                Nothing ->
+                    ( usersModel
+                    , Cmd.none
+                    , Nothing
+                    )
 
-                            Just user ->
-                                let
-                                    updatedUser =
-                                        { user | name = name }
-                                in
-                                    { usersModel | shownUser = (Just updatedUser) }
-                in
-                    { model | usersModel = newUsersModel } ! []
+                Just user ->
+                    let
+                        updatedUser =
+                            { user | name = name }
+                    in
+                        ( { usersModel | shownUser = (Just updatedUser) }
+                        , Cmd.none
+                        , Nothing
+                        )
 
-            UpdateUser ->
-                case usersModel.shownUser of
-                    Nothing ->
-                        model ! []
+        UpdateUser ->
+            case usersModel.shownUser of
+                Nothing ->
+                    ( usersModel
+                    , Cmd.none
+                    , Nothing
+                    )
 
-                    Just shownUser ->
-                        model ! [ API.updateUser model shownUser (UserMsg' << UpdateUserFailed) (UserMsg' << UpdateUserSucceeded) ]
+                Just shownUser ->
+                    ( usersModel
+                    , API.updateUser model shownUser (UserMsg' << UpdateUserFailed) (UserMsg' << UpdateUserSucceeded)
+                    , Nothing
+                    )
 
-            UpdateUserFailed error ->
-                model ! [] |> andLog "Update User failed" error
+        UpdateUserFailed error ->
+            ( usersModel
+            , Cmd.none
+            , Just ( "Update User failed", toString error )
+            )
 
-            UpdateUserSucceeded user ->
-                let
-                    ( newUsersModel, cmd ) =
-                        case user.id of
-                            Nothing ->
-                                { usersModel | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.Users ]
+        UpdateUserSucceeded user ->
+            case user.id of
+                Nothing ->
+                    ( { usersModel | shownUser = Nothing }
+                    , Navigation.newUrl <| Route.urlFor <| Route.Users
+                    , Nothing
+                    )
 
-                            Just id ->
-                                { usersModel | shownUser = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowUser id ]
-                in
-                    { model | usersModel = newUsersModel } ! [ cmd ]
+                Just id ->
+                    ( { usersModel | shownUser = Nothing }
+                    , Navigation.newUrl <| Route.urlFor <| Route.ShowUser id
+                    , Nothing
+                    )
 
-            NewUserFormMsg formMsg ->
-                let
-                    ( newUsersModel, cmd ) =
-                        case ( formMsg, Form.getOutput (fst usersModel.newUserForm) ) of
-                            ( Form.Submit, Just user ) ->
-                                usersModel ! [ API.createUser model user (UserMsg' << CreateUserFailed) (UserMsg' << CreateUserSucceeded) ]
+        NewUserFormMsg formMsg ->
+            case ( formMsg, Form.getOutput (fst usersModel.newUserForm) ) of
+                ( Form.Submit, Just user ) ->
+                    ( usersModel
+                    , API.createUser model user (UserMsg' << CreateUserFailed) (UserMsg' << CreateUserSucceeded)
+                    , Nothing
+                    )
 
-                            _ ->
-                                { usersModel
-                                    | newUserForm =
-                                        ( Form.update formMsg (fst usersModel.newUserForm)
-                                        , snd usersModel.newUserForm
-                                        )
-                                }
-                                    ! []
-                in
-                    { model | usersModel = newUsersModel } ! [ cmd ]
+                _ ->
+                    ( { usersModel
+                        | newUserForm =
+                            ( Form.update formMsg (fst usersModel.newUserForm)
+                            , snd usersModel.newUserForm
+                            )
+                      }
+                    , Cmd.none
+                    , Nothing
+                    )
 
-            SwitchUsersListView usersListView ->
-                let
-                    newUsersModel =
-                        { usersModel | usersListView = usersListView }
-                in
-                    { model | usersModel = newUsersModel } ! []
+        SwitchUsersListView usersListView ->
+            ( { usersModel | usersListView = usersListView }
+            , Cmd.none
+            , Nothing
+            )
 
 
 updateProjectMsg : ProjectMsg -> Model -> ( Model, Cmd Msg )
