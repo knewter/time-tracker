@@ -1,8 +1,8 @@
 module View.ActivityGraph exposing (view)
 
 import Msg exposing (Msg(..))
-import Html exposing (Html, text, h2, div, a, span, strong)
-import Html.Attributes exposing (href, style, title)
+import Html exposing (Html, text, h2, div, a, span, strong, node)
+import Html.Attributes exposing (href, style, title, class, type')
 import Date exposing (Month(..), Date)
 import Date.Extra as Date
 import Types exposing (DayActivity(..), WeekActivity(..))
@@ -46,7 +46,13 @@ toActivityBlock weeks =
         -- Turn the weeks into a 2-tuple with the month name first
         monthedWeeks : List ( String, WeekActivity )
         monthedWeeks =
-            List.map (\(WeekActivity (DayActivity date count) d2 d3 d4 d5 d6 d7) -> ( (toString <| Date.month date), (WeekActivity (DayActivity date count) d2 d3 d4 d5 d6 d7) )) weeks
+            List.map
+                (\(WeekActivity (DayActivity date count) d2 d3 d4 d5 d6 d7) ->
+                    ( toString <| Date.month date
+                    , WeekActivity (DayActivity date count) d2 d3 d4 d5 d6 d7
+                    )
+                )
+                weeks
 
         foldChunks : ( String, WeekActivity ) -> List ActivityChunk -> List ActivityChunk
         foldChunks ( m, week ) acc =
@@ -71,7 +77,10 @@ toActivityBlock weeks =
 
 view : Html Msg
 view =
-    viewActivityBlock (toActivityBlock mockWeeks)
+    div []
+        [ node "style" [ type' "text/css" ] [ text styles ]
+        , viewActivityBlock (toActivityBlock mockWeeks)
+        ]
 
 
 viewActivityBlock : ActivityBlock -> Html Msg
@@ -145,16 +154,37 @@ dayActivityToBox (DayActivity date count) =
 viewBox : Box -> Html Msg
 viewBox (Box boxHue { text }) =
     div
-        [ title text
+        [ class "activitygraph-box"
         , style <|
             (hueColor boxHue)
                 :: [ ( "width", "14px" )
                    , ( "height", "14px" )
                    , ( "margin-right", "2px" )
                    , ( "margin-bottom", "2px" )
+                   , ( "cursor", "pointer" )
+                   , ( "position", "relative" )
+                   , ( "z-index", "1" )
                    ]
         ]
-        []
+        [ labelDiv text ]
+
+
+labelDiv : String -> Html Msg
+labelDiv title =
+    div
+        [ class "activitygraph-box-label"
+        , style
+            [ ( "position", "absolute" )
+            , ( "top", "-5em" )
+            , ( "font-size", "10px" )
+            , ( "background-color", "#aaa" )
+            , ( "width", "16em" )
+            , ( "height", "2em" )
+            , ( "padding", "1em" )
+            , ( "z-index", "10" )
+            ]
+        ]
+        [ text title ]
 
 
 hue : Int -> Hue
@@ -330,3 +360,15 @@ mockWeeks =
         , week10
         , week11
         ]
+
+
+styles : String
+styles =
+    """
+    .activitygraph-box .activitygraph-box-label {
+        display: none;
+    }
+    .activitygraph-box:hover .activitygraph-box-label {
+        display: block;
+    }
+    """
