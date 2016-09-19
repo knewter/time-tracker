@@ -10,9 +10,14 @@ import Material
 import Util
 
 
-main : Program Never
+type alias ProgramFlags =
+    { apiKey : Maybe String
+    }
+
+
+main : Program ProgramFlags
 main =
-    Navigation.program (Navigation.makeParser Route.locFor)
+    Navigation.programWithFlags (Navigation.makeParser Route.locFor)
         { init = init
         , update = Update.update
         , urlUpdate = urlUpdate
@@ -59,6 +64,15 @@ urlUpdate location oldModel =
         )
 
 
-init : Maybe Route.Location -> ( Model, Cmd Msg )
-init location =
-    urlUpdate location <| Model.initialModel location
+init : ProgramFlags -> Maybe Route.Location -> ( Model, Cmd Msg )
+init programFlags location =
+    let
+        initialModel =
+            Model.initialModel location
+    in
+        case programFlags.apiKey of
+            Nothing ->
+                urlUpdate location <| initialModel
+
+            Just apiKey ->
+                urlUpdate location <| { initialModel | apiKey = Just apiKey }
