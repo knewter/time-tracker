@@ -7,6 +7,7 @@ import Material.Grid exposing (grid, size, cell, Device(..))
 import Material.Elevation as Elevation
 import Material.Card as Card
 import Material.Options as Options exposing (when)
+import View.Charts
 
 
 view : Model -> Html Msg
@@ -25,7 +26,7 @@ view model =
 viewActivitySummary : Model -> Html a
 viewActivitySummary model =
     [ Card.text []
-        [ text "Imagine an activity summary here"
+        [ View.Charts.activityGraph
         ]
     ]
         |> viewGridCard
