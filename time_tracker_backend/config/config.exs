@@ -27,7 +27,8 @@ config :guardian, Guardian,
   verify_module: Guardian.JWT,  # optional
   verify_issuer: true, # optional
   issuer: "TimeTrackerBackend",
-  ttl: { 30, :days },
+  #ttl: { 30, :days },
+  ttl: { 15, :seconds },
   secret_key: fn ->
     JOSE.JWK.from_pem_file("ec-secp521r1.pem")
   end,
