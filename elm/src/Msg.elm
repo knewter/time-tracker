@@ -17,6 +17,7 @@ type Msg
     | OrganizationMsg' OrganizationMsg
     | LoginMsg' LoginMsg
     | NavigateTo (Maybe Route.Location)
+    | ClearApiKey
     | NoOp
 
 

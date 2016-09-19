@@ -65,6 +65,9 @@ update msg model =
         OrganizationMsg' msg ->
             updateOrganizationMsg msg model
 
+        ClearApiKey ->
+            { model | apiKey = Nothing } ! [ Navigation.newUrl <| Route.urlFor Login ]
+
         NoOp ->
             model ! []
 
