@@ -14,11 +14,13 @@ import API
 import Form
 import Dict
 import Decoders
+import Ports
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case Debug.log "msg: " msg of
+    case msg of
+        --case Debug.log "msg: " msg of
         Mdl msg' ->
             Material.update msg' model
 
@@ -164,7 +166,7 @@ updateLoginMsg msg model =
                         ! []
 
         LoginSucceeded apiKey ->
-            { model | apiKey = Just apiKey } ! [] |> andLog "Login success" apiKey
+            { model | apiKey = Just apiKey } ! [ Ports.storeApiKey apiKey ] |> andLog "Login success" apiKey
 
         LoginFailed error ->
             model ! [] |> andLog "Login failed" (toString <| decodeError error)

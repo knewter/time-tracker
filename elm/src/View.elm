@@ -141,52 +141,48 @@ drawerMenuItem model menuItem =
 
 body : Model -> Html Msg
 body model =
-    let
-        _ =
-            Debug.log "model: " model
-    in
-        case model.route of
-            Just (Route.Login) ->
-                View.Login.view model
+    case model.route of
+        Just (Route.Login) ->
+            View.Login.view model
 
-            Just (Route.Home) ->
-                View.Home.view model
+        Just (Route.Home) ->
+            View.Home.view model
 
-            Just (Route.Users) ->
-                View.Users.view model
+        Just (Route.Users) ->
+            View.Users.view model
 
-            Just (Route.NewUser) ->
-                View.Users.New.view model
+        Just (Route.NewUser) ->
+            View.Users.New.view model
 
-            Just (Route.ShowUser id) ->
-                View.Users.Show.view model id
+        Just (Route.ShowUser id) ->
+            View.Users.Show.view model id
 
-            Just (Route.EditUser id) ->
-                View.Users.Edit.view model id
+        Just (Route.EditUser id) ->
+            View.Users.Edit.view model id
 
-            Just (Route.Projects) ->
-                View.Projects.view model
+        Just (Route.Projects) ->
+            View.Projects.view model
 
-            Just (Route.NewProject) ->
-                View.Projects.New.view model
+        Just (Route.NewProject) ->
+            View.Projects.New.view model
 
-            Just (Route.ShowProject id) ->
-                View.Projects.Show.view model id
+        Just (Route.ShowProject id) ->
+            View.Projects.Show.view model id
 
-            Just (Route.EditProject id) ->
-                View.Projects.Edit.view model id
+        Just (Route.EditProject id) ->
+            View.Projects.Edit.view model id
 
-            Just (Route.Organizations) ->
-                View.Organizations.view model
+        Just (Route.Organizations) ->
+            View.Organizations.view model
 
-            Just (Route.NewOrganization) ->
-                View.Organizations.New.view model
+        Just (Route.NewOrganization) ->
+            View.Organizations.New.view model
 
-            Just (Route.ShowOrganization id) ->
-                View.Organizations.Show.view model id
+        Just (Route.ShowOrganization id) ->
+            View.Organizations.Show.view model id
 
-            Just (Route.EditOrganization id) ->
-                View.Organizations.Edit.view model id
+        Just (Route.EditOrganization id) ->
+            View.Organizations.Edit.view model id
 
-            Nothing ->
-                text "404"
+        Nothing ->
+            text "404"
