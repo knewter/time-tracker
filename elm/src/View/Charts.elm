@@ -18,28 +18,28 @@ data =
     ]
 
 
-xScale : Scale
-xScale x =
-    20 + x * 100
+xScale : Int -> Scale
+xScale width x =
+    20 + x * (toFloat width / 8)
 
 
-yScale : Scale
-yScale y =
-    600 - y * 3
+yScale : Int -> Scale
+yScale height y =
+    (toFloat height) - (y * 3)
 
 
-activityGraph : Svg msg
-activityGraph =
+activity : ( Int, Int ) -> Svg msg
+activity ( width, height ) =
     svg
-        [ Svg.Attributes.width "800"
-        , Svg.Attributes.height "600"
+        [ Svg.Attributes.width (toString width)
+        , Svg.Attributes.height (toString height)
         ]
         [ lineChart
             [ LineChart.color "#7E94C7"
             , LineChart.width "4"
             ]
             { data = data
-            , xScale = xScale
-            , yScale = (\y -> 500 - y * 4)
+            , xScale = xScale width
+            , yScale = yScale height
             }
         ]
