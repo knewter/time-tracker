@@ -199,12 +199,36 @@ defaultRequest model path =
         }
 
 
+handleOurHttp401 : (OurHttp.Error -> Msg) -> (OurHttp.Error -> Msg)
+handleOurHttp401 msg =
+    (\error ->
+        case error of
+            OurHttp.BadResponse 401 _ _ ->
+                ClearApiKey
+
+            _ ->
+                msg error
+    )
+
+
+handle401 : (Http.Error -> Msg) -> (Http.Error -> Msg)
+handle401 msg =
+    (\error ->
+        case error of
+            Http.BadResponse 401 _ ->
+                ClearApiKey
+
+            _ ->
+                msg error
+    )
+
+
 get : Model -> String -> JD.Decoder a -> (Http.Error -> Msg) -> (a -> Msg) -> Cmd Msg
 get model path decoder errorMsg msg =
     Http.send Http.defaultSettings
         (defaultRequest model path)
         |> Http.fromJson ("data" := decoder)
-        |> Task.perform errorMsg msg
+        |> Task.perform (handle401 errorMsg) msg
 
 
 post : Model -> String -> JE.Value -> JD.Decoder a -> (OurHttp.Error -> Msg) -> (a -> Msg) -> Cmd Msg
@@ -219,7 +243,7 @@ post model path encoded decoder errorMsg msg =
                 , body = Http.string (encoded |> JE.encode 0)
             }
             |> OurHttp.fromJson ("data" := decoder)
-            |> Task.perform errorMsg msg
+            |> Task.perform (handleOurHttp401 errorMsg) msg
 
 
 delete : Model -> String -> (Http.RawError -> Msg) -> Msg -> Cmd Msg
@@ -245,4 +269,4 @@ put model path encoded decoder errorMsg msg =
                 , body = Http.string (encoded |> JE.encode 0)
             }
             |> OurHttp.fromJson ("data" := decoder)
-            |> Task.perform errorMsg msg
+            |> Task.perform (handleOurHttp401 errorMsg) msg

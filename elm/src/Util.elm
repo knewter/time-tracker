@@ -13,19 +13,7 @@ cmdsForModelRoute : Model -> List (Cmd Msg)
 cmdsForModelRoute model =
     case model.route of
         Just Users ->
-            [ API.fetchUsers model
-                (\x ->
-                    case x of
-                        BadResponse 401 _ ->
-                            ClearApiKey
-
-                        _ ->
-                            NoOp
-                )
-              <|
-                UserMsg'
-                    << GotUsers
-            ]
+            [ API.fetchUsers model (always NoOp) <| UserMsg' << GotUsers ]
 
         Just (ShowUser id) ->
             [ API.fetchUser model id (always NoOp) <| UserMsg' << GotUser ]
