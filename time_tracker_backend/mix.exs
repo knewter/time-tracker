@@ -17,9 +17,20 @@ defmodule TimeTrackerBackend.Mixfile do
   #
   # Type `mix help compile.app` for more information.
   def application do
-    [mod: {TimeTrackerBackend, []},
-     applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex]]
+    [
+      mod: {TimeTrackerBackend, []},
+      applications: [
+        :phoenix,
+        :phoenix_pubsub,
+        :phoenix_html,
+        :cowboy,
+        :logger,
+        :gettext,
+        :phoenix_ecto,
+        :postgrex,
+        :scrivener_ecto,
+      ]
+    ]
   end
 
   # Specifies which paths to compile per environment.
@@ -40,7 +51,11 @@ defmodule TimeTrackerBackend.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:cors_plug, "~> 1.1"},
-      {:guardian, "~> 0.12.0"}
+      {:guardian, "~> 0.12.0"},
+      {:scrivener_ecto, "~> 1.0"},
+      {:scrivener_headers, "~> 3.0"},
+      {:ex_machina, "~> 1.0", only: :test},
+      {:ex_link_header, "~> 0.0.5"},
     ]
   end
 

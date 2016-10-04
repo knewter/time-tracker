@@ -1,5 +1,6 @@
 defmodule TimeTrackerBackend.UserControllerTest do
   use TimeTrackerBackend.ConnCase
+  import TimeTrackerBackend.Factory
 
   @valid_attrs %{name: "some content"}
   @invalid_attrs %{}
@@ -18,9 +19,19 @@ defmodule TimeTrackerBackend.UserControllerTest do
   describe "when authenticated" do
     setup [:set_auth_headers]
 
-    test "lists all entries on index", %{conn: conn} do
+    test "paginates entries on index", %{conn: conn} do
+      insert_list(12, :user)
       conn = get conn, user_path(conn, :index)
-      assert json_response(conn, 200)["data"] |> is_list
+      response = json_response(conn, 200)["data"]
+      assert get_resp_header(conn, "total") == ["13"]
+      assert get_resp_header(conn, "per-page") == ["10"]
+      assert get_resp_header(conn, "total-pages") == ["2"]
+      assert get_resp_header(conn, "page-number") == ["1"]
+      link_header = get_resp_header(conn, "link") |> hd |> ExLinkHeader.parse!
+      assert "2" == link_header.next.params.page
+      assert "2" == link_header.last.params.page
+      assert "1" == link_header.first.params.page
+      assert length(response) == 10
     end
 
     test "shows chosen resource", %{conn: conn} do

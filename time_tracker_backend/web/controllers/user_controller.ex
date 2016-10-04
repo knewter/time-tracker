@@ -2,9 +2,14 @@ defmodule TimeTrackerBackend.UserController do
   use TimeTrackerBackend.Web, :controller
   plug Guardian.Plug.EnsureAuthenticated, handler: __MODULE__
 
-  def index(conn, _params) do
-    users = Repo.all(User)
-    render(conn, "index.json", users: users)
+  def index(conn, params) do
+    page =
+      User
+      |> Repo.paginate(params)
+
+    conn
+    |> Scrivener.Headers.paginate(page)
+    |> render("index.json", users: page.entries)
   end
 
   def create(conn, %{"user" => user_params}) do
