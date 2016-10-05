@@ -143,7 +143,10 @@ updateLoginMsg msg model =
 -}
 updateUserMsg : Model -> UserMsg -> UsersModel -> ( UsersModel, Cmd Msg, Maybe ( String, String ) )
 updateUserMsg model msg usersModel =
-    case msg of
+    case Debug.log "updateUserMsg" msg of
+        FetchUsers url ->
+            ( usersModel, API.fetchUsersWithUrl url model (always NoOp) (UserMsg' << GotUsers), Nothing )
+
         GotUsers users ->
             ( { usersModel | users = Just users }, Cmd.none, Nothing )
 

@@ -1,11 +1,11 @@
 module View.Users exposing (view, header)
 
 import Model exposing (Model)
-import Types exposing (User, UserSortableField(..), Sorted(..), UsersListView(..))
+import Types exposing (User, UserSortableField(..), Sorted(..), UsersListView(..), Paginated)
 import Msg exposing (Msg(..), UserMsg(..))
 import Route exposing (Location(..))
-import Html exposing (Html, text, div, a, img, span, h3)
-import Html.Attributes exposing (href, src, style)
+import Html exposing (Html, text, div, a, img, span, h3, ul, li)
+import Html.Attributes exposing (href, src, style, colspan)
 import Html.Events exposing (onClick)
 import Material.List as List
 import Material.Button as Button
@@ -80,23 +80,53 @@ usersTable model =
             text ""
 
         Just paginatedUsers ->
-            Table.table []
-                [ Table.thead []
-                    [ Table.th [] []
-                    , Table.th
-                        (thOptions UserName model)
-                        [ text "Name" ]
-                    , Table.th [] [ text "Position" ]
-                    , Table.th [] [ text "Email" ]
-                    , Table.th [] [ text "Today" ]
-                    , Table.th [] [ text "Last 7 days" ]
-                    , Table.th [] [ text "Projects" ]
-                    , Table.th [] [ text "Open Tasks" ]
-                    , Table.th [] [ text "Actions" ]
+            div []
+                [ Table.table []
+                    [ Table.thead []
+                        [ Table.th [] []
+                        , Table.th
+                            (thOptions UserName model)
+                            [ text "Name" ]
+                        , Table.th [] [ text "Position" ]
+                        , Table.th [] [ text "Email" ]
+                        , Table.th [] [ text "Today" ]
+                        , Table.th [] [ text "Last 7 days" ]
+                        , Table.th [] [ text "Projects" ]
+                        , Table.th [] [ text "Open Tasks" ]
+                        , Table.th [] [ text "Actions" ]
+                        ]
+                    , Table.tbody []
+                        (List.indexedMap (viewUserRow model) paginatedUsers.items)
                     ]
-                , Table.tbody []
-                    (List.indexedMap (viewUserRow model) paginatedUsers.items)
+                , paginationLinks paginatedUsers
                 ]
+
+
+paginationLinks : Paginated User -> Html Msg
+paginationLinks paginatedUsers =
+    let
+        toLink link label =
+            a
+                [ onClick <| UserMsg' <| FetchUsers link.target
+                , style [ ( "cursor", "pointer" ), ( "text-decoration", "underline" ) ]
+                ]
+                [ text label ]
+
+        toListLink maybeLink label =
+            maybeLink
+                |> Maybe.map (\l -> [ toLink l label ])
+                |> Maybe.withDefault []
+
+        previousLink =
+            toListLink paginatedUsers.links.previous "previous"
+
+        nextLink =
+            toListLink paginatedUsers.links.next "next"
+    in
+        ul []
+            (previousLink
+                ++ nextLink
+            )
 
 
 viewUserRow : Model -> Int -> User -> Html Msg

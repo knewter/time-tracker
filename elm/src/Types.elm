@@ -16,6 +16,7 @@ module Types
 
 import Dict exposing (Dict)
 import Date exposing (Date)
+import RFC5988 exposing (Link)
 
 
 type alias User =
@@ -71,10 +72,10 @@ type WeekActivity
 
 
 type alias PaginationLinks =
-    { next : Maybe String
-    , last : Maybe String
-    , first : Maybe String
-    , previous : Maybe String
+    { next : Maybe Link
+    , last : Maybe Link
+    , first : Maybe Link
+    , previous : Maybe Link
     }
 
 

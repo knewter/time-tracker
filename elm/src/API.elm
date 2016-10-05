@@ -2,6 +2,7 @@ module API
     exposing
         ( login
         , fetchUsers
+        , fetchUsersWithUrl
         , createUser
         , deleteUser
         , fetchUser
@@ -29,6 +30,9 @@ import Task
 import Json.Encode as JE
 import Json.Decode as JD exposing ((:=))
 import Dict exposing (Dict)
+import RFC5988
+import Combine exposing (parse)
+import String
 
 
 login : Model -> ( String, String ) -> (Error -> Msg) -> (String -> Msg) -> Cmd Msg
@@ -38,7 +42,31 @@ login model loginForm errorMsg msg =
 
 fetchUsers : Model -> (OurHttp.Error -> Msg) -> (Paginated User -> Msg) -> Cmd Msg
 fetchUsers model errorMsg msg =
-    getPaginated model "/users" Decoders.usersDecoder errorMsg msg
+    fetchUsersWithUrl "/users" model errorMsg msg
+
+
+fetchUsersWithUrl : String -> Model -> (OurHttp.Error -> Msg) -> (Paginated User -> Msg) -> Cmd Msg
+fetchUsersWithUrl url model errorMsg msg =
+    let
+        apiPath =
+            case getQueryParams url of
+                Nothing ->
+                    "/users"
+
+                Just queryParams ->
+                    "/users?" ++ queryParams
+    in
+        getPaginated model apiPath Decoders.usersDecoder errorMsg msg
+
+
+getQueryParams : String -> Maybe String
+getQueryParams url =
+    url
+        |> String.split "/"
+        |> List.drop 3
+        |> List.head
+        |> Maybe.map (String.split "?" >> List.drop 1 >> List.head)
+        |> Maybe.withDefault Nothing
 
 
 fetchUser : Model -> Int -> (Http.Error -> Msg) -> (User -> Msg) -> Cmd Msg
@@ -216,20 +244,49 @@ getPaginated model path decoder errorMsg msg =
         |> Task.perform errorMsg msg
 
 
-paginationParser : Dict String String -> a -> Paginated b
+paginationParser : Dict String String -> List a -> Paginated a
 paginationParser headers data =
-    { items = []
-    , total = 0
-    , perPage = 0
-    , totalPages = 0
-    , pageNumber = 0
-    , links =
-        { first = Nothing
-        , last = Nothing
-        , next = Nothing
-        , previous = Nothing
+    let
+        _ =
+            Debug.log "headers" headers
+
+        links =
+            case headers |> Dict.get "link" of
+                Nothing ->
+                    []
+
+                Just linksString ->
+                    case parse RFC5988.rfc5988s linksString of
+                        ( Ok links, _ ) ->
+                            links
+
+                        ( Err err, _ ) ->
+                            Debug.log ("failed to parse links: " ++ (String.join ", " err)) []
+
+        next =
+            List.filter (\l -> l.relationType == "next") links |> List.head
+
+        first =
+            List.filter (\l -> l.relationType == "first") links |> List.head
+
+        last =
+            List.filter (\l -> l.relationType == "last") links |> List.head
+
+        previous =
+            List.filter (\l -> l.relationType == "prev") links |> List.head
+    in
+        { items = data
+        , total = 0
+        , perPage = 0
+        , totalPages = 0
+        , pageNumber = 0
+        , links =
+            { first = first
+            , last = last
+            , next = next
+            , previous = previous
+            }
         }
-    }
 
 
 post : Model -> String -> JE.Value -> JD.Decoder a -> (OurHttp.Error -> Msg) -> (a -> Msg) -> Cmd Msg

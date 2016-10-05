@@ -8,6 +8,7 @@
     ],
     "exposed-modules": [],
     "dependencies": {
+        "Bogdanp/elm-combine": "2.2.1 <= v < 3.0.0",
         "debois/elm-mdl": "7.6.0 <= v < 8.0.0",
         "elm-community/json-extra": "1.1.0 <= v < 2.0.0",
         "elm-lang/core": "4.0.5 <= v < 5.0.0",
@@ -17,6 +18,7 @@
         "etaque/elm-simple-form": "4.0.0 <= v < 5.0.0",
         "evancz/elm-http": "3.0.1 <= v < 4.0.0",
         "justinmimbs/elm-date-extra": "2.0.0 <= v < 3.0.0",
+        "knewter/elm-rfc5988-parser": "1.0.0 <= v < 2.0.0",
         "lukewestby/elm-http-builder": "3.0.0 <= v < 4.0.0",
         "wuct/elm-charts": "1.0.1 <= v < 2.0.0"
     },

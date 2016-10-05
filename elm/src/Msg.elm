@@ -30,6 +30,7 @@ type LoginMsg
 type UserMsg
     = GotUser User
     | GotUsers (Paginated User)
+    | FetchUsers String
     | CreateUserSucceeded User
     | CreateUserFailed OurHttp.Error
     | DeleteUser User
