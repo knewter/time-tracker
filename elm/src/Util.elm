@@ -6,7 +6,7 @@ import Model exposing (Model)
 import Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..), OrganizationMsg(..))
 import Material.Table as Table
 import Html exposing (Html)
-import Http exposing (Error(BadResponse))
+import OurHttp exposing (Error(BadResponse))
 
 
 cmdsForModelRoute : Model -> List (Cmd Msg)
@@ -16,7 +16,7 @@ cmdsForModelRoute model =
             [ API.fetchUsers model
                 (\x ->
                     case x of
-                        BadResponse 401 _ ->
+                        BadResponse 401 _ _ ->
                             ClearApiKey
 
                         _ ->

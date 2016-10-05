@@ -3,7 +3,7 @@ module Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..), OrganizationMsg(..), 
 import Material
 import Material.Snackbar as Snackbar
 import Route
-import Types exposing (User, UserSortableField, Project, ProjectSortableField, Organization, OrganizationSortableField, UsersListView)
+import Types exposing (User, UserSortableField, Project, ProjectSortableField, Organization, OrganizationSortableField, UsersListView, Paginated)
 import Http
 import OurHttp
 import Form
@@ -29,7 +29,7 @@ type LoginMsg
 
 type UserMsg
     = GotUser User
-    | GotUsers (List User)
+    | GotUsers (Paginated User)
     | CreateUserSucceeded User
     | CreateUserFailed OurHttp.Error
     | DeleteUser User

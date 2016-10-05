@@ -72,42 +72,6 @@ update msg model =
             model ! []
 
 
-reorderUsers : UserSortableField -> UsersModel -> UsersModel
-reorderUsers sortableField model =
-    let
-        fun =
-            userSortableFieldFun sortableField
-    in
-        case model.usersSort of
-            Nothing ->
-                { model
-                    | usersSort = Just ( Ascending, sortableField )
-                    , users = List.sortBy fun model.users
-                }
-
-            Just ( sortOrder, currentSortableField ) ->
-                case currentSortableField == sortableField of
-                    True ->
-                        case sortOrder of
-                            Ascending ->
-                                { model
-                                    | usersSort = Just ( Descending, sortableField )
-                                    , users = List.sortBy fun model.users |> List.reverse
-                                }
-
-                            Descending ->
-                                { model
-                                    | usersSort = Just ( Ascending, sortableField )
-                                    , users = List.sortBy fun model.users
-                                }
-
-                    False ->
-                        { model
-                            | usersSort = Just ( Ascending, sortableField )
-                            , users = List.sortBy fun model.users
-                        }
-
-
 userSortableFieldFun : UserSortableField -> (User -> String)
 userSortableFieldFun sortableField =
     case sortableField of
@@ -181,7 +145,7 @@ updateUserMsg : Model -> UserMsg -> UsersModel -> ( UsersModel, Cmd Msg, Maybe (
 updateUserMsg model msg usersModel =
     case msg of
         GotUsers users ->
-            ( { usersModel | users = users }, Cmd.none, Nothing )
+            ( { usersModel | users = Just users }, Cmd.none, Nothing )
 
         CreateUserSucceeded _ ->
             ( { usersModel
@@ -222,7 +186,8 @@ updateUserMsg model msg usersModel =
             )
 
         ReorderUsers field ->
-            ( reorderUsers field model.usersModel
+            --( reorderUsers field model.usersModel
+            ( usersModel
             , Cmd.none
             , Nothing
             )

@@ -11,6 +11,7 @@ module Types
         , UsersListView(..)
         , DayActivity(..)
         , WeekActivity(..)
+        , Paginated
         )
 
 import Dict exposing (Dict)
@@ -67,3 +68,21 @@ type DayActivity
 
 type WeekActivity
     = WeekActivity DayActivity DayActivity DayActivity DayActivity DayActivity DayActivity DayActivity
+
+
+type alias PaginationLinks =
+    { next : Maybe String
+    , last : Maybe String
+    , first : Maybe String
+    , previous : Maybe String
+    }
+
+
+type alias Paginated a =
+    { items : List a
+    , total : Int
+    , perPage : Int
+    , totalPages : Int
+    , pageNumber : Int
+    , links : PaginationLinks
+    }

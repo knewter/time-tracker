@@ -20,7 +20,7 @@ module API
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
-import Types exposing (User, Project, Organization)
+import Types exposing (User, Project, Organization, Paginated)
 import Decoders
 import Json.Decode exposing ((:=))
 import OurHttp exposing (Error)
@@ -28,6 +28,7 @@ import Http
 import Task
 import Json.Encode as JE
 import Json.Decode as JD exposing ((:=))
+import Dict exposing (Dict)
 
 
 login : Model -> ( String, String ) -> (Error -> Msg) -> (String -> Msg) -> Cmd Msg
@@ -35,9 +36,9 @@ login model loginForm errorMsg msg =
     post model "/sessions" (encodeLoginForm loginForm) ("token" := JD.string) errorMsg msg
 
 
-fetchUsers : Model -> (Http.Error -> Msg) -> (List User -> Msg) -> Cmd Msg
+fetchUsers : Model -> (OurHttp.Error -> Msg) -> (Paginated User -> Msg) -> Cmd Msg
 fetchUsers model errorMsg msg =
-    get model "/users" Decoders.usersDecoder errorMsg msg
+    getPaginated model "/users" Decoders.usersDecoder errorMsg msg
 
 
 fetchUser : Model -> Int -> (Http.Error -> Msg) -> (User -> Msg) -> Cmd Msg
@@ -205,6 +206,30 @@ get model path decoder errorMsg msg =
         (defaultRequest model path)
         |> Http.fromJson ("data" := decoder)
         |> Task.perform errorMsg msg
+
+
+getPaginated : Model -> String -> JD.Decoder (List a) -> (OurHttp.Error -> Msg) -> (Paginated a -> Msg) -> Cmd Msg
+getPaginated model path decoder errorMsg msg =
+    Http.send Http.defaultSettings
+        (defaultRequest model path)
+        |> OurHttp.fromJsonWithHeaders ("data" := decoder) paginationParser
+        |> Task.perform errorMsg msg
+
+
+paginationParser : Dict String String -> a -> Paginated b
+paginationParser headers data =
+    { items = []
+    , total = 0
+    , perPage = 0
+    , totalPages = 0
+    , pageNumber = 0
+    , links =
+        { first = Nothing
+        , last = Nothing
+        , next = Nothing
+        , previous = Nothing
+        }
+    }
 
 
 post : Model -> String -> JE.Value -> JD.Decoder a -> (OurHttp.Error -> Msg) -> (a -> Msg) -> Cmd Msg

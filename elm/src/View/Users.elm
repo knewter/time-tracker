@@ -37,10 +37,15 @@ view model =
 
 usersCards : Model -> Html Msg
 usersCards model =
-    grid [] <|
-        List.map
-            (\user -> cell [ size All 3 ] [ userCard user ])
-            model.usersModel.users
+    case model.usersModel.users of
+        Nothing ->
+            text ""
+
+        Just paginatedUsers ->
+            grid [] <|
+                List.map
+                    (\user -> cell [ size All 3 ] [ userCard user ])
+                    paginatedUsers.items
 
 
 userCard : User -> Html Msg
@@ -70,23 +75,28 @@ userCard user =
 
 usersTable : Model -> Html Msg
 usersTable model =
-    Table.table []
-        [ Table.thead []
-            [ Table.th [] []
-            , Table.th
-                (thOptions UserName model)
-                [ text "Name" ]
-            , Table.th [] [ text "Position" ]
-            , Table.th [] [ text "Email" ]
-            , Table.th [] [ text "Today" ]
-            , Table.th [] [ text "Last 7 days" ]
-            , Table.th [] [ text "Projects" ]
-            , Table.th [] [ text "Open Tasks" ]
-            , Table.th [] [ text "Actions" ]
-            ]
-        , Table.tbody []
-            (List.indexedMap (viewUserRow model) model.usersModel.users)
-        ]
+    case model.usersModel.users of
+        Nothing ->
+            text ""
+
+        Just paginatedUsers ->
+            Table.table []
+                [ Table.thead []
+                    [ Table.th [] []
+                    , Table.th
+                        (thOptions UserName model)
+                        [ text "Name" ]
+                    , Table.th [] [ text "Position" ]
+                    , Table.th [] [ text "Email" ]
+                    , Table.th [] [ text "Today" ]
+                    , Table.th [] [ text "Last 7 days" ]
+                    , Table.th [] [ text "Projects" ]
+                    , Table.th [] [ text "Open Tasks" ]
+                    , Table.th [] [ text "Actions" ]
+                    ]
+                , Table.tbody []
+                    (List.indexedMap (viewUserRow model) paginatedUsers.items)
+                ]
 
 
 viewUserRow : Model -> Int -> User -> Html Msg
