@@ -274,12 +274,27 @@ paginationParser headers data =
 
         previous =
             List.filter (\l -> l.relationType == "prev") links |> List.head
+
+        getMaybeStringNumber field =
+            headers |> Dict.get field |> Maybe.withDefault "0" |> String.toInt |> Result.withDefault 0
+
+        pageNumber =
+            getMaybeStringNumber "page-number"
+
+        totalPages =
+            getMaybeStringNumber "total-pages"
+
+        perPage =
+            getMaybeStringNumber "per-page"
+
+        total =
+            getMaybeStringNumber "total"
     in
         { items = data
-        , total = 0
-        , perPage = 0
-        , totalPages = 0
-        , pageNumber = 0
+        , total = total
+        , perPage = perPage
+        , totalPages = totalPages
+        , pageNumber = pageNumber
         , links =
             { first = first
             , last = last

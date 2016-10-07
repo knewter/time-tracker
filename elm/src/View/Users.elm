@@ -131,11 +131,11 @@ paginationData model paginatedUsers =
         lastButton =
             toListButton paginatedUsers.links.last "last" 4
 
-        progressText =
-            text <| (toString paginatedUsers.pageNumber) ++ " of " ++ (toString paginatedUsers.totalPages)
+        pageProgressText =
+            text <| (toString paginatedUsers.pageNumber) ++ " of " ++ (toString paginatedUsers.totalPages) ++ " pages"
     in
         div [ style [ ( "padding", "1em" ) ] ] <|
-            [ progressText ]
+            [ pageProgressText ]
                 ++ (firstButton
                         ++ previousButton
                         ++ nextButton
