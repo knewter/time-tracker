@@ -98,35 +98,49 @@ usersTable model =
                     , Table.tbody []
                         (List.indexedMap (viewUserRow model) paginatedUsers.items)
                     ]
-                , paginationLinks paginatedUsers
+                , paginationData model paginatedUsers
                 ]
 
 
-paginationLinks : Paginated User -> Html Msg
-paginationLinks paginatedUsers =
+paginationData : Model -> Paginated User -> Html Msg
+paginationData model paginatedUsers =
     let
-        toLink link label =
-            a
-                [ onClick <| UserMsg' <| FetchUsers link.target
-                , style [ ( "cursor", "pointer" ), ( "text-decoration", "underline" ) ]
+        toButton link label index =
+            Button.render Mdl
+                [ 0, 3, index ]
+                model.mdl
+                [ Button.ripple
+                , Button.onClick <| UserMsg' <| FetchUsers link.target
                 ]
                 [ text label ]
 
-        toListLink maybeLink label =
+        toListButton maybeLink label index =
             maybeLink
-                |> Maybe.map (\l -> [ toLink l label ])
+                |> Maybe.map (\l -> [ toButton l label index ])
                 |> Maybe.withDefault []
 
-        previousLink =
-            toListLink paginatedUsers.links.previous "previous"
+        firstButton =
+            toListButton paginatedUsers.links.first "first" 1
 
-        nextLink =
-            toListLink paginatedUsers.links.next "next"
+        previousButton =
+            toListButton paginatedUsers.links.previous "previous" 2
+
+        nextButton =
+            toListButton paginatedUsers.links.next "next" 3
+
+        lastButton =
+            toListButton paginatedUsers.links.last "last" 4
+
+        progressText =
+            text <| (toString paginatedUsers.pageNumber) ++ " of " ++ (toString paginatedUsers.totalPages)
     in
-        ul []
-            (previousLink
-                ++ nextLink
-            )
+        div [ style [ ( "padding", "1em" ) ] ] <|
+            [ progressText ]
+                ++ (firstButton
+                        ++ previousButton
+                        ++ nextButton
+                        ++ lastButton
+                   )
 
 
 viewUserRow : Model -> Int -> User -> Html Msg
