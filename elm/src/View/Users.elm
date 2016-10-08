@@ -5,7 +5,7 @@ import Types exposing (User, UserSortableField(..), Sorted(..), UsersListView(..
 import Msg exposing (Msg(..), UserMsg(..))
 import Route exposing (Location(..))
 import Html exposing (Html, text, div, a, img, span, h3, ul, li)
-import Html.Attributes exposing (href, src, style, colspan)
+import Html.Attributes exposing (href, src, style, colspan, class)
 import Html.Events exposing (onClick)
 import Material.List as List
 import Material.Button as Button
@@ -81,7 +81,10 @@ usersTable model =
 
         Just paginatedUsers ->
             div []
-                [ Table.table []
+                [ Table.table
+                    [ Options.css "width" "100%"
+                    , Elevation.e2
+                    ]
                     [ Table.thead []
                         [ Table.th [] []
                         , Table.th
@@ -97,8 +100,11 @@ usersTable model =
                         ]
                     , Table.tbody []
                         (List.indexedMap (viewUserRow model) paginatedUsers.items)
+                    , Table.tfoot []
+                        [ Html.td [ colspan 999, class "mdl-data-table__cell--non-numeric" ]
+                            [ paginationData model paginatedUsers ]
+                        ]
                     ]
-                , paginationData model paginatedUsers
                 ]
 
 
@@ -132,15 +138,34 @@ paginationData model paginatedUsers =
             toListButton paginatedUsers.links.last "last" 4
 
         pageProgressText =
-            text <| (toString paginatedUsers.pageNumber) ++ " of " ++ (toString paginatedUsers.totalPages) ++ " pages"
+            (toString paginatedUsers.pageNumber) ++ " of " ++ (toString paginatedUsers.totalPages) ++ " pages"
+
+        firstItemNumber =
+            ((paginatedUsers.pageNumber - 1) * paginatedUsers.perPage) + 1
+
+        itemRange =
+            (toString firstItemNumber) ++ " - " ++ (toString <| (firstItemNumber + (List.length paginatedUsers.items) - 1))
     in
-        div [ style [ ( "padding", "1em" ) ] ] <|
-            [ pageProgressText ]
-                ++ (firstButton
-                        ++ previousButton
-                        ++ nextButton
-                        ++ lastButton
-                   )
+        grid [ Options.css "width" "100%" ]
+            [ cell
+                [ size All 6 ]
+                [ div
+                    [ style [ ( "padding-top", "0.5em" ) ] ]
+                    [ text <| itemRange ++ " of " ++ (toString paginatedUsers.total) ]
+                ]
+            , cell
+                [ size All 6 ]
+                [ div
+                    [ style [ ( "text-align", "right" ) ] ]
+                  <|
+                    [ div [ style [ ( "display", "inline-block" ), ( "margin-right", "1em" ) ] ] [ text pageProgressText ] ]
+                        ++ (firstButton
+                                ++ previousButton
+                                ++ nextButton
+                                ++ lastButton
+                           )
+                ]
+            ]
 
 
 viewUserRow : Model -> Int -> User -> Html Msg
