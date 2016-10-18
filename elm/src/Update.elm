@@ -1,6 +1,6 @@
 module Update exposing (update)
 
-import Model exposing (Model, UsersModel)
+import Model exposing (Model, UsersModel, ProjectsModel, OrganizationsModel)
 import Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..), OrganizationMsg(..), LoginMsg(..))
 import Types exposing (User, UserSortableField(..), Sorted(..), Project, ProjectSortableField(..), Organization, OrganizationSortableField(..), APIFieldErrors)
 import Material
@@ -20,7 +20,6 @@ import Ports
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        --case Debug.log "msg: " msg of
         Mdl msg' ->
             Material.update msg' model
 
@@ -60,10 +59,38 @@ update msg model =
                             |> andLog tag value
 
         ProjectMsg' msg ->
-            updateProjectMsg msg model
+            let
+                ( projectsModel, cmd, maybeLog ) =
+                    updateProjectMsg model msg model.projectsModel
+            in
+                case maybeLog of
+                    Nothing ->
+                        ( { model | projectsModel = projectsModel }
+                        , cmd
+                        )
+
+                    Just ( tag, value ) ->
+                        ( { model | projectsModel = projectsModel }
+                        , cmd
+                        )
+                            |> andLog tag value
 
         OrganizationMsg' msg ->
-            updateOrganizationMsg msg model
+            let
+                ( organizationsModel, cmd, maybeLog ) =
+                    updateOrganizationMsg model msg model.organizationsModel
+            in
+                case maybeLog of
+                    Nothing ->
+                        ( { model | organizationsModel = organizationsModel }
+                        , cmd
+                        )
+
+                    Just ( tag, value ) ->
+                        ( { model | organizationsModel = organizationsModel }
+                        , cmd
+                        )
+                            |> andLog tag value
 
         ClearApiKey ->
             { model | apiKey = Nothing } ! [ Navigation.newUrl <| Route.urlFor Login ]
@@ -77,42 +104,6 @@ userSortableFieldFun sortableField =
     case sortableField of
         UserName ->
             .name
-
-
-reorderProjects : ProjectSortableField -> Model -> Model
-reorderProjects sortableField model =
-    let
-        fun =
-            projectSortableFieldFun sortableField
-    in
-        case model.projectsSort of
-            Nothing ->
-                { model
-                    | projectsSort = Just ( Ascending, sortableField )
-                    , projects = List.sortBy fun model.projects
-                }
-
-            Just ( sortOrder, currentSortableField ) ->
-                case currentSortableField == sortableField of
-                    True ->
-                        case sortOrder of
-                            Ascending ->
-                                { model
-                                    | projectsSort = Just ( Descending, sortableField )
-                                    , projects = List.sortBy fun model.projects |> List.reverse
-                                }
-
-                            Descending ->
-                                { model
-                                    | projectsSort = Just ( Ascending, sortableField )
-                                    , projects = List.sortBy fun model.projects
-                                }
-
-                    False ->
-                        { model
-                            | projectsSort = Just ( Ascending, sortableField )
-                            , projects = List.sortBy fun model.projects
-                        }
 
 
 updateLoginMsg : LoginMsg -> Model -> ( Model, Cmd Msg )
@@ -143,7 +134,7 @@ updateLoginMsg msg model =
 -}
 updateUserMsg : Model -> UserMsg -> UsersModel -> ( UsersModel, Cmd Msg, Maybe ( String, String ) )
 updateUserMsg model msg usersModel =
-    case Debug.log "updateUserMsg" msg of
+    case msg of
         FetchUsers url ->
             ( usersModel, API.fetchUsersWithUrl url model (always NoOp) (UserMsg' << GotUsers), Nothing )
 
@@ -273,82 +264,130 @@ updateUserMsg model msg usersModel =
             )
 
 
-updateProjectMsg : ProjectMsg -> Model -> ( Model, Cmd Msg )
-updateProjectMsg msg model =
+updateProjectMsg : Model -> ProjectMsg -> ProjectsModel -> ( ProjectsModel, Cmd Msg, Maybe ( String, String ) )
+updateProjectMsg model msg projectsModel =
     case msg of
+        FetchProjects url ->
+            ( projectsModel, API.fetchProjectsWithUrl url model (always NoOp) (ProjectMsg' << GotProjects), Nothing )
+
         GotProjects projects ->
-            { model | projects = projects } ! []
+            ( { projectsModel | projects = Just projects }
+            , Cmd.none
+            , Nothing
+            )
 
         CreateProjectSucceeded _ ->
-            { model
-                | newProjectForm = initialModel.newProjectForm
-            }
-                ! [ Navigation.newUrl (Route.urlFor Projects) ]
+            ( { projectsModel
+                | newProjectForm = initialModel.projectsModel.newProjectForm
+              }
+            , Navigation.newUrl (Route.urlFor Projects)
+            , Nothing
+            )
 
         CreateProjectFailed error ->
-            { model | newProjectForm = ( fst model.newProjectForm, Just (decodeError error) ) }
-                ! []
-                |> andLog "Create Project failed" (toString <| decodeError error)
+            ( { projectsModel | newProjectForm = ( fst model.projectsModel.newProjectForm, Just (decodeError error) ) }
+            , Cmd.none
+            , Just ( "Create Project failed", toString <| decodeError error )
+            )
 
         DeleteProject project ->
-            model ! [ API.deleteProject model project (ProjectMsg' << DeleteProjectFailed) (ProjectMsg' << DeleteProjectSucceeded) ]
+            ( projectsModel
+            , API.deleteProject model project (ProjectMsg' << DeleteProjectFailed) (ProjectMsg' << DeleteProjectSucceeded)
+            , Nothing
+            )
 
         DeleteProjectFailed error ->
-            model ! [] |> andLog "Delete Project failed" error
+            ( projectsModel
+            , Cmd.none
+            , Just ( "Delete Project failed", toString error )
+            )
 
         DeleteProjectSucceeded project ->
-            model ! [ API.fetchProjects model (always NoOp) (ProjectMsg' << GotProjects) ]
+            ( projectsModel
+            , API.fetchProjects model (always NoOp) (ProjectMsg' << GotProjects)
+            , Nothing
+            )
 
         GotProject project ->
-            { model | shownProject = Just project } ! []
+            ( { projectsModel | shownProject = Just project }
+            , Cmd.none
+            , Nothing
+            )
 
         ReorderProjects field ->
-            reorderProjects field model ! []
+            --reorderProjects field model ! []
+            ( projectsModel
+            , Cmd.none
+            , Nothing
+            )
 
         SetShownProjectName name ->
-            case model.shownProject of
+            case projectsModel.shownProject of
                 Nothing ->
-                    model ! []
+                    ( projectsModel
+                    , Cmd.none
+                    , Nothing
+                    )
 
                 Just project ->
                     let
                         updatedProject =
                             { project | name = name }
                     in
-                        { model | shownProject = (Just updatedProject) } ! []
+                        ( { projectsModel | shownProject = (Just updatedProject) }
+                        , Cmd.none
+                        , Nothing
+                        )
 
         UpdateProject ->
-            case model.shownProject of
+            case projectsModel.shownProject of
                 Nothing ->
-                    model ! []
+                    ( projectsModel, Cmd.none, Nothing )
 
                 Just shownProject ->
-                    model ! [ API.updateProject model shownProject (ProjectMsg' << UpdateProjectFailed) (ProjectMsg' << UpdateProjectSucceeded) ]
+                    ( projectsModel
+                    , API.updateProject model shownProject (ProjectMsg' << UpdateProjectFailed) (ProjectMsg' << UpdateProjectSucceeded)
+                    , Nothing
+                    )
 
         UpdateProjectFailed error ->
-            model ! [] |> andLog "Update Project failed" error
+            ( projectsModel
+            , Cmd.none
+            , Just ( "Update Project failed", toString error )
+            )
 
         UpdateProjectSucceeded project ->
             case project.id of
                 Nothing ->
-                    { model | shownProject = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.Projects ]
+                    ( { projectsModel | shownProject = Nothing }
+                    , Navigation.newUrl <| Route.urlFor <| Route.Projects
+                    , Nothing
+                    )
 
                 Just id ->
-                    { model | shownProject = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowProject id ]
+                    ( { projectsModel | shownProject = Nothing }
+                    , Navigation.newUrl <| Route.urlFor <| Route.ShowProject id
+                    , Nothing
+                    )
 
         NewProjectFormMsg formMsg ->
-            case ( formMsg, Form.getOutput (fst model.newProjectForm) ) of
+            case ( formMsg, Form.getOutput (fst projectsModel.newProjectForm) ) of
                 ( Form.Submit, Just user ) ->
-                    model ! [ API.createProject model user (ProjectMsg' << CreateProjectFailed) (ProjectMsg' << CreateProjectSucceeded) ]
+                    ( projectsModel
+                    , API.createProject model user (ProjectMsg' << CreateProjectFailed) (ProjectMsg' << CreateProjectSucceeded)
+                    , Nothing
+                    )
 
                 _ ->
-                    { model
+                    ( { projectsModel
                         | newProjectForm =
-                            ( Form.update formMsg (fst model.newProjectForm)
-                            , snd model.newProjectForm
+                            ( Form.update formMsg (fst projectsModel.newProjectForm)
+                            , snd projectsModel.newProjectForm
                             )
-                    }
-                        ! []
+                      }
+                    , Cmd.none
+                    , Nothing
+                    )
 
 
 projectSortableFieldFun : ProjectSortableField -> (Project -> String)
@@ -358,82 +397,130 @@ projectSortableFieldFun sortableField =
             .name
 
 
-updateOrganizationMsg : OrganizationMsg -> Model -> ( Model, Cmd Msg )
-updateOrganizationMsg msg model =
+updateOrganizationMsg : Model -> OrganizationMsg -> OrganizationsModel -> ( OrganizationsModel, Cmd Msg, Maybe ( String, String ) )
+updateOrganizationMsg model msg organizationsModel =
     case msg of
+        FetchOrganizations url ->
+            ( organizationsModel, API.fetchOrganizationsWithUrl url model (always NoOp) (OrganizationMsg' << GotOrganizations), Nothing )
+
         GotOrganizations organizations ->
-            { model | organizations = organizations } ! []
+            ( { organizationsModel | organizations = Just organizations }
+            , Cmd.none
+            , Nothing
+            )
 
         CreateOrganizationSucceeded _ ->
-            { model
-                | newOrganizationForm = initialModel.newOrganizationForm
-            }
-                ! [ Navigation.newUrl (Route.urlFor Organizations) ]
+            ( { organizationsModel
+                | newOrganizationForm = initialModel.organizationsModel.newOrganizationForm
+              }
+            , Navigation.newUrl (Route.urlFor Organizations)
+            , Nothing
+            )
 
         CreateOrganizationFailed error ->
-            { model | newOrganizationForm = ( fst model.newOrganizationForm, Just (decodeError error) ) }
-                ! []
-                |> andLog "Create Organization failed" (toString <| decodeError error)
+            ( { organizationsModel | newOrganizationForm = ( fst model.organizationsModel.newOrganizationForm, Just (decodeError error) ) }
+            , Cmd.none
+            , Just ( "Create Organization failed", toString <| decodeError error )
+            )
 
         DeleteOrganization organization ->
-            model ! [ API.deleteOrganization model organization (OrganizationMsg' << DeleteOrganizationFailed) (OrganizationMsg' << DeleteOrganizationSucceeded) ]
+            ( organizationsModel
+            , API.deleteOrganization model organization (OrganizationMsg' << DeleteOrganizationFailed) (OrganizationMsg' << DeleteOrganizationSucceeded)
+            , Nothing
+            )
 
         DeleteOrganizationFailed error ->
-            model ! [] |> andLog "Delete Organization failed" error
+            ( organizationsModel
+            , Cmd.none
+            , Just ( "Delete Organization failed", toString error )
+            )
 
         DeleteOrganizationSucceeded organization ->
-            model ! [ API.fetchOrganizations model (always NoOp) (OrganizationMsg' << GotOrganizations) ]
+            ( organizationsModel
+            , API.fetchOrganizations model (always NoOp) (OrganizationMsg' << GotOrganizations)
+            , Nothing
+            )
 
         GotOrganization organization ->
-            { model | shownOrganization = Just organization } ! []
+            ( { organizationsModel | shownOrganization = Just organization }
+            , Cmd.none
+            , Nothing
+            )
 
         ReorderOrganizations field ->
-            reorderOrganizations field model ! []
+            --reorderOrganizations field model ! []
+            ( organizationsModel
+            , Cmd.none
+            , Nothing
+            )
 
         SetShownOrganizationName name ->
-            case model.shownOrganization of
+            case organizationsModel.shownOrganization of
                 Nothing ->
-                    model ! []
+                    ( organizationsModel
+                    , Cmd.none
+                    , Nothing
+                    )
 
                 Just organization ->
                     let
                         updatedOrganization =
                             { organization | name = name }
                     in
-                        { model | shownOrganization = (Just updatedOrganization) } ! []
+                        ( { organizationsModel | shownOrganization = (Just updatedOrganization) }
+                        , Cmd.none
+                        , Nothing
+                        )
 
         UpdateOrganization ->
-            case model.shownOrganization of
+            case organizationsModel.shownOrganization of
                 Nothing ->
-                    model ! []
+                    ( organizationsModel, Cmd.none, Nothing )
 
                 Just shownOrganization ->
-                    model ! [ API.updateOrganization model shownOrganization (OrganizationMsg' << UpdateOrganizationFailed) (OrganizationMsg' << UpdateOrganizationSucceeded) ]
+                    ( organizationsModel
+                    , API.updateOrganization model shownOrganization (OrganizationMsg' << UpdateOrganizationFailed) (OrganizationMsg' << UpdateOrganizationSucceeded)
+                    , Nothing
+                    )
 
         UpdateOrganizationFailed error ->
-            model ! [] |> andLog "Update Organization failed" error
+            ( organizationsModel
+            , Cmd.none
+            , Just ( "Update Organization failed", toString error )
+            )
 
         UpdateOrganizationSucceeded organization ->
             case organization.id of
                 Nothing ->
-                    { model | shownOrganization = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.Organizations ]
+                    ( { organizationsModel | shownOrganization = Nothing }
+                    , Navigation.newUrl <| Route.urlFor <| Route.Organizations
+                    , Nothing
+                    )
 
                 Just id ->
-                    { model | shownOrganization = Nothing } ! [ Navigation.newUrl <| Route.urlFor <| Route.ShowOrganization id ]
+                    ( { organizationsModel | shownOrganization = Nothing }
+                    , Navigation.newUrl <| Route.urlFor <| Route.ShowOrganization id
+                    , Nothing
+                    )
 
         NewOrganizationFormMsg formMsg ->
-            case ( formMsg, Form.getOutput (fst model.newOrganizationForm) ) of
-                ( Form.Submit, Just organization ) ->
-                    model ! [ API.createOrganization model organization (OrganizationMsg' << CreateOrganizationFailed) (OrganizationMsg' << CreateOrganizationSucceeded) ]
+            case ( formMsg, Form.getOutput (fst organizationsModel.newOrganizationForm) ) of
+                ( Form.Submit, Just user ) ->
+                    ( organizationsModel
+                    , API.createOrganization model user (OrganizationMsg' << CreateOrganizationFailed) (OrganizationMsg' << CreateOrganizationSucceeded)
+                    , Nothing
+                    )
 
                 _ ->
-                    { model
+                    ( { organizationsModel
                         | newOrganizationForm =
-                            ( Form.update formMsg (fst model.newOrganizationForm)
-                            , snd model.newOrganizationForm
+                            ( Form.update formMsg (fst organizationsModel.newOrganizationForm)
+                            , snd organizationsModel.newOrganizationForm
                             )
-                    }
-                        ! []
+                      }
+                    , Cmd.none
+                    , Nothing
+                    )
 
 
 organizationSortableFieldFun : OrganizationSortableField -> (Organization -> String)
@@ -441,42 +528,6 @@ organizationSortableFieldFun sortableField =
     case sortableField of
         OrganizationName ->
             .name
-
-
-reorderOrganizations : OrganizationSortableField -> Model -> Model
-reorderOrganizations sortableField model =
-    let
-        fun =
-            organizationSortableFieldFun sortableField
-    in
-        case model.organizationsSort of
-            Nothing ->
-                { model
-                    | organizationsSort = Just ( Ascending, sortableField )
-                    , organizations = List.sortBy fun model.organizations
-                }
-
-            Just ( sortOrder, currentSortableField ) ->
-                case currentSortableField == sortableField of
-                    True ->
-                        case sortOrder of
-                            Ascending ->
-                                { model
-                                    | organizationsSort = Just ( Descending, sortableField )
-                                    , organizations = List.sortBy fun model.organizations |> List.reverse
-                                }
-
-                            Descending ->
-                                { model
-                                    | organizationsSort = Just ( Ascending, sortableField )
-                                    , organizations = List.sortBy fun model.organizations
-                                }
-
-                    False ->
-                        { model
-                            | organizationsSort = Just ( Ascending, sortableField )
-                            , organizations = List.sortBy fun model.organizations
-                        }
 
 
 andLog : String -> a -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )

@@ -16,7 +16,7 @@ import View.Helpers as Helpers
 
 view : Model -> Int -> Html Msg
 view model id =
-    case model.shownProject of
+    case model.projectsModel.shownProject of
         Nothing ->
             text "No project here, sorry bud."
 
@@ -39,7 +39,7 @@ nameField model =
         [ Textfield.label "Name"
         , Textfield.floatingLabel
         , Textfield.text'
-        , Textfield.value <| Maybe.withDefault "" <| Maybe.map .name model.shownProject
+        , Textfield.value <| Maybe.withDefault "" <| Maybe.map .name model.projectsModel.shownProject
         , Textfield.onInput <| ProjectMsg' << SetShownProjectName
         ]
 
@@ -71,7 +71,7 @@ cancelButton model =
 
 header : Model -> Int -> List (Html Msg)
 header model id =
-    case model.shownProject of
+    case model.projectsModel.shownProject of
         Nothing ->
             Helpers.defaultHeader model "No such project"
 

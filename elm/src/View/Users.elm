@@ -18,6 +18,7 @@ import Material.Options as Options
 import Material.Layout as Layout
 import Material.Grid exposing (grid, size, cell, Device(..))
 import View.Helpers as Helpers
+import View.Pieces.PaginatedTable as PaginatedTable
 import Util
 
 
@@ -102,70 +103,10 @@ usersTable model =
                         (List.indexedMap (viewUserRow model) paginatedUsers.items)
                     , Table.tfoot []
                         [ Html.td [ colspan 999, class "mdl-data-table__cell--non-numeric" ]
-                            [ paginationData model paginatedUsers ]
+                            [ PaginatedTable.paginationData [ 0, 3 ] (UserMsg' << FetchUsers) model paginatedUsers ]
                         ]
                     ]
                 ]
-
-
-paginationData : Model -> Paginated User -> Html Msg
-paginationData model paginatedUsers =
-    let
-        toButton link label index =
-            Button.render Mdl
-                [ 0, 3, index ]
-                model.mdl
-                [ Button.ripple
-                , Button.onClick <| UserMsg' <| FetchUsers link.target
-                ]
-                [ text label ]
-
-        toListButton maybeLink label index =
-            maybeLink
-                |> Maybe.map (\l -> [ toButton l label index ])
-                |> Maybe.withDefault []
-
-        firstButton =
-            toListButton paginatedUsers.links.first "first" 1
-
-        previousButton =
-            toListButton paginatedUsers.links.previous "previous" 2
-
-        nextButton =
-            toListButton paginatedUsers.links.next "next" 3
-
-        lastButton =
-            toListButton paginatedUsers.links.last "last" 4
-
-        pageProgressText =
-            (toString paginatedUsers.pageNumber) ++ " of " ++ (toString paginatedUsers.totalPages) ++ " pages"
-
-        firstItemNumber =
-            ((paginatedUsers.pageNumber - 1) * paginatedUsers.perPage) + 1
-
-        itemRange =
-            (toString firstItemNumber) ++ " - " ++ (toString <| (firstItemNumber + (List.length paginatedUsers.items) - 1))
-    in
-        grid [ Options.css "width" "100%" ]
-            [ cell
-                [ size All 6 ]
-                [ div
-                    [ style [ ( "padding-top", "0.5em" ) ] ]
-                    [ text <| itemRange ++ " of " ++ (toString paginatedUsers.total) ]
-                ]
-            , cell
-                [ size All 6 ]
-                [ div
-                    [ style [ ( "text-align", "right" ) ] ]
-                  <|
-                    [ div [ style [ ( "display", "inline-block" ), ( "margin-right", "1em" ) ] ] [ text pageProgressText ] ]
-                        ++ (firstButton
-                                ++ previousButton
-                                ++ nextButton
-                                ++ lastButton
-                           )
-                ]
-            ]
 
 
 viewUserRow : Model -> Int -> User -> Html Msg

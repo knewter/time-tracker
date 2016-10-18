@@ -5,36 +5,51 @@ import Types exposing (Project, ProjectSortableField(..), Sorted(..))
 import Msg exposing (Msg(..), ProjectMsg(..))
 import Route exposing (Location(..))
 import Html exposing (Html, text, div, a, img, span)
-import Html.Attributes exposing (href, src, style)
+import Html.Attributes exposing (href, src, style, colspan, class)
 import Material.List as List
 import Material.Button as Button
 import Material.Icon as Icon
 import Material.Table as Table
 import Material.Options as Options
+import Material.Elevation as Elevation
 import Material.Layout as Layout
 import View.Helpers as Helpers
+import View.Pieces.PaginatedTable as PaginatedTable
 import Util
 
 
 view : Model -> Html Msg
 view model =
     div []
-        [ projectsTable model
-        ]
+        [ projectsTable model ]
 
 
 projectsTable : Model -> Html Msg
 projectsTable model =
-    Table.table []
-        [ Table.thead []
-            [ Table.th
-                (thOptions ProjectName model)
-                [ text "Name" ]
-            , Table.th [] [ text "Actions" ]
-            ]
-        , Table.tbody []
-            (List.indexedMap (projectRow model) model.projects)
-        ]
+    case model.projectsModel.projects of
+        Nothing ->
+            text ""
+
+        Just paginatedProject ->
+            div []
+                [ Table.table
+                    [ Options.css "width" "100%"
+                    , Elevation.e2
+                    ]
+                    [ Table.thead []
+                        [ Table.th
+                            (thOptions ProjectName model)
+                            [ text "Name" ]
+                        , Table.th [] [ text "Actions" ]
+                        ]
+                    , Table.tbody []
+                        (List.indexedMap (projectRow model) paginatedProject.items)
+                    , Table.tfoot []
+                        [ Html.td [ colspan 999, class "mdl-data-table__cell--non-numeric" ]
+                            [ PaginatedTable.paginationData [ 3, 3 ] (ProjectMsg' << FetchProjects) model paginatedProject ]
+                        ]
+                    ]
+                ]
 
 
 projectRow : Model -> Int -> Project -> Html Msg
@@ -113,7 +128,7 @@ thOptions sortableField model =
     [ Table.onClick <| ProjectMsg' <| ReorderProjects sortableField
     , Options.css "cursor" "pointer"
     ]
-        ++ case model.projectsSort of
+        ++ case model.projectsModel.projectsSort of
             Nothing ->
                 []
 

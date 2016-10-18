@@ -24,7 +24,7 @@ view model id =
 
 header : Model -> Int -> List (Html Msg)
 header model id =
-    case model.shownProject of
+    case model.projectsModel.shownProject of
         Nothing ->
             Helpers.defaultHeader model "No such project"
 

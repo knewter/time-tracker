@@ -46,16 +46,29 @@ fetchResources endpoint decoder model errorMsg msg =
     fetchResourcesWithUrl endpoint decoder model errorMsg msg
 
 
+stripDomain : String -> String
+stripDomain url =
+    url
+        |> String.split "/"
+        |> List.reverse
+        |> List.head
+        |> Maybe.map (\x -> "/" ++ x)
+        |> Maybe.withDefault ""
+
+
 fetchResourcesWithUrl : String -> JD.Decoder (List a) -> Model -> (OurHttp.Error -> Msg) -> (Paginated a -> Msg) -> Cmd Msg
 fetchResourcesWithUrl url decoder model errorMsg msg =
     let
+        strippedUrl =
+            stripDomain url
+
         apiPath =
-            case getQueryParams url of
+            case getQueryParams strippedUrl of
                 Nothing ->
-                    url
+                    strippedUrl
 
                 Just queryParams ->
-                    url ++ "?" ++ queryParams
+                    strippedUrl ++ "?" ++ queryParams
     in
         getPaginated model apiPath decoder errorMsg msg
 
@@ -268,9 +281,6 @@ getPaginated model path decoder errorMsg msg =
 paginationParser : Dict String String -> List a -> Paginated a
 paginationParser headers data =
     let
-        _ =
-            Debug.log "headers" headers
-
         links =
             case headers |> Dict.get "link" of
                 Nothing ->

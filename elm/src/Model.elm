@@ -1,4 +1,4 @@
-module Model exposing (Model, UsersModel, initialModel)
+module Model exposing (Model, UsersModel, ProjectsModel, OrganizationsModel, initialModel)
 
 import Msg exposing (Msg)
 import Material
@@ -33,14 +33,8 @@ type alias Model =
     , apiKey : Maybe String
     , loginForm : FormWithErrors ( String, String )
     , usersModel : UsersModel
-    , projects : List Project
-    , newProjectForm : FormWithErrors Project
-    , shownProject : Maybe Project
-    , projectsSort : Maybe ( Sorted, ProjectSortableField )
-    , organizations : List Organization
-    , newOrganizationForm : FormWithErrors Organization
-    , shownOrganization : Maybe Organization
-    , organizationsSort : Maybe ( Sorted, OrganizationSortableField )
+    , projectsModel : ProjectsModel
+    , organizationsModel : OrganizationsModel
     }
 
 
@@ -50,6 +44,22 @@ type alias UsersModel =
     , newUserForm : FormWithErrors User
     , shownUser : Maybe User
     , usersSort : Maybe ( Sorted, UserSortableField )
+    }
+
+
+type alias ProjectsModel =
+    { projects : Maybe (Paginated Project)
+    , newProjectForm : FormWithErrors Project
+    , shownProject : Maybe Project
+    , projectsSort : Maybe ( Sorted, ProjectSortableField )
+    }
+
+
+type alias OrganizationsModel =
+    { organizations : Maybe (Paginated Organization)
+    , newOrganizationForm : FormWithErrors Organization
+    , shownOrganization : Maybe Organization
+    , organizationsSort : Maybe ( Sorted, OrganizationSortableField )
     }
 
 
@@ -68,12 +78,16 @@ initialModel location =
         , shownUser = Nothing
         , usersSort = Nothing
         }
-    , projects = []
-    , newProjectForm = ( Form.initial [] Validators.validateNewProject, Nothing )
-    , shownProject = Nothing
-    , projectsSort = Nothing
-    , organizations = []
-    , newOrganizationForm = ( Form.initial [] Validators.validateNewOrganization, Nothing )
-    , shownOrganization = Nothing
-    , organizationsSort = Nothing
+    , projectsModel =
+        { projects = Nothing
+        , newProjectForm = ( Form.initial [] Validators.validateNewProject, Nothing )
+        , shownProject = Nothing
+        , projectsSort = Nothing
+        }
+    , organizationsModel =
+        { organizations = Nothing
+        , newOrganizationForm = ( Form.initial [] Validators.validateNewOrganization, Nothing )
+        , shownOrganization = Nothing
+        , organizationsSort = Nothing
+        }
     }

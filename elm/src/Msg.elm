@@ -47,7 +47,8 @@ type UserMsg
 
 type ProjectMsg
     = GotProject Project
-    | GotProjects (List Project)
+    | GotProjects (Paginated Project)
+    | FetchProjects String
     | CreateProjectSucceeded Project
     | CreateProjectFailed OurHttp.Error
     | DeleteProject Project
@@ -63,7 +64,8 @@ type ProjectMsg
 
 type OrganizationMsg
     = GotOrganization Organization
-    | GotOrganizations (List Organization)
+    | GotOrganizations (Paginated Organization)
+    | FetchOrganizations String
     | CreateOrganizationSucceeded Organization
     | CreateOrganizationFailed OurHttp.Error
     | DeleteOrganization Organization

@@ -12,7 +12,7 @@ import Material.Layout as Layout
 
 view : Model -> Int -> Html Msg
 view model id =
-    case model.shownOrganization of
+    case model.organizationsModel.shownOrganization of
         Nothing ->
             text "No organization here, sorry bud."
 
@@ -22,7 +22,7 @@ view model id =
 
 header : Model -> Int -> List (Html Msg)
 header model id =
-    case model.shownOrganization of
+    case model.organizationsModel.shownOrganization of
         Nothing ->
             Helpers.defaultHeader model "No such organization"
 

@@ -16,7 +16,7 @@ import View.Helpers as Helpers
 
 view : Model -> Int -> Html Msg
 view model id =
-    case model.shownOrganization of
+    case model.organizationsModel.shownOrganization of
         Nothing ->
             text "No organization here, sorry bud."
 
@@ -39,7 +39,7 @@ nameField model =
         [ Textfield.label "Name"
         , Textfield.floatingLabel
         , Textfield.text'
-        , Textfield.value <| Maybe.withDefault "" <| Maybe.map .name model.shownOrganization
+        , Textfield.value <| Maybe.withDefault "" <| Maybe.map .name model.organizationsModel.shownOrganization
         , Textfield.onInput <| OrganizationMsg' << SetShownOrganizationName
         ]
 
@@ -71,7 +71,7 @@ cancelButton model =
 
 header : Model -> Int -> List (Html Msg)
 header model id =
-    case model.shownOrganization of
+    case model.organizationsModel.shownOrganization of
         Nothing ->
             Helpers.defaultHeader model "No such organization"
 
