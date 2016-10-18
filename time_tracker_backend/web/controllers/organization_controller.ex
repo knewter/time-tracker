@@ -3,9 +3,14 @@ defmodule TimeTrackerBackend.OrganizationController do
 
   alias TimeTrackerBackend.Organization
 
-  def index(conn, _params) do
-    organizations = Repo.all(Organization)
-    render(conn, "index.json", organizations: organizations)
+  def index(conn, params) do
+    page =
+      Organization
+      |> Repo.paginate(params)
+
+    conn
+    |> Scrivener.Headers.paginate(page)
+    |> render("index.json", organizations: page.entries)
   end
 
   def create(conn, %{"organization" => organization_params}) do

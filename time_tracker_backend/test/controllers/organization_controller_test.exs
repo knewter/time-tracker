@@ -1,5 +1,6 @@
 defmodule TimeTrackerBackend.OrganizationControllerTest do
   use TimeTrackerBackend.ConnCase
+  import TimeTrackerBackend.Factory
 
   @valid_attrs %{name: "some content"}
   @invalid_attrs %{}
