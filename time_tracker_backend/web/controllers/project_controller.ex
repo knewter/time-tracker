@@ -1,9 +1,14 @@
 defmodule TimeTrackerBackend.ProjectController do
   use TimeTrackerBackend.Web, :controller
 
-  def index(conn, _params) do
-    projects = Repo.all(Project)
-    render(conn, "index.json", projects: projects)
+  def index(conn, params) do
+    page =
+      Project
+      |> Repo.paginate(params)
+
+    conn
+    |> Scrivener.Headers.paginate(page)
+    |> render("index.json", projects: page.entries)
   end
 
   def create(conn, %{"project" => project_params}) do

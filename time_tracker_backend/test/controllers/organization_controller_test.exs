@@ -1,7 +1,6 @@
 defmodule TimeTrackerBackend.OrganizationControllerTest do
   use TimeTrackerBackend.ConnCase
 
-  alias TimeTrackerBackend.Organization
   @valid_attrs %{name: "some content"}
   @invalid_attrs %{}
 
@@ -9,9 +8,19 @@ defmodule TimeTrackerBackend.OrganizationControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  test "lists all entries on index", %{conn: conn} do
+  test "paginates entries on index", %{conn: conn} do
+    insert_list(12, :organization)
     conn = get conn, organization_path(conn, :index)
-    assert json_response(conn, 200)["data"] == []
+    response = json_response(conn, 200)["data"]
+    assert get_resp_header(conn, "total") == ["12"]
+    assert get_resp_header(conn, "per-page") == ["10"]
+    assert get_resp_header(conn, "total-pages") == ["2"]
+    assert get_resp_header(conn, "page-number") == ["1"]
+    link_header = get_resp_header(conn, "link") |> hd |> ExLinkHeader.parse!
+    assert "2" == link_header.next.params.page
+    assert "2" == link_header.last.params.page
+    assert "1" == link_header.first.params.page
+    assert length(response) == 10
   end
 
   test "shows chosen resource", %{conn: conn} do
