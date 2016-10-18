@@ -1,7 +1,7 @@
 module View.Organizations exposing (view, header)
 
 import Model exposing (Model)
-import Types exposing (Organization, OrganizationSortableField(..), Sorted(..))
+import Types exposing (Organization, OrganizationSortableField(..), Sorted(..), Paginated)
 import Msg exposing (Msg(..), OrganizationMsg(..))
 import Route exposing (Location(..))
 import Html exposing (Html, text, div, a, img, span)

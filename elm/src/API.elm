@@ -8,11 +8,13 @@ module API
         , fetchUser
         , updateUser
         , fetchProjects
+        , fetchProjectsWithUrl
         , createProject
         , deleteProject
         , fetchProject
         , updateProject
         , fetchOrganizations
+        , fetchOrganizationsWithUrl
         , createOrganization
         , deleteOrganization
         , fetchOrganization
@@ -23,7 +25,6 @@ import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Types exposing (User, Project, Organization, Paginated)
 import Decoders
-import Json.Decode exposing ((:=))
 import OurHttp exposing (Error)
 import Http
 import Task
@@ -40,23 +41,33 @@ login model loginForm errorMsg msg =
     post model "/sessions" (encodeLoginForm loginForm) ("token" := JD.string) errorMsg msg
 
 
-fetchUsers : Model -> (OurHttp.Error -> Msg) -> (Paginated User -> Msg) -> Cmd Msg
-fetchUsers model errorMsg msg =
-    fetchUsersWithUrl "/users" model errorMsg msg
+fetchResources : String -> JD.Decoder (List a) -> Model -> (OurHttp.Error -> Msg) -> (Paginated a -> Msg) -> Cmd Msg
+fetchResources endpoint decoder model errorMsg msg =
+    fetchResourcesWithUrl endpoint decoder model errorMsg msg
 
 
-fetchUsersWithUrl : String -> Model -> (OurHttp.Error -> Msg) -> (Paginated User -> Msg) -> Cmd Msg
-fetchUsersWithUrl url model errorMsg msg =
+fetchResourcesWithUrl : String -> JD.Decoder (List a) -> Model -> (OurHttp.Error -> Msg) -> (Paginated a -> Msg) -> Cmd Msg
+fetchResourcesWithUrl url decoder model errorMsg msg =
     let
         apiPath =
             case getQueryParams url of
                 Nothing ->
-                    "/users"
+                    url
 
                 Just queryParams ->
-                    "/users?" ++ queryParams
+                    url ++ "?" ++ queryParams
     in
-        getPaginated model apiPath Decoders.usersDecoder errorMsg msg
+        getPaginated model apiPath decoder errorMsg msg
+
+
+fetchUsers : Model -> (OurHttp.Error -> Msg) -> (Paginated User -> Msg) -> Cmd Msg
+fetchUsers model errorMsg msg =
+    fetchResources "/users" Decoders.usersDecoder model errorMsg msg
+
+
+fetchUsersWithUrl : String -> Model -> (OurHttp.Error -> Msg) -> (Paginated User -> Msg) -> Cmd Msg
+fetchUsersWithUrl url model errorMsg msg =
+    fetchResourcesWithUrl url Decoders.usersDecoder model errorMsg msg
 
 
 getQueryParams : String -> Maybe String
@@ -118,9 +129,14 @@ encodeUser user =
         ]
 
 
-fetchProjects : Model -> (Http.Error -> Msg) -> (List Project -> Msg) -> Cmd Msg
+fetchProjects : Model -> (OurHttp.Error -> Msg) -> (Paginated Project -> Msg) -> Cmd Msg
 fetchProjects model errorMsg msg =
-    get model "/projects" Decoders.projectsDecoder errorMsg msg
+    fetchResources "/projects" Decoders.projectsDecoder model errorMsg msg
+
+
+fetchProjectsWithUrl : String -> Model -> (OurHttp.Error -> Msg) -> (Paginated Project -> Msg) -> Cmd Msg
+fetchProjectsWithUrl url model errorMsg msg =
+    fetchResourcesWithUrl url Decoders.projectsDecoder model errorMsg msg
 
 
 fetchProject : Model -> Int -> (Http.Error -> Msg) -> (Project -> Msg) -> Cmd Msg
@@ -164,9 +180,14 @@ encodeProject project =
         ]
 
 
-fetchOrganizations : Model -> (Http.Error -> Msg) -> (List Organization -> Msg) -> Cmd Msg
+fetchOrganizations : Model -> (OurHttp.Error -> Msg) -> (Paginated Organization -> Msg) -> Cmd Msg
 fetchOrganizations model errorMsg msg =
-    get model "/organizations" Decoders.organizationsDecoder errorMsg msg
+    fetchResources "/organizations" Decoders.organizationsDecoder model errorMsg msg
+
+
+fetchOrganizationsWithUrl : String -> Model -> (OurHttp.Error -> Msg) -> (Paginated Organization -> Msg) -> Cmd Msg
+fetchOrganizationsWithUrl url model errorMsg msg =
+    fetchResourcesWithUrl url Decoders.organizationsDecoder model errorMsg msg
 
 
 fetchOrganization : Model -> Int -> (Http.Error -> Msg) -> (Organization -> Msg) -> Cmd Msg
