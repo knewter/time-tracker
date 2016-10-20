@@ -7,6 +7,7 @@ import Types exposing (User, UserSortableField, Project, ProjectSortableField, O
 import Http
 import OurHttp
 import Form
+import RemoteData exposing (RemoteData)
 
 
 type Msg
@@ -29,7 +30,7 @@ type LoginMsg
 
 type UserMsg
     = GotUser User
-    | GotUsers (Paginated User)
+    | GotUsers (RemoteData OurHttp.Error (Paginated User))
     | FetchUsers String
     | CreateUserSucceeded User
     | CreateUserFailed OurHttp.Error
@@ -47,7 +48,7 @@ type UserMsg
 
 type ProjectMsg
     = GotProject Project
-    | GotProjects (Paginated Project)
+    | GotProjects (RemoteData OurHttp.Error (Paginated Project))
     | FetchProjects String
     | CreateProjectSucceeded Project
     | CreateProjectFailed OurHttp.Error
@@ -64,7 +65,7 @@ type ProjectMsg
 
 type OrganizationMsg
     = GotOrganization Organization
-    | GotOrganizations (Paginated Organization)
+    | GotOrganizations (RemoteData OurHttp.Error (Paginated Organization))
     | FetchOrganizations String
     | CreateOrganizationSucceeded Organization
     | CreateOrganizationFailed OurHttp.Error

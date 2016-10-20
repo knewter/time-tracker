@@ -16,6 +16,7 @@ import Material.Layout as Layout
 import View.Helpers as Helpers
 import View.Pieces.PaginatedTable as PaginatedTable
 import Util
+import RemoteData exposing (RemoteData(..))
 
 
 view : Model -> Html Msg
@@ -27,10 +28,16 @@ view model =
 organizationsTable : Model -> Html Msg
 organizationsTable model =
     case model.organizationsModel.organizations of
-        Nothing ->
-            text ""
+        NotAsked ->
+            text "Initialising..."
 
-        Just paginatedOrganizations ->
+        Loading ->
+            text "Loading..."
+
+        Failure err ->
+            text <| "There was a problem fetching the organizations: " ++ toString err
+
+        Success paginatedOrganizations ->
             div []
                 [ Table.table
                     [ Options.css "width" "100%"

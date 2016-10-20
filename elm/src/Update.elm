@@ -15,6 +15,7 @@ import Form
 import Dict
 import Decoders
 import Ports
+import RemoteData exposing (RemoteData(..))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -136,10 +137,10 @@ updateUserMsg : Model -> UserMsg -> UsersModel -> ( UsersModel, Cmd Msg, Maybe (
 updateUserMsg model msg usersModel =
     case msg of
         FetchUsers url ->
-            ( usersModel, API.fetchUsersWithUrl url model (always NoOp) (UserMsg' << GotUsers), Nothing )
+            ( { usersModel | users = Loading }, API.fetchUsersWithUrl url model (UserMsg' << GotUsers), Nothing )
 
         GotUsers users ->
-            ( { usersModel | users = Just users }, Cmd.none, Nothing )
+            ( { usersModel | users = users }, Cmd.none, Nothing )
 
         CreateUserSucceeded _ ->
             ( { usersModel
@@ -168,8 +169,8 @@ updateUserMsg model msg usersModel =
             )
 
         DeleteUserSucceeded user ->
-            ( usersModel
-            , API.fetchUsers model (always NoOp) (UserMsg' << GotUsers)
+            ( { usersModel | users = Loading }
+            , API.fetchUsers model (UserMsg' << GotUsers)
             , Nothing
             )
 
@@ -268,10 +269,10 @@ updateProjectMsg : Model -> ProjectMsg -> ProjectsModel -> ( ProjectsModel, Cmd 
 updateProjectMsg model msg projectsModel =
     case msg of
         FetchProjects url ->
-            ( projectsModel, API.fetchProjectsWithUrl url model (always NoOp) (ProjectMsg' << GotProjects), Nothing )
+            ( { projectsModel | projects = Loading }, API.fetchProjectsWithUrl url model (ProjectMsg' << GotProjects), Nothing )
 
         GotProjects projects ->
-            ( { projectsModel | projects = Just projects }
+            ( { projectsModel | projects = projects }
             , Cmd.none
             , Nothing
             )
@@ -303,8 +304,8 @@ updateProjectMsg model msg projectsModel =
             )
 
         DeleteProjectSucceeded project ->
-            ( projectsModel
-            , API.fetchProjects model (always NoOp) (ProjectMsg' << GotProjects)
+            ( { projectsModel | projects = Loading }
+            , API.fetchProjects model (ProjectMsg' << GotProjects)
             , Nothing
             )
 
@@ -394,10 +395,10 @@ updateOrganizationMsg : Model -> OrganizationMsg -> OrganizationsModel -> ( Orga
 updateOrganizationMsg model msg organizationsModel =
     case msg of
         FetchOrganizations url ->
-            ( organizationsModel, API.fetchOrganizationsWithUrl url model (always NoOp) (OrganizationMsg' << GotOrganizations), Nothing )
+            ( { organizationsModel | organizations = Loading }, API.fetchOrganizationsWithUrl url model (OrganizationMsg' << GotOrganizations), Nothing )
 
         GotOrganizations organizations ->
-            ( { organizationsModel | organizations = Just organizations }
+            ( { organizationsModel | organizations = organizations }
             , Cmd.none
             , Nothing
             )
@@ -429,8 +430,8 @@ updateOrganizationMsg model msg organizationsModel =
             )
 
         DeleteOrganizationSucceeded organization ->
-            ( organizationsModel
-            , API.fetchOrganizations model (always NoOp) (OrganizationMsg' << GotOrganizations)
+            ( { organizationsModel | organizations = Loading }
+            , API.fetchOrganizations model (OrganizationMsg' << GotOrganizations)
             , Nothing
             )
 

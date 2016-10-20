@@ -34,6 +34,7 @@ import Dict exposing (Dict)
 import RFC5988
 import Combine exposing (parse)
 import String
+import RemoteData
 
 
 login : Model -> ( String, String ) -> (Error -> Msg) -> (String -> Msg) -> Cmd Msg
@@ -41,9 +42,9 @@ login model loginForm errorMsg msg =
     post model "/sessions" (encodeLoginForm loginForm) ("token" := JD.string) errorMsg msg
 
 
-fetchResources : String -> JD.Decoder (List a) -> Model -> (OurHttp.Error -> Msg) -> (Paginated a -> Msg) -> Cmd Msg
-fetchResources endpoint decoder model errorMsg msg =
-    fetchResourcesWithUrl endpoint decoder model errorMsg msg
+fetchResources : String -> JD.Decoder (List a) -> Model -> (RemoteData.RemoteData Error (Paginated a) -> Msg) -> Cmd Msg
+fetchResources endpoint decoder model msg =
+    fetchResourcesWithUrl endpoint decoder model msg
 
 
 stripDomain : String -> String
@@ -56,8 +57,8 @@ stripDomain url =
         |> Maybe.withDefault ""
 
 
-fetchResourcesWithUrl : String -> JD.Decoder (List a) -> Model -> (OurHttp.Error -> Msg) -> (Paginated a -> Msg) -> Cmd Msg
-fetchResourcesWithUrl url decoder model errorMsg msg =
+fetchResourcesWithUrl : String -> JD.Decoder (List a) -> Model -> (RemoteData.RemoteData Error (Paginated a) -> Msg) -> Cmd Msg
+fetchResourcesWithUrl url decoder model msg =
     let
         strippedUrl =
             stripDomain url
@@ -70,17 +71,17 @@ fetchResourcesWithUrl url decoder model errorMsg msg =
                 Just queryParams ->
                     strippedUrl ++ "?" ++ queryParams
     in
-        getPaginated model apiPath decoder errorMsg msg
+        getPaginated model apiPath decoder msg
 
 
-fetchUsers : Model -> (OurHttp.Error -> Msg) -> (Paginated User -> Msg) -> Cmd Msg
-fetchUsers model errorMsg msg =
-    fetchResources "/users" Decoders.usersDecoder model errorMsg msg
+fetchUsers : Model -> (RemoteData.RemoteData Error (Paginated User) -> Msg) -> Cmd Msg
+fetchUsers model msg =
+    fetchResources "/users" Decoders.usersDecoder model msg
 
 
-fetchUsersWithUrl : String -> Model -> (OurHttp.Error -> Msg) -> (Paginated User -> Msg) -> Cmd Msg
-fetchUsersWithUrl url model errorMsg msg =
-    fetchResourcesWithUrl url Decoders.usersDecoder model errorMsg msg
+fetchUsersWithUrl : String -> Model -> (RemoteData.RemoteData Error (Paginated User) -> Msg) -> Cmd Msg
+fetchUsersWithUrl url model msg =
+    fetchResourcesWithUrl url Decoders.usersDecoder model msg
 
 
 getQueryParams : String -> Maybe String
@@ -142,14 +143,14 @@ encodeUser user =
         ]
 
 
-fetchProjects : Model -> (OurHttp.Error -> Msg) -> (Paginated Project -> Msg) -> Cmd Msg
-fetchProjects model errorMsg msg =
-    fetchResources "/projects" Decoders.projectsDecoder model errorMsg msg
+fetchProjects : Model -> (RemoteData.RemoteData Error (Paginated Project) -> Msg) -> Cmd Msg
+fetchProjects model msg =
+    fetchResources "/projects" Decoders.projectsDecoder model msg
 
 
-fetchProjectsWithUrl : String -> Model -> (OurHttp.Error -> Msg) -> (Paginated Project -> Msg) -> Cmd Msg
-fetchProjectsWithUrl url model errorMsg msg =
-    fetchResourcesWithUrl url Decoders.projectsDecoder model errorMsg msg
+fetchProjectsWithUrl : String -> Model -> (RemoteData.RemoteData Error (Paginated Project) -> Msg) -> Cmd Msg
+fetchProjectsWithUrl url model msg =
+    fetchResourcesWithUrl url Decoders.projectsDecoder model msg
 
 
 fetchProject : Model -> Int -> (Http.Error -> Msg) -> (Project -> Msg) -> Cmd Msg
@@ -193,14 +194,14 @@ encodeProject project =
         ]
 
 
-fetchOrganizations : Model -> (OurHttp.Error -> Msg) -> (Paginated Organization -> Msg) -> Cmd Msg
-fetchOrganizations model errorMsg msg =
-    fetchResources "/organizations" Decoders.organizationsDecoder model errorMsg msg
+fetchOrganizations : Model -> (RemoteData.RemoteData Error (Paginated Organization) -> Msg) -> Cmd Msg
+fetchOrganizations model msg =
+    fetchResources "/organizations" Decoders.organizationsDecoder model msg
 
 
-fetchOrganizationsWithUrl : String -> Model -> (OurHttp.Error -> Msg) -> (Paginated Organization -> Msg) -> Cmd Msg
-fetchOrganizationsWithUrl url model errorMsg msg =
-    fetchResourcesWithUrl url Decoders.organizationsDecoder model errorMsg msg
+fetchOrganizationsWithUrl : String -> Model -> (RemoteData.RemoteData Error (Paginated Organization) -> Msg) -> Cmd Msg
+fetchOrganizationsWithUrl url model msg =
+    fetchResourcesWithUrl url Decoders.organizationsDecoder model msg
 
 
 fetchOrganization : Model -> Int -> (Http.Error -> Msg) -> (Organization -> Msg) -> Cmd Msg
@@ -270,12 +271,13 @@ get model path decoder errorMsg msg =
         |> Task.perform errorMsg msg
 
 
-getPaginated : Model -> String -> JD.Decoder (List a) -> (OurHttp.Error -> Msg) -> (Paginated a -> Msg) -> Cmd Msg
-getPaginated model path decoder errorMsg msg =
+getPaginated : Model -> String -> JD.Decoder (List a) -> (RemoteData.RemoteData Error (Paginated a) -> Msg) -> Cmd Msg
+getPaginated model path decoder msg =
     Http.send Http.defaultSettings
         (defaultRequest model path)
         |> OurHttp.fromJsonWithHeaders ("data" := decoder) paginationParser
-        |> Task.perform errorMsg msg
+        |> RemoteData.asCmd
+        |> Cmd.map msg
 
 
 paginationParser : Dict String String -> List a -> Paginated a

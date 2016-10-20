@@ -20,6 +20,7 @@ import Material.Grid exposing (grid, size, cell, Device(..))
 import View.Helpers as Helpers
 import View.Pieces.PaginatedTable as PaginatedTable
 import Util
+import RemoteData exposing (RemoteData(..))
 
 
 view : Model -> Html Msg
@@ -39,10 +40,16 @@ view model =
 usersCards : Model -> Html Msg
 usersCards model =
     case model.usersModel.users of
-        Nothing ->
-            text ""
+        NotAsked ->
+            text "Initialising..."
 
-        Just paginatedUsers ->
+        Loading ->
+            text "Loading..."
+
+        Failure err ->
+            text <| "There was a problem fetching the users: " ++ toString err
+
+        Success paginatedUsers ->
             grid [] <|
                 List.map
                     (\user -> cell [ size All 3 ] [ userCard user ])
@@ -77,10 +84,16 @@ userCard user =
 usersTable : Model -> Html Msg
 usersTable model =
     case model.usersModel.users of
-        Nothing ->
-            text ""
+        NotAsked ->
+            text "Initialising..."
 
-        Just paginatedUsers ->
+        Loading ->
+            text "Loading..."
+
+        Failure err ->
+            text <| "There was a problem fetching the users: " ++ toString err
+
+        Success paginatedUsers ->
             div []
                 [ Table.table
                     [ Options.css "width" "100%"

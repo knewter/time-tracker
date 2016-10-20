@@ -13,18 +13,7 @@ cmdsForModelRoute : Model -> List (Cmd Msg)
 cmdsForModelRoute model =
     case model.route of
         Just Users ->
-            [ API.fetchUsers model
-                (\x ->
-                    case x of
-                        BadResponse 401 _ _ ->
-                            ClearApiKey
-
-                        _ ->
-                            NoOp
-                )
-              <|
-                UserMsg'
-                    << GotUsers
+            [ API.fetchUsers model <| UserMsg' << GotUsers
             ]
 
         Just (ShowUser id) ->
@@ -34,7 +23,7 @@ cmdsForModelRoute model =
             [ API.fetchUser model id (always NoOp) <| UserMsg' << GotUser ]
 
         Just Projects ->
-            [ API.fetchProjects model (always NoOp) <| ProjectMsg' << GotProjects ]
+            [ API.fetchProjects model <| ProjectMsg' << GotProjects ]
 
         Just (ShowProject id) ->
             [ API.fetchProject model id (always NoOp) <| ProjectMsg' << GotProject ]
@@ -43,7 +32,7 @@ cmdsForModelRoute model =
             [ API.fetchProject model id (always NoOp) <| ProjectMsg' << GotProject ]
 
         Just Organizations ->
-            [ API.fetchOrganizations model (always NoOp) <| OrganizationMsg' << GotOrganizations ]
+            [ API.fetchOrganizations model <| OrganizationMsg' << GotOrganizations ]
 
         Just (ShowOrganization id) ->
             [ API.fetchOrganization model id (always NoOp) <| OrganizationMsg' << GotOrganization ]

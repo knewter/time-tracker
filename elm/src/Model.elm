@@ -19,6 +19,8 @@ import Types
         )
 import Form exposing (Form)
 import Validators
+import RemoteData exposing (RemoteData(..))
+import OurHttp
 
 
 type alias FormWithErrors a =
@@ -39,7 +41,7 @@ type alias Model =
 
 
 type alias UsersModel =
-    { users : Maybe (Paginated User)
+    { users : RemoteData OurHttp.Error (Paginated User)
     , usersListView : UsersListView
     , newUserForm : FormWithErrors User
     , shownUser : Maybe User
@@ -48,7 +50,7 @@ type alias UsersModel =
 
 
 type alias ProjectsModel =
-    { projects : Maybe (Paginated Project)
+    { projects : RemoteData OurHttp.Error (Paginated Project)
     , newProjectForm : FormWithErrors Project
     , shownProject : Maybe Project
     , projectsSort : Maybe ( Sorted, ProjectSortableField )
@@ -56,7 +58,7 @@ type alias ProjectsModel =
 
 
 type alias OrganizationsModel =
-    { organizations : Maybe (Paginated Organization)
+    { organizations : RemoteData OurHttp.Error (Paginated Organization)
     , newOrganizationForm : FormWithErrors Organization
     , shownOrganization : Maybe Organization
     , organizationsSort : Maybe ( Sorted, OrganizationSortableField )
@@ -73,19 +75,19 @@ initialModel location =
     , loginForm = ( Form.initial [] Validators.validateLoginForm, Nothing )
     , usersModel =
         { usersListView = UsersTable
-        , users = Nothing
+        , users = NotAsked
         , newUserForm = ( Form.initial [] Validators.validateNewUser, Nothing )
         , shownUser = Nothing
         , usersSort = Nothing
         }
     , projectsModel =
-        { projects = Nothing
+        { projects = NotAsked
         , newProjectForm = ( Form.initial [] Validators.validateNewProject, Nothing )
         , shownProject = Nothing
         , projectsSort = Nothing
         }
     , organizationsModel =
-        { organizations = Nothing
+        { organizations = NotAsked
         , newOrganizationForm = ( Form.initial [] Validators.validateNewOrganization, Nothing )
         , shownOrganization = Nothing
         , organizationsSort = Nothing
