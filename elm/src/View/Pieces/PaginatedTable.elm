@@ -15,7 +15,7 @@ paginationData mdlIndexPrefix tagger model paginatedData =
     let
         toButton link label index =
             Button.render Mdl
-                (mdlIndexPrefix |> List.reverse |> (::) index |> List.reverse)
+                (mdlIndexPrefix ++ [ index ])
                 model.mdl
                 [ Button.ripple
                 , Button.onClick <| tagger link.target

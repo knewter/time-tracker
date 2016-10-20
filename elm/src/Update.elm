@@ -390,13 +390,6 @@ updateProjectMsg model msg projectsModel =
                     )
 
 
-projectSortableFieldFun : ProjectSortableField -> (Project -> String)
-projectSortableFieldFun sortableField =
-    case sortableField of
-        ProjectName ->
-            .name
-
-
 updateOrganizationMsg : Model -> OrganizationMsg -> OrganizationsModel -> ( OrganizationsModel, Cmd Msg, Maybe ( String, String ) )
 updateOrganizationMsg model msg organizationsModel =
     case msg of
@@ -521,13 +514,6 @@ updateOrganizationMsg model msg organizationsModel =
                     , Cmd.none
                     , Nothing
                     )
-
-
-organizationSortableFieldFun : OrganizationSortableField -> (Organization -> String)
-organizationSortableFieldFun sortableField =
-    case sortableField of
-        OrganizationName ->
-            .name
 
 
 andLog : String -> a -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
