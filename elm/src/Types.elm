@@ -12,11 +12,14 @@ module Types
         , DayActivity(..)
         , WeekActivity(..)
         , Paginated
+        , RemotePaginated
         )
 
 import Dict exposing (Dict)
 import Date exposing (Date)
 import RFC5988 exposing (Link)
+import RemoteData exposing (RemoteData)
+import OurHttp exposing (Error)
 
 
 type alias User =
@@ -87,3 +90,7 @@ type alias Paginated a =
     , pageNumber : Int
     , links : PaginationLinks
     }
+
+
+type alias RemotePaginated a =
+    RemoteData Error (Paginated a)
