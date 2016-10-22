@@ -13,6 +13,8 @@ module Types
         , WeekActivity(..)
         , Paginated
         , RemotePaginated
+        , RemotePersistent
+        , RemotePersistentPaginated
         )
 
 import Dict exposing (Dict)
@@ -90,6 +92,16 @@ type alias Paginated a =
     , pageNumber : Int
     , links : PaginationLinks
     }
+
+
+type alias RemotePersistent a =
+    { current : RemoteData Error a
+    , previous : Maybe a
+    }
+
+
+type alias RemotePersistentPaginated a =
+    RemotePersistent (Paginated a)
 
 
 type alias RemotePaginated a =

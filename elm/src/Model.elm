@@ -16,6 +16,7 @@ import Types
         , APIFieldErrors
         , UsersListView(..)
         , Paginated
+        , RemotePersistentPaginated
         )
 import Form exposing (Form)
 import Validators
@@ -41,7 +42,7 @@ type alias Model =
 
 
 type alias UsersModel =
-    { users : RemoteData OurHttp.Error (Paginated User)
+    { users : RemotePersistentPaginated User
     , usersListView : UsersListView
     , newUserForm : FormWithErrors User
     , shownUser : Maybe User
@@ -50,7 +51,7 @@ type alias UsersModel =
 
 
 type alias ProjectsModel =
-    { projects : RemoteData OurHttp.Error (Paginated Project)
+    { projects : RemotePersistentPaginated Project
     , newProjectForm : FormWithErrors Project
     , shownProject : Maybe Project
     , projectsSort : Maybe ( Sorted, ProjectSortableField )
@@ -58,7 +59,7 @@ type alias ProjectsModel =
 
 
 type alias OrganizationsModel =
-    { organizations : RemoteData OurHttp.Error (Paginated Organization)
+    { organizations : RemotePersistentPaginated Organization
     , newOrganizationForm : FormWithErrors Organization
     , shownOrganization : Maybe Organization
     , organizationsSort : Maybe ( Sorted, OrganizationSortableField )
@@ -75,19 +76,19 @@ initialModel location =
     , loginForm = ( Form.initial [] Validators.validateLoginForm, Nothing )
     , usersModel =
         { usersListView = UsersTable
-        , users = NotAsked
+        , users = { current = NotAsked, previous = Nothing }
         , newUserForm = ( Form.initial [] Validators.validateNewUser, Nothing )
         , shownUser = Nothing
         , usersSort = Nothing
         }
     , projectsModel =
-        { projects = NotAsked
+        { projects = { current = NotAsked, previous = Nothing }
         , newProjectForm = ( Form.initial [] Validators.validateNewProject, Nothing )
         , shownProject = Nothing
         , projectsSort = Nothing
         }
     , organizationsModel =
-        { organizations = NotAsked
+        { organizations = { current = NotAsked, previous = Nothing }
         , newOrganizationForm = ( Form.initial [] Validators.validateNewOrganization, Nothing )
         , shownOrganization = Nothing
         , organizationsSort = Nothing

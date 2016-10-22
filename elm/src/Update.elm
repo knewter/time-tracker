@@ -2,7 +2,18 @@ module Update exposing (update)
 
 import Model exposing (Model, UsersModel, ProjectsModel, OrganizationsModel)
 import Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..), OrganizationMsg(..), LoginMsg(..))
-import Types exposing (User, UserSortableField(..), Sorted(..), Project, ProjectSortableField(..), Organization, OrganizationSortableField(..), APIFieldErrors)
+import Types
+    exposing
+        ( User
+        , UserSortableField(..)
+        , Sorted(..)
+        , Project
+        , ProjectSortableField(..)
+        , Organization
+        , OrganizationSortableField(..)
+        , APIFieldErrors
+        , RemotePersistent
+        )
 import Material
 import Material.Snackbar as Snackbar
 import Navigation
@@ -137,10 +148,10 @@ updateUserMsg : Model -> UserMsg -> UsersModel -> ( UsersModel, Cmd Msg, Maybe (
 updateUserMsg model msg usersModel =
     case msg of
         FetchUsers url ->
-            ( { usersModel | users = Loading }, API.fetchUsersWithUrl url model (UserMsg' << GotUsers), Nothing )
+            ( { usersModel | users = updateRemotePersistent Loading usersModel.users }, API.fetchUsersWithUrl url model (UserMsg' << GotUsers), Nothing )
 
         GotUsers users ->
-            ( { usersModel | users = users }, Cmd.none, Nothing )
+            ( { usersModel | users = updateRemotePersistent users usersModel.users }, Cmd.none, Nothing )
 
         CreateUserSucceeded _ ->
             ( { usersModel
@@ -169,7 +180,7 @@ updateUserMsg model msg usersModel =
             )
 
         DeleteUserSucceeded user ->
-            ( { usersModel | users = Loading }
+            ( { usersModel | users = updateRemotePersistent Loading usersModel.users }
             , API.fetchUsers model (UserMsg' << GotUsers)
             , Nothing
             )
@@ -269,10 +280,13 @@ updateProjectMsg : Model -> ProjectMsg -> ProjectsModel -> ( ProjectsModel, Cmd 
 updateProjectMsg model msg projectsModel =
     case msg of
         FetchProjects url ->
-            ( { projectsModel | projects = Loading }, API.fetchProjectsWithUrl url model (ProjectMsg' << GotProjects), Nothing )
+            ( { projectsModel | projects = updateRemotePersistent Loading projectsModel.projects }
+            , API.fetchProjectsWithUrl url model (ProjectMsg' << GotProjects)
+            , Nothing
+            )
 
         GotProjects projects ->
-            ( { projectsModel | projects = projects }
+            ( { projectsModel | projects = updateRemotePersistent projects projectsModel.projects }
             , Cmd.none
             , Nothing
             )
@@ -304,7 +318,7 @@ updateProjectMsg model msg projectsModel =
             )
 
         DeleteProjectSucceeded project ->
-            ( { projectsModel | projects = Loading }
+            ( { projectsModel | projects = updateRemotePersistent Loading projectsModel.projects }
             , API.fetchProjects model (ProjectMsg' << GotProjects)
             , Nothing
             )
@@ -395,10 +409,13 @@ updateOrganizationMsg : Model -> OrganizationMsg -> OrganizationsModel -> ( Orga
 updateOrganizationMsg model msg organizationsModel =
     case msg of
         FetchOrganizations url ->
-            ( { organizationsModel | organizations = Loading }, API.fetchOrganizationsWithUrl url model (OrganizationMsg' << GotOrganizations), Nothing )
+            ( { organizationsModel | organizations = updateRemotePersistent Loading organizationsModel.organizations }
+            , API.fetchOrganizationsWithUrl url model (OrganizationMsg' << GotOrganizations)
+            , Nothing
+            )
 
         GotOrganizations organizations ->
-            ( { organizationsModel | organizations = organizations }
+            ( { organizationsModel | organizations = updateRemotePersistent organizations organizationsModel.organizations }
             , Cmd.none
             , Nothing
             )
@@ -430,7 +447,7 @@ updateOrganizationMsg model msg organizationsModel =
             )
 
         DeleteOrganizationSucceeded organization ->
-            ( { organizationsModel | organizations = Loading }
+            ( { organizationsModel | organizations = updateRemotePersistent Loading organizationsModel.organizations }
             , API.fetchOrganizations model (OrganizationMsg' << GotOrganizations)
             , Nothing
             )
@@ -570,3 +587,13 @@ decodeError error =
                         "Something other than a BadResponse: "
                             ++ (toString e)
                    )
+
+
+updateRemotePersistent : RemoteData Error a -> RemotePersistent a -> RemotePersistent a
+updateRemotePersistent newValue persistentWrapped =
+    case persistentWrapped.current of
+        Success a ->
+            { current = newValue, previous = Just a }
+
+        _ ->
+            { current = newValue, previous = Nothing }

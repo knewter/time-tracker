@@ -1,18 +1,18 @@
-'use strict';
+'use strict'
 
-require('./index.html');
-var Elm = require('./Main');
+require('./index.html')
+let Elm = require('./Main')
 
-var apiKey = localStorage.getItem('apiKey');
+let apiKey = localStorage.getItem('apiKey')
 
-var app;
+let app
 
 if(apiKey){
-  app = Elm.Main.fullscreen({apiKey: apiKey});
+  app = Elm.Main.fullscreen({apiKey: apiKey})
 } else {
-  app = Elm.Main.fullscreen({apiKey: null});
+  app = Elm.Main.fullscreen({apiKey: null})
 }
 
 app.ports.storeApiKey.subscribe(function(data){
-  localStorage.setItem('apiKey', data);
+  localStorage.setItem('apiKey', data)
 });

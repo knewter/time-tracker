@@ -27,7 +27,7 @@ view model =
 
 organizationsTable : Model -> Html Msg
 organizationsTable model =
-    case model.organizationsModel.organizations of
+    case model.organizationsModel.organizations.current of
         NotAsked ->
             text "Initialising..."
 

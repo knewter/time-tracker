@@ -27,7 +27,7 @@ view model =
 
 projectsTable : Model -> Html Msg
 projectsTable model =
-    case model.projectsModel.projects of
+    case model.projectsModel.projects.current of
         NotAsked ->
             text "Initialising..."
 

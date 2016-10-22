@@ -39,7 +39,7 @@ view model =
 
 usersCards : Model -> Html Msg
 usersCards model =
-    case model.usersModel.users of
+    case model.usersModel.users.current of
         NotAsked ->
             text "Initialising..."
 
@@ -83,43 +83,60 @@ userCard user =
 
 usersTable : Model -> Html Msg
 usersTable model =
-    case model.usersModel.users of
-        NotAsked ->
-            text "Initialising..."
-
-        Loading ->
-            text "Loading..."
-
-        Failure err ->
-            text <| "There was a problem fetching the users: " ++ toString err
-
-        Success paginatedUsers ->
-            div []
-                [ Table.table
-                    [ Options.css "width" "100%"
-                    , Elevation.e2
+    let
+        renderTable paginatedUsers =
+            Table.table
+                [ Options.css "width" "100%"
+                , Elevation.e2
+                ]
+                [ Table.thead []
+                    [ Table.th [] []
+                    , Table.th
+                        (thOptions UserName model)
+                        [ text "Name" ]
+                    , Table.th [] [ text "Position" ]
+                    , Table.th [] [ text "Email" ]
+                    , Table.th [] [ text "Today" ]
+                    , Table.th [] [ text "Last 7 days" ]
+                    , Table.th [] [ text "Projects" ]
+                    , Table.th [] [ text "Open Tasks" ]
+                    , Table.th [] [ text "Actions" ]
                     ]
-                    [ Table.thead []
-                        [ Table.th [] []
-                        , Table.th
-                            (thOptions UserName model)
-                            [ text "Name" ]
-                        , Table.th [] [ text "Position" ]
-                        , Table.th [] [ text "Email" ]
-                        , Table.th [] [ text "Today" ]
-                        , Table.th [] [ text "Last 7 days" ]
-                        , Table.th [] [ text "Projects" ]
-                        , Table.th [] [ text "Open Tasks" ]
-                        , Table.th [] [ text "Actions" ]
-                        ]
-                    , Table.tbody []
-                        (List.indexedMap (viewUserRow model) paginatedUsers.items)
-                    , Table.tfoot []
-                        [ Html.td [ colspan 999, class "mdl-data-table__cell--non-numeric" ]
-                            [ PaginatedTable.paginationData [ 0, 3 ] (UserMsg' << FetchUsers) model paginatedUsers ]
-                        ]
+                , Table.tbody []
+                    (List.indexedMap (viewUserRow model) paginatedUsers.items)
+                , Table.tfoot []
+                    [ Html.td [ colspan 999, class "mdl-data-table__cell--non-numeric" ]
+                        [ PaginatedTable.paginationData [ 0, 3 ] (UserMsg' << FetchUsers) model paginatedUsers ]
                     ]
                 ]
+    in
+        case model.usersModel.users.current of
+            NotAsked ->
+                text "Initialising..."
+
+            Loading ->
+                case model.usersModel.users.previous of
+                    Nothing ->
+                        text "Loading..."
+
+                    Just previousUsers ->
+                        div [ class "loading" ]
+                            [ renderTable previousUsers
+                            ]
+
+            Failure err ->
+                case model.usersModel.users.previous of
+                    Nothing ->
+                        text <| "There was a problem fetching the users: " ++ toString err
+
+                    Just previousUsers ->
+                        div []
+                            [ text <| "There was a problem fetching the users: " ++ toString err
+                            , renderTable previousUsers
+                            ]
+
+            Success paginatedUsers ->
+                renderTable paginatedUsers
 
 
 viewUserRow : Model -> Int -> User -> Html Msg
