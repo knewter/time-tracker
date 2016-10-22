@@ -34,6 +34,14 @@ defmodule TimeTrackerBackend.UserControllerTest do
       assert length(response) == 10
     end
 
+    test "searches entries on index with query", %{conn: conn} do
+      insert_list(12, :user)
+      insert(:user, %{name: "jabbity"})
+      conn = get conn, user_path(conn, :index, %{q: "jabbity"})
+      response = json_response(conn, 200)["data"]
+      assert (hd response)["name"] == "jabbity"
+    end
+
     test "shows chosen resource", %{conn: conn} do
       user = Repo.insert! %User{}
       conn = get conn, user_path(conn, :show, user)

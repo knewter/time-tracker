@@ -2,9 +2,16 @@ defmodule TimeTrackerBackend.UserController do
   use TimeTrackerBackend.Web, :controller
   plug Guardian.Plug.EnsureAuthenticated, handler: __MODULE__
 
+  defp search(query, %{ "q" => q }) do
+    from u in query,
+      where: ilike(u.name, ^q)
+  end
+  defp search(query, _), do: query
+
   def index(conn, params) do
     page =
       User
+      |> search(params)
       |> Repo.paginate(params)
 
     # We'll make the users index action take a little while so we can be sure
