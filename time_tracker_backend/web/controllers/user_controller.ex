@@ -4,7 +4,7 @@ defmodule TimeTrackerBackend.UserController do
 
   defp search(query, %{ "q" => q }) do
     from u in query,
-      where: ilike(u.name, ^q)
+      where: ilike(u.name, ^"%#{q}%")
   end
   defp search(query, _), do: query
 
