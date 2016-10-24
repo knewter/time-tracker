@@ -47,6 +47,7 @@ type alias UsersModel =
     , newUserForm : FormWithErrors User
     , shownUser : Maybe User
     , usersSort : Maybe ( Sorted, UserSortableField )
+    , userSearchQuery : String
     }
 
 
@@ -80,6 +81,7 @@ initialModel location =
         , newUserForm = ( Form.initial [] Validators.validateNewUser, Nothing )
         , shownUser = Nothing
         , usersSort = Nothing
+        , userSearchQuery = ""
         }
     , projectsModel =
         { projects = { current = NotAsked, previous = Nothing }

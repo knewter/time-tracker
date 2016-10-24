@@ -16,10 +16,11 @@ import Material.Elevation as Elevation
 import Material.Color as Color
 import Material.Options as Options
 import Material.Layout as Layout
+import Material.Textfield as Textfield
 import Material.Grid exposing (grid, size, cell, Device(..))
 import View.Helpers as Helpers
 import View.Pieces.PaginatedTable as PaginatedTable
-import Util
+import Util exposing (onEnter)
 import RemoteData exposing (RemoteData(..))
 
 
@@ -100,7 +101,18 @@ usersTable model =
                     , Table.th [] [ text "Last 7 days" ]
                     , Table.th [] [ text "Projects" ]
                     , Table.th [] [ text "Open Tasks" ]
-                    , Table.th [] [ text "Actions" ]
+                    , Table.th []
+                        [ Textfield.render Mdl
+                            [ 0, 4 ]
+                            model.mdl
+                            [ Textfield.label "Search"
+                            , Textfield.floatingLabel
+                            , Textfield.text'
+                            , Textfield.value model.usersModel.userSearchQuery
+                            , Textfield.onInput <| UserMsg' << SetUserSearchQuery
+                            , onEnter <| UserMsg' <| FetchUsers <| "/users?q=" ++ model.usersModel.userSearchQuery
+                            ]
+                        ]
                     ]
                 , Table.tbody []
                     (List.indexedMap (viewUserRow model) paginatedUsers.items)

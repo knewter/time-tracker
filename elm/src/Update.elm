@@ -275,6 +275,15 @@ updateUserMsg model msg usersModel =
             , Nothing
             )
 
+        SetUserSearchQuery query ->
+            ( { usersModel | userSearchQuery = query }
+            , Cmd.none
+            , Nothing
+            )
+
+        SearchUsers ->
+            ( { usersModel | users = updateRemotePersistent Loading usersModel.users }, API.fetchUsers model (UserMsg' << GotUsers), Nothing )
+
 
 updateProjectMsg : Model -> ProjectMsg -> ProjectsModel -> ( ProjectsModel, Cmd Msg, Maybe ( String, String ) )
 updateProjectMsg model msg projectsModel =

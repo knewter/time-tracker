@@ -44,6 +44,7 @@ type UserMsg
     | UpdateUserSucceeded User
     | NewUserFormMsg Form.Msg
     | SwitchUsersListView UsersListView
+    | SetUserSearchQuery String
 
 
 type ProjectMsg

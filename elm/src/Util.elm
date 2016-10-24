@@ -1,12 +1,16 @@
-module Util exposing (cmdsForModelRoute, MaterialTableHeader)
+module Util exposing (cmdsForModelRoute, MaterialTableHeader, onEnter)
 
 import Route exposing (Location(..))
 import API
 import Model exposing (Model)
 import Msg exposing (Msg(..), UserMsg(..), ProjectMsg(..), OrganizationMsg(..))
 import Material.Table as Table
+import Material.Textfield as Textfield
 import Html exposing (Html)
 import OurHttp exposing (Error(BadResponse))
+import Html.Events exposing (keyCode)
+import Html
+import Json.Decode as JD
 
 
 cmdsForModelRoute : Model -> List (Cmd Msg)
@@ -55,3 +59,14 @@ type alias MaterialTableHeader m =
     , sorted : Maybe Table.Order
     , onClick : Maybe (Html.Attribute m)
     }
+
+
+onEnter msg =
+    let
+        tagger code =
+            if code == 13 then
+                msg
+            else
+                NoOp
+    in
+        Textfield.on "keydown" (JD.map tagger keyCode)
