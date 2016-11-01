@@ -26,19 +26,11 @@ view model =
 
 viewActivitySummary : Model -> Html a
 viewActivitySummary model =
-    let
-        staticData =
-            [ ( Date.fromTime 1448928000000, 2 )
-            , ( Date.fromTime 1451606400000, 2 )
-            , ( Date.fromTime 1454284800000, 1 )
-            , ( Date.fromTime 1456790400000, 1 )
-            ]
-    in
-        [ Card.text []
-            [ View.Charts.activity ( 800, 200 ) staticData
-            ]
+    [ Card.text []
+        [ View.Charts.activity ( 800, 200 ) model.chartData
         ]
-            |> viewGridCard
+    ]
+        |> viewGridCard
 
 
 viewWordCloud : Model -> Html a

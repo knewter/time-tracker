@@ -22,6 +22,7 @@ import Form exposing (Form)
 import Validators
 import RemoteData exposing (RemoteData(..))
 import OurHttp
+import Date exposing (Date)
 
 
 type alias FormWithErrors a =
@@ -38,6 +39,7 @@ type alias Model =
     , usersModel : UsersModel
     , projectsModel : ProjectsModel
     , organizationsModel : OrganizationsModel
+    , chartData : List ( Date, Float )
     }
 
 
@@ -99,4 +101,10 @@ initialModel location =
         , organizationsSort = Nothing
         , organizationSearchQuery = ""
         }
+    , chartData =
+        [ ( Date.fromTime 1448928000000, 1 )
+        , ( Date.fromTime 1451606400000, 1 )
+        , ( Date.fromTime 1454284800000, 2 )
+        , ( Date.fromTime 1456790400000, 3 )
+        ]
     }
