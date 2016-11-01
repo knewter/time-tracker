@@ -14,11 +14,6 @@ defmodule TimeTrackerBackend.UserController do
       |> search(params)
       |> Repo.paginate(params)
 
-    # We'll make the users index action take a little while so we can be sure
-    # that the user experience handles slower responses well / doesn't look
-    # stupid.
-    :timer.sleep(5_000)
-
     conn
     |> Scrivener.Headers.paginate(page)
     |> render("index.json", users: page.entries)
