@@ -8,18 +8,6 @@ defmodule TimeTrackerBackend.UserController do
   end
   defp search(query, _), do: query
 
-  defp order(query, "asc "<>field) do
-    field = String.to_existing_atom(field)
-    from u in query,
-      order_by: [asc: ^field]
-  end
-  defp order(query, "desc "<>field) do
-    field = String.to_existing_atom(field)
-    from u in query,
-      order_by: [desc: ^field]
-  end
-  defp order(query, _), do: query
-
   def index(conn, params) do
     page =
       User

@@ -11,6 +11,7 @@ defmodule TimeTrackerBackend.ProjectController do
     page =
       Project
       |> search(params)
+      |> order(params["order"])
       |> Repo.paginate(params)
 
     conn

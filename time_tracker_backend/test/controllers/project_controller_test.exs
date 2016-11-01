@@ -32,6 +32,19 @@ defmodule TimeTrackerBackend.ProjectControllerTest do
     assert (hd response)["name"] == "jabbity"
   end
 
+  test "supports sorting by name", %{conn: conn} do
+    insert(:project, %{name: "2 potato"})
+    insert(:project, %{name: "1 potato"})
+    insert(:project, %{name: "3 potato"})
+    insert(:project, %{name: "zzzzzzzz"})
+    conn2 = get conn, project_path(conn, :index, %{order: "desc name"})
+    response = json_response(conn2, 200)["data"]
+    assert (hd response)["name"] == "zzzzzzzz"
+    conn3 = get conn, project_path(conn, :index, %{order: "asc name"})
+    response = json_response(conn3, 200)["data"]
+    assert (hd response)["name"] == "1 potato"
+  end
+
   test "shows chosen resource", %{conn: conn} do
     project = Repo.insert! %Project{}
     conn = get conn, project_path(conn, :show, project)

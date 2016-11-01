@@ -32,6 +32,19 @@ defmodule TimeTrackerBackend.OrganizationControllerTest do
     assert (hd response)["name"] == "jabbity"
   end
 
+  test "supports sorting by name", %{conn: conn} do
+    insert(:organization, %{name: "2 potato"})
+    insert(:organization, %{name: "1 potato"})
+    insert(:organization, %{name: "3 potato"})
+    insert(:organization, %{name: "zzzzzzzz"})
+    conn2 = get conn, organization_path(conn, :index, %{order: "desc name"})
+    response = json_response(conn2, 200)["data"]
+    assert (hd response)["name"] == "zzzzzzzz"
+    conn3 = get conn, organization_path(conn, :index, %{order: "asc name"})
+    response = json_response(conn3, 200)["data"]
+    assert (hd response)["name"] == "1 potato"
+  end
+
   test "shows chosen resource", %{conn: conn} do
     organization = Repo.insert! %Organization{}
     conn = get conn, organization_path(conn, :show, organization)

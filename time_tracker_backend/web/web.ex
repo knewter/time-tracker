@@ -37,7 +37,19 @@ defmodule TimeTrackerBackend.Web do
       import TimeTrackerBackend.Router.Helpers
       import TimeTrackerBackend.Gettext
 
-      alias TimeTrackerBackend.{User, Project}
+      alias TimeTrackerBackend.{User, Project, Organization}
+
+      defp order(query, "asc "<>field) do
+        field = String.to_existing_atom(field)
+        from u in query,
+          order_by: [asc: ^field]
+      end
+      defp order(query, "desc "<>field) do
+        field = String.to_existing_atom(field)
+        from u in query,
+          order_by: [desc: ^field]
+      end
+      defp order(query, _), do: query
     end
   end
 
