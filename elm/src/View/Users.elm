@@ -90,9 +90,7 @@ renderTable model paginatedUsers =
         ]
         [ Table.thead []
             [ Table.th [] []
-            , Table.th
-                (thOptions UserName model)
-                [ text "Name" ]
+            , Table.th [] [ text "Name" ]
             , Table.th [] [ text "Position" ]
             , Table.th [] [ text "Email" ]
             , Table.th [] [ text "Today" ]
@@ -232,29 +230,6 @@ editButton model index user =
                 , Button.onClick <| NavigateTo <| Just <| EditUser id
                 ]
                 [ Icon.i "edit" ]
-
-
-thOptions : UserSortableField -> Model -> List (Options.Property (Util.MaterialTableHeader Msg) Msg)
-thOptions sortableField model =
-    [ Table.onClick <| UserMsg' <| ReorderUsers sortableField
-    , Options.css "cursor" "pointer"
-    ]
-        ++ case model.usersModel.usersSort of
-            Nothing ->
-                []
-
-            Just ( sorted, sortedField ) ->
-                case sortedField == sortableField of
-                    True ->
-                        case sorted of
-                            Ascending ->
-                                [ Table.sorted Table.Ascending ]
-
-                            Descending ->
-                                [ Table.sorted Table.Descending ]
-
-                    False ->
-                        []
 
 
 header : Model -> List (Html Msg)
