@@ -1,9 +1,16 @@
 defmodule TimeTrackerBackend.ProjectController do
   use TimeTrackerBackend.Web, :controller
 
+  defp search(query, %{ "q" => q }) do
+    from u in query,
+      where: ilike(u.name, ^"%#{q}%")
+  end
+  defp search(query, _), do: query
+
   def index(conn, params) do
     page =
       Project
+      |> search(params)
       |> Repo.paginate(params)
 
     conn

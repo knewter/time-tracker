@@ -24,6 +24,14 @@ defmodule TimeTrackerBackend.ProjectControllerTest do
     assert length(response) == 10
   end
 
+  test "searches entries on index with query", %{conn: conn} do
+    insert_list(12, :project)
+    insert(:project, %{name: "jabbity"})
+    conn = get conn, project_path(conn, :index, %{q: "jabbit"})
+    response = json_response(conn, 200)["data"]
+    assert (hd response)["name"] == "jabbity"
+  end
+
   test "shows chosen resource", %{conn: conn} do
     project = Repo.insert! %Project{}
     conn = get conn, project_path(conn, :show, project)

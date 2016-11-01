@@ -24,6 +24,14 @@ defmodule TimeTrackerBackend.OrganizationControllerTest do
     assert length(response) == 10
   end
 
+  test "searches entries on index with query", %{conn: conn} do
+    insert_list(12, :organization)
+    insert(:organization, %{name: "jabbity"})
+    conn = get conn, organization_path(conn, :index, %{q: "jabbit"})
+    response = json_response(conn, 200)["data"]
+    assert (hd response)["name"] == "jabbity"
+  end
+
   test "shows chosen resource", %{conn: conn} do
     organization = Repo.insert! %Organization{}
     conn = get conn, organization_path(conn, :show, organization)
