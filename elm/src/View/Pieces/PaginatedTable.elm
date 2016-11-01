@@ -1,22 +1,22 @@
 module View.Pieces.PaginatedTable exposing (paginationData)
 
 import Types exposing (Paginated)
-import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Html exposing (Html, text, div)
 import Html.Attributes exposing (style)
 import Material.Grid exposing (grid, size, cell, Device(..))
 import Material.Options as Options
 import Material.Button as Button
+import Material
 
 
-paginationData : List Int -> (String -> Msg) -> Model -> Paginated a -> Html Msg
-paginationData mdlIndexPrefix tagger model paginatedData =
+paginationData : List Int -> (String -> Msg) -> Material.Model -> Paginated a -> Html Msg
+paginationData mdlIndexPrefix tagger mdl paginatedData =
     let
         toButton link label index =
             Button.render Mdl
                 (mdlIndexPrefix ++ [ index ])
-                model.mdl
+                mdl
                 [ Button.ripple
                 , Button.onClick <| tagger link.target
                 ]

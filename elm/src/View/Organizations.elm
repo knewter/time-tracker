@@ -53,7 +53,7 @@ renderTable model paginatedOrganizations =
             (List.indexedMap (organizationRow model) paginatedOrganizations.items)
         , Table.tfoot []
             [ Html.td [ colspan 999, class "mdl-data-table__cell--non-numeric" ]
-                [ PaginatedTable.paginationData [ 7, 3 ] (OrganizationMsg' << FetchOrganizations) model paginatedOrganizations ]
+                [ PaginatedTable.paginationData [ 7, 3 ] (OrganizationMsg' << FetchOrganizations) model.mdl paginatedOrganizations ]
             ]
         ]
 

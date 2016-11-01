@@ -83,8 +83,8 @@ userCard user =
             ]
 
 
-renderTable : Model -> Paginated User -> Html Msg
-renderTable model paginatedUsers =
+renderTable : Material.Model -> String -> Paginated User -> Html Msg
+renderTable mdl searchQuery paginatedUsers =
     Table.table
         [ Options.css "width" "100%"
         , Elevation.e2
@@ -101,21 +101,21 @@ renderTable model paginatedUsers =
             , Table.th []
                 [ Textfield.render Mdl
                     [ 0, 4 ]
-                    model.mdl
+                    mdl
                     [ Textfield.label "Search"
                     , Textfield.floatingLabel
                     , Textfield.text'
-                    , Textfield.value model.usersModel.userSearchQuery
+                    , Textfield.value searchQuery
                     , Textfield.onInput <| UserMsg' << SetUserSearchQuery
-                    , onEnter <| UserMsg' <| FetchUsers <| "/users?q=" ++ model.usersModel.userSearchQuery
+                    , onEnter <| UserMsg' <| FetchUsers <| "/users?q=" ++ searchQuery
                     ]
                 ]
             ]
         , Table.tbody []
-            (List.indexedMap (viewUserRow model.mdl) paginatedUsers.items)
+            (List.indexedMap (viewUserRow mdl) paginatedUsers.items)
         , Table.tfoot []
             [ Html.td [ colspan 999, class "mdl-data-table__cell--non-numeric" ]
-                [ PaginatedTable.paginationData [ 0, 3 ] (UserMsg' << FetchUsers) model paginatedUsers ]
+                [ PaginatedTable.paginationData [ 0, 3 ] (UserMsg' << FetchUsers) mdl paginatedUsers ]
             ]
         ]
 
@@ -133,7 +133,7 @@ usersTable model =
 
                 Just previousUsers ->
                     div [ class "loading" ]
-                        [ renderTable model previousUsers
+                        [ renderTable model.mdl model.usersModel.userSearchQuery previousUsers
                         ]
 
         Failure err ->
@@ -144,11 +144,11 @@ usersTable model =
                 Just previousUsers ->
                     div []
                         [ text <| "There was a problem fetching the users: " ++ toString err
-                        , renderTable model previousUsers
+                        , renderTable model.mdl model.usersModel.userSearchQuery previousUsers
                         ]
 
         Success paginatedUsers ->
-            renderTable model paginatedUsers
+            renderTable model.mdl model.usersModel.userSearchQuery paginatedUsers
 
 
 viewUserRow : Material.Model -> Int -> User -> Html Msg

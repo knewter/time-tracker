@@ -53,7 +53,7 @@ renderTable model paginatedProjects =
             (List.indexedMap (projectRow model) paginatedProjects.items)
         , Table.tfoot []
             [ Html.td [ colspan 999, class "mdl-data-table__cell--non-numeric" ]
-                [ PaginatedTable.paginationData [ 3, 3 ] (ProjectMsg' << FetchProjects) model paginatedProjects ]
+                [ PaginatedTable.paginationData [ 3, 3 ] (ProjectMsg' << FetchProjects) model.mdl paginatedProjects ]
             ]
         ]
 
