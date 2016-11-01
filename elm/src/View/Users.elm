@@ -1,6 +1,6 @@
 module View.Users exposing (view, header)
 
-import Model exposing (Model)
+import Model exposing (Model, UsersModel)
 import Types exposing (User, UserSortableField(..), Sorted(..), UsersListView(..), Paginated)
 import Msg exposing (Msg(..), UserMsg(..))
 import Route exposing (Location(..))
@@ -25,23 +25,23 @@ import Util exposing (onEnter)
 import RemoteData exposing (RemoteData(..))
 
 
-view : Model -> Html Msg
-view model =
+view : Material.Model -> UsersModel -> Html Msg
+view mdl usersModel =
     let
         body =
-            case model.usersModel.usersListView of
+            case usersModel.usersListView of
                 UsersTable ->
-                    usersTable model
+                    usersTable mdl usersModel
 
                 UsersCards ->
-                    usersCards model
+                    usersCards usersModel
     in
         div [] [ body ]
 
 
-usersCards : Model -> Html Msg
-usersCards model =
-    case model.usersModel.users.current of
+usersCards : UsersModel -> Html Msg
+usersCards usersModel =
+    case usersModel.users.current of
         NotAsked ->
             text "Initialising..."
 
@@ -120,35 +120,35 @@ renderTable mdl searchQuery paginatedUsers =
         ]
 
 
-usersTable : Model -> Html Msg
-usersTable model =
-    case model.usersModel.users.current of
+usersTable : Material.Model -> UsersModel -> Html Msg
+usersTable mdl usersModel =
+    case usersModel.users.current of
         NotAsked ->
             text "Initialising..."
 
         Loading ->
-            case model.usersModel.users.previous of
+            case usersModel.users.previous of
                 Nothing ->
                     text "Loading..."
 
                 Just previousUsers ->
                     div [ class "loading" ]
-                        [ renderTable model.mdl model.usersModel.userSearchQuery previousUsers
+                        [ renderTable mdl usersModel.userSearchQuery previousUsers
                         ]
 
         Failure err ->
-            case model.usersModel.users.previous of
+            case usersModel.users.previous of
                 Nothing ->
                     text <| "There was a problem fetching the users: " ++ toString err
 
                 Just previousUsers ->
                     div []
                         [ text <| "There was a problem fetching the users: " ++ toString err
-                        , renderTable model.mdl model.usersModel.userSearchQuery previousUsers
+                        , renderTable mdl usersModel.userSearchQuery previousUsers
                         ]
 
         Success paginatedUsers ->
-            renderTable model.mdl model.usersModel.userSearchQuery paginatedUsers
+            renderTable mdl usersModel.userSearchQuery paginatedUsers
 
 
 viewUserRow : Material.Model -> Int -> User -> Html Msg

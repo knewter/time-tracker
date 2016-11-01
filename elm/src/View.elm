@@ -149,7 +149,7 @@ body model =
             View.Home.view model
 
         Just (Route.Users) ->
-            View.Users.view model
+            View.Users.view model.mdl model.usersModel
 
         Just (Route.NewUser) ->
             View.Users.New.view model
