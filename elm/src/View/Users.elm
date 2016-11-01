@@ -17,6 +17,7 @@ import Material.Color as Color
 import Material.Options as Options
 import Material.Layout as Layout
 import Material.Textfield as Textfield
+import Material
 import Material.Grid exposing (grid, size, cell, Device(..))
 import View.Helpers as Helpers
 import View.Pieces.PaginatedTable as PaginatedTable
@@ -236,16 +237,16 @@ header : Model -> List (Html Msg)
 header model =
     Helpers.defaultHeaderWithNavigation model
         "Users"
-        [ switchViewButton model
+        [ switchViewButton model.usersModel.usersListView model.mdl
         , addUserButton model
         ]
 
 
-switchViewButton : Model -> Html Msg
-switchViewButton model =
+switchViewButton : UsersListView -> Material.Model -> Html Msg
+switchViewButton listView mdl =
     let
         ( msg, icon ) =
-            case model.usersModel.usersListView of
+            case listView of
                 UsersTable ->
                     ( SwitchUsersListView UsersCards, "insert_photo" )
 
@@ -254,7 +255,7 @@ switchViewButton model =
     in
         Button.render Mdl
             [ 0, 3 ]
-            model.mdl
+            mdl
             [ Button.icon
             , Button.ripple
             , Button.onClick <| UserMsg' msg
