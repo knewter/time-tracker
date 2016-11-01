@@ -56,6 +56,7 @@ type alias ProjectsModel =
     , newProjectForm : FormWithErrors Project
     , shownProject : Maybe Project
     , projectsSort : Maybe ( Sorted, ProjectSortableField )
+    , projectSearchQuery : String
     }
 
 
@@ -64,6 +65,7 @@ type alias OrganizationsModel =
     , newOrganizationForm : FormWithErrors Organization
     , shownOrganization : Maybe Organization
     , organizationsSort : Maybe ( Sorted, OrganizationSortableField )
+    , organizationSearchQuery : String
     }
 
 
@@ -88,11 +90,13 @@ initialModel location =
         , newProjectForm = ( Form.initial [] Validators.validateNewProject, Nothing )
         , shownProject = Nothing
         , projectsSort = Nothing
+        , projectSearchQuery = ""
         }
     , organizationsModel =
         { organizations = { current = NotAsked, previous = Nothing }
         , newOrganizationForm = ( Form.initial [] Validators.validateNewOrganization, Nothing )
         , shownOrganization = Nothing
         , organizationsSort = Nothing
+        , organizationSearchQuery = ""
         }
     }

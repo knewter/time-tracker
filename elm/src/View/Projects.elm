@@ -13,9 +13,10 @@ import Material.Table as Table
 import Material.Options as Options
 import Material.Elevation as Elevation
 import Material.Layout as Layout
+import Material.Textfield as Textfield
 import View.Helpers as Helpers
 import View.Pieces.PaginatedTable as PaginatedTable
-import Util
+import Util exposing (onEnter)
 import RemoteData exposing (RemoteData(..))
 
 
@@ -35,7 +36,18 @@ renderTable model paginatedProjects =
             [ Table.th
                 (thOptions ProjectName model)
                 [ text "Name" ]
-            , Table.th [] [ text "Actions" ]
+            , Table.th []
+                [ Textfield.render Mdl
+                    [ 3, 4 ]
+                    model.mdl
+                    [ Textfield.label "Search"
+                    , Textfield.floatingLabel
+                    , Textfield.text'
+                    , Textfield.value model.projectsModel.projectSearchQuery
+                    , Textfield.onInput <| ProjectMsg' << SetProjectSearchQuery
+                    , onEnter <| ProjectMsg' <| FetchProjects <| "/projects?q=" ++ model.projectsModel.projectSearchQuery
+                    ]
+                ]
             ]
         , Table.tbody []
             (List.indexedMap (projectRow model) paginatedProjects.items)

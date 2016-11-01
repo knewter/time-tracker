@@ -62,6 +62,7 @@ type ProjectMsg
     | UpdateProjectFailed OurHttp.Error
     | UpdateProjectSucceeded Project
     | NewProjectFormMsg Form.Msg
+    | SetProjectSearchQuery String
 
 
 type OrganizationMsg
@@ -79,3 +80,4 @@ type OrganizationMsg
     | UpdateOrganizationFailed OurHttp.Error
     | UpdateOrganizationSucceeded Organization
     | NewOrganizationFormMsg Form.Msg
+    | SetOrganizationSearchQuery String

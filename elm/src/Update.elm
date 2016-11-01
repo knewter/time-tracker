@@ -410,6 +410,12 @@ updateProjectMsg model msg projectsModel =
                     , Nothing
                     )
 
+        SetProjectSearchQuery query ->
+            ( { projectsModel | projectSearchQuery = query }
+            , Cmd.none
+            , Nothing
+            )
+
 
 updateOrganizationMsg : Model -> OrganizationMsg -> OrganizationsModel -> ( OrganizationsModel, Cmd Msg, Maybe ( String, String ) )
 updateOrganizationMsg model msg organizationsModel =
@@ -538,6 +544,12 @@ updateOrganizationMsg model msg organizationsModel =
                     , Cmd.none
                     , Nothing
                     )
+
+        SetOrganizationSearchQuery query ->
+            ( { organizationsModel | organizationSearchQuery = query }
+            , Cmd.none
+            , Nothing
+            )
 
 
 andLog : String -> a -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )

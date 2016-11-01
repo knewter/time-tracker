@@ -13,9 +13,10 @@ import Material.Table as Table
 import Material.Options as Options
 import Material.Elevation as Elevation
 import Material.Layout as Layout
+import Material.Textfield as Textfield
 import View.Helpers as Helpers
 import View.Pieces.PaginatedTable as PaginatedTable
-import Util
+import Util exposing (onEnter)
 import RemoteData exposing (RemoteData(..))
 
 
@@ -35,7 +36,18 @@ renderTable model paginatedOrganizations =
             [ Table.th
                 (thOptions OrganizationName model)
                 [ text "Name" ]
-            , Table.th [] [ text "Actions" ]
+            , Table.th []
+                [ Textfield.render Mdl
+                    [ 7, 4 ]
+                    model.mdl
+                    [ Textfield.label "Search"
+                    , Textfield.floatingLabel
+                    , Textfield.text'
+                    , Textfield.value model.organizationsModel.organizationSearchQuery
+                    , Textfield.onInput <| OrganizationMsg' << SetOrganizationSearchQuery
+                    , onEnter <| OrganizationMsg' <| FetchOrganizations <| "/organizations?q=" ++ model.organizationsModel.organizationSearchQuery
+                    ]
+                ]
             ]
         , Table.tbody []
             (List.indexedMap (organizationRow model) paginatedOrganizations.items)
