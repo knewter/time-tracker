@@ -25,6 +25,27 @@ view model =
         [ organizationsTable model ]
 
 
+renderTable : Model -> Paginated Organization -> Html Msg
+renderTable model paginatedOrganizations =
+    Table.table
+        [ Options.css "width" "100%"
+        , Elevation.e2
+        ]
+        [ Table.thead []
+            [ Table.th
+                (thOptions OrganizationName model)
+                [ text "Name" ]
+            , Table.th [] [ text "Actions" ]
+            ]
+        , Table.tbody []
+            (List.indexedMap (organizationRow model) paginatedOrganizations.items)
+        , Table.tfoot []
+            [ Html.td [ colspan 999, class "mdl-data-table__cell--non-numeric" ]
+                [ PaginatedTable.paginationData [ 7, 3 ] (OrganizationMsg' << FetchOrganizations) model paginatedOrganizations ]
+            ]
+        ]
+
+
 organizationsTable : Model -> Html Msg
 organizationsTable model =
     case model.organizationsModel.organizations.current of
@@ -32,31 +53,28 @@ organizationsTable model =
             text "Initialising..."
 
         Loading ->
-            text "Loading..."
+            case model.organizationsModel.organizations.previous of
+                Nothing ->
+                    text "Loading..."
+
+                Just previousOrganizations ->
+                    div [ class "loading" ]
+                        [ renderTable model previousOrganizations
+                        ]
 
         Failure err ->
-            text <| "There was a problem fetching the organizations: " ++ toString err
+            case model.organizationsModel.organizations.previous of
+                Nothing ->
+                    text <| "There was a problem fetching the organizations: " ++ toString err
+
+                Just previousOrganizations ->
+                    div []
+                        [ text <| "There was a problem fetching the organizations: " ++ toString err
+                        , renderTable model previousOrganizations
+                        ]
 
         Success paginatedOrganizations ->
-            div []
-                [ Table.table
-                    [ Options.css "width" "100%"
-                    , Elevation.e2
-                    ]
-                    [ Table.thead []
-                        [ Table.th
-                            (thOptions OrganizationName model)
-                            [ text "Name" ]
-                        , Table.th [] [ text "Actions" ]
-                        ]
-                    , Table.tbody []
-                        (List.indexedMap (organizationRow model) paginatedOrganizations.items)
-                    , Table.tfoot []
-                        [ Html.td [ colspan 999, class "mdl-data-table__cell--non-numeric" ]
-                            [ PaginatedTable.paginationData [ 7, 3 ] (OrganizationMsg' << FetchOrganizations) model paginatedOrganizations ]
-                        ]
-                    ]
-                ]
+            renderTable model paginatedOrganizations
 
 
 organizationRow : Model -> Int -> Organization -> Html Msg

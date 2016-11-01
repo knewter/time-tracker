@@ -82,73 +82,74 @@ userCard user =
             ]
 
 
+renderTable : Model -> Paginated User -> Html Msg
+renderTable model paginatedUsers =
+    Table.table
+        [ Options.css "width" "100%"
+        , Elevation.e2
+        ]
+        [ Table.thead []
+            [ Table.th [] []
+            , Table.th
+                (thOptions UserName model)
+                [ text "Name" ]
+            , Table.th [] [ text "Position" ]
+            , Table.th [] [ text "Email" ]
+            , Table.th [] [ text "Today" ]
+            , Table.th [] [ text "Last 7 days" ]
+            , Table.th [] [ text "Projects" ]
+            , Table.th [] [ text "Open Tasks" ]
+            , Table.th []
+                [ Textfield.render Mdl
+                    [ 0, 4 ]
+                    model.mdl
+                    [ Textfield.label "Search"
+                    , Textfield.floatingLabel
+                    , Textfield.text'
+                    , Textfield.value model.usersModel.userSearchQuery
+                    , Textfield.onInput <| UserMsg' << SetUserSearchQuery
+                    , onEnter <| UserMsg' <| FetchUsers <| "/users?q=" ++ model.usersModel.userSearchQuery
+                    ]
+                ]
+            ]
+        , Table.tbody []
+            (List.indexedMap (viewUserRow model) paginatedUsers.items)
+        , Table.tfoot []
+            [ Html.td [ colspan 999, class "mdl-data-table__cell--non-numeric" ]
+                [ PaginatedTable.paginationData [ 0, 3 ] (UserMsg' << FetchUsers) model paginatedUsers ]
+            ]
+        ]
+
+
 usersTable : Model -> Html Msg
 usersTable model =
-    let
-        renderTable paginatedUsers =
-            Table.table
-                [ Options.css "width" "100%"
-                , Elevation.e2
-                ]
-                [ Table.thead []
-                    [ Table.th [] []
-                    , Table.th
-                        (thOptions UserName model)
-                        [ text "Name" ]
-                    , Table.th [] [ text "Position" ]
-                    , Table.th [] [ text "Email" ]
-                    , Table.th [] [ text "Today" ]
-                    , Table.th [] [ text "Last 7 days" ]
-                    , Table.th [] [ text "Projects" ]
-                    , Table.th [] [ text "Open Tasks" ]
-                    , Table.th []
-                        [ Textfield.render Mdl
-                            [ 0, 4 ]
-                            model.mdl
-                            [ Textfield.label "Search"
-                            , Textfield.floatingLabel
-                            , Textfield.text'
-                            , Textfield.value model.usersModel.userSearchQuery
-                            , Textfield.onInput <| UserMsg' << SetUserSearchQuery
-                            , onEnter <| UserMsg' <| FetchUsers <| "/users?q=" ++ model.usersModel.userSearchQuery
-                            ]
+    case model.usersModel.users.current of
+        NotAsked ->
+            text "Initialising..."
+
+        Loading ->
+            case model.usersModel.users.previous of
+                Nothing ->
+                    text "Loading..."
+
+                Just previousUsers ->
+                    div [ class "loading" ]
+                        [ renderTable model previousUsers
                         ]
-                    ]
-                , Table.tbody []
-                    (List.indexedMap (viewUserRow model) paginatedUsers.items)
-                , Table.tfoot []
-                    [ Html.td [ colspan 999, class "mdl-data-table__cell--non-numeric" ]
-                        [ PaginatedTable.paginationData [ 0, 3 ] (UserMsg' << FetchUsers) model paginatedUsers ]
-                    ]
-                ]
-    in
-        case model.usersModel.users.current of
-            NotAsked ->
-                text "Initialising..."
 
-            Loading ->
-                case model.usersModel.users.previous of
-                    Nothing ->
-                        text "Loading..."
+        Failure err ->
+            case model.usersModel.users.previous of
+                Nothing ->
+                    text <| "There was a problem fetching the users: " ++ toString err
 
-                    Just previousUsers ->
-                        div [ class "loading" ]
-                            [ renderTable previousUsers
-                            ]
+                Just previousUsers ->
+                    div []
+                        [ text <| "There was a problem fetching the users: " ++ toString err
+                        , renderTable model previousUsers
+                        ]
 
-            Failure err ->
-                case model.usersModel.users.previous of
-                    Nothing ->
-                        text <| "There was a problem fetching the users: " ++ toString err
-
-                    Just previousUsers ->
-                        div []
-                            [ text <| "There was a problem fetching the users: " ++ toString err
-                            , renderTable previousUsers
-                            ]
-
-            Success paginatedUsers ->
-                renderTable paginatedUsers
+        Success paginatedUsers ->
+            renderTable model paginatedUsers
 
 
 viewUserRow : Model -> Int -> User -> Html Msg

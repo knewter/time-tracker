@@ -1,7 +1,7 @@
 module View.Projects exposing (view, header)
 
 import Model exposing (Model)
-import Types exposing (Project, ProjectSortableField(..), Sorted(..))
+import Types exposing (Project, ProjectSortableField(..), Sorted(..), Paginated)
 import Msg exposing (Msg(..), ProjectMsg(..))
 import Route exposing (Location(..))
 import Html exposing (Html, text, div, a, img, span)
@@ -25,6 +25,27 @@ view model =
         [ projectsTable model ]
 
 
+renderTable : Model -> Paginated Project -> Html Msg
+renderTable model paginatedProjects =
+    Table.table
+        [ Options.css "width" "100%"
+        , Elevation.e2
+        ]
+        [ Table.thead []
+            [ Table.th
+                (thOptions ProjectName model)
+                [ text "Name" ]
+            , Table.th [] [ text "Actions" ]
+            ]
+        , Table.tbody []
+            (List.indexedMap (projectRow model) paginatedProjects.items)
+        , Table.tfoot []
+            [ Html.td [ colspan 999, class "mdl-data-table__cell--non-numeric" ]
+                [ PaginatedTable.paginationData [ 3, 3 ] (ProjectMsg' << FetchProjects) model paginatedProjects ]
+            ]
+        ]
+
+
 projectsTable : Model -> Html Msg
 projectsTable model =
     case model.projectsModel.projects.current of
@@ -32,31 +53,28 @@ projectsTable model =
             text "Initialising..."
 
         Loading ->
-            text "Loading..."
+            case model.projectsModel.projects.previous of
+                Nothing ->
+                    text "Loading..."
+
+                Just previousProjects ->
+                    div [ class "loading" ]
+                        [ renderTable model previousProjects
+                        ]
 
         Failure err ->
-            text <| "There was a problem fetching the projects: " ++ toString err
+            case model.projectsModel.projects.previous of
+                Nothing ->
+                    text <| "There was a problem fetching the Projeccts: " ++ toString err
 
-        Success paginatedProject ->
-            div []
-                [ Table.table
-                    [ Options.css "width" "100%"
-                    , Elevation.e2
-                    ]
-                    [ Table.thead []
-                        [ Table.th
-                            (thOptions ProjectName model)
-                            [ text "Name" ]
-                        , Table.th [] [ text "Actions" ]
+                Just previousProjects ->
+                    div []
+                        [ text <| "There was a problem fetching the Projects: " ++ toString err
+                        , renderTable model previousProjects
                         ]
-                    , Table.tbody []
-                        (List.indexedMap (projectRow model) paginatedProject.items)
-                    , Table.tfoot []
-                        [ Html.td [ colspan 999, class "mdl-data-table__cell--non-numeric" ]
-                            [ PaginatedTable.paginationData [ 3, 3 ] (ProjectMsg' << FetchProjects) model paginatedProject ]
-                        ]
-                    ]
-                ]
+
+        Success paginatedProjects ->
+            renderTable model paginatedProjects
 
 
 projectRow : Model -> Int -> Project -> Html Msg
