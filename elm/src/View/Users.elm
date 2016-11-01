@@ -112,7 +112,7 @@ renderTable model paginatedUsers =
                 ]
             ]
         , Table.tbody []
-            (List.indexedMap (viewUserRow model) paginatedUsers.items)
+            (List.indexedMap (viewUserRow model.mdl) paginatedUsers.items)
         , Table.tfoot []
             [ Html.td [ colspan 999, class "mdl-data-table__cell--non-numeric" ]
                 [ PaginatedTable.paginationData [ 0, 3 ] (UserMsg' << FetchUsers) model paginatedUsers ]
@@ -151,8 +151,8 @@ usersTable model =
             renderTable model paginatedUsers
 
 
-viewUserRow : Model -> Int -> User -> Html Msg
-viewUserRow model index user =
+viewUserRow : Material.Model -> Int -> User -> Html Msg
+viewUserRow mdl index user =
     let
         attributes =
             case user.id of
@@ -176,8 +176,8 @@ viewUserRow model index user =
             , Table.td [] [ text "20" ]
             , Table.td [] [ text "8" ]
             , Table.td []
-                [ editButton model.mdl index user
-                , deleteButton model.mdl index user
+                [ editButton mdl index user
+                , deleteButton mdl index user
                 ]
             ]
 
