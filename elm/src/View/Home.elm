@@ -8,6 +8,7 @@ import Material.Elevation as Elevation
 import Material.Card as Card
 import Material.Options as Options exposing (when)
 import View.Charts
+import Date exposing (Date)
 
 
 view : Model -> Html Msg
@@ -25,11 +26,19 @@ view model =
 
 viewActivitySummary : Model -> Html a
 viewActivitySummary model =
-    [ Card.text []
-        [ View.Charts.activity ( 800, 200 )
+    let
+        staticData =
+            [ ( Date.fromTime 1448928000000, 2 )
+            , ( Date.fromTime 1451606400000, 2 )
+            , ( Date.fromTime 1454284800000, 1 )
+            , ( Date.fromTime 1456790400000, 1 )
+            ]
+    in
+        [ Card.text []
+            [ View.Charts.activity ( 800, 200 ) staticData
+            ]
         ]
-    ]
-        |> viewGridCard
+            |> viewGridCard
 
 
 viewWordCloud : Model -> Html a

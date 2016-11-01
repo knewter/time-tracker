@@ -1,45 +1,73 @@
 module View.Charts exposing (..)
 
-import Svg exposing (Svg, svg)
-import Svg.Attributes exposing (width, height)
-import Chart exposing (Scale, Data)
-import BarChart exposing (barChart, color, width)
-import LineChart exposing (lineChart, color, width)
-import ScatterPlot exposing (scatterPlot, color, size)
+import Visualization.Scale as Scale exposing (ContinuousScale, ContinuousTimeScale)
+import Visualization.Axis as Axis
+import Visualization.List as List
+import Visualization.Shape as Shape
+import Date
+import Svg exposing (..)
+import Svg.Attributes exposing (..)
+import Date exposing (Date)
+import String
 
 
-data : Data msg
-data =
-    [ ( 1, 22.2, [] )
-    , ( 2, 34, [] )
-    , ( 3, 56, [] )
-    , ( 4, 62, [] )
-    , ( 5, 77, [] )
-    ]
+padding : Float
+padding =
+    30
 
 
-xScale : Int -> Scale
-xScale width x =
-    20 + x * (toFloat width / 8)
+type alias LineChartData =
+    List ( Date, Float )
 
 
-yScale : Int -> Scale
-yScale height y =
-    (toFloat height) - (y * 3)
+activity : ( Float, Float ) -> LineChartData -> Svg msg
+activity ( w, h ) lineChartData =
+    let
+        xScale : ContinuousTimeScale
+        xScale =
+            Scale.time ( Date.fromTime 1448928000000, Date.fromTime 1456790400000 ) ( 0, w - 2 * padding )
 
+        yScale : ContinuousScale
+        yScale =
+            Scale.linear ( 0, 5 ) ( h - 2 * padding, 0 )
 
-activity : ( Int, Int ) -> Svg msg
-activity ( width, height ) =
-    svg
-        [ Svg.Attributes.width (toString width)
-        , Svg.Attributes.height (toString height)
-        ]
-        [ lineChart
-            [ LineChart.color "#7E94C7"
-            , LineChart.width "4"
+        opts : Axis.Options a
+        opts =
+            Axis.defaultOptions
+
+        xAxis : Svg msg
+        xAxis =
+            Axis.axis { opts | orientation = Axis.Bottom, tickCount = List.length lineChartData } xScale
+
+        yAxis : Svg msg
+        yAxis =
+            Axis.axis { opts | orientation = Axis.Left, tickCount = 5 } yScale
+
+        areaGenerator : ( Date, Float ) -> Maybe ( ( Float, Float ), ( Float, Float ) )
+        areaGenerator ( x, y ) =
+            Just ( ( Scale.convert xScale x, fst (Scale.rangeExtent yScale) ), ( Scale.convert xScale x, Scale.convert yScale y ) )
+
+        lineGenerator : ( Date, Float ) -> Maybe ( Float, Float )
+        lineGenerator ( x, y ) =
+            Just ( Scale.convert xScale x, Scale.convert yScale y )
+
+        area : String
+        area =
+            List.map areaGenerator lineChartData
+                |> Shape.area Shape.monotoneInXCurve
+
+        line : String
+        line =
+            List.map lineGenerator lineChartData
+                |> Shape.line Shape.monotoneInXCurve
+    in
+        svg [ width (toString w ++ "px"), height (toString h ++ "px") ]
+            [ g [ transform ("translate(" ++ toString (padding - 1) ++ ", " ++ toString (h - padding) ++ ")") ]
+                [ xAxis ]
+            , g [ transform ("translate(" ++ toString (padding - 1) ++ ", " ++ toString padding ++ ")") ]
+                [ yAxis ]
+            , g [ transform ("translate(" ++ toString padding ++ ", " ++ toString padding ++ ")"), class "series" ]
+                [ Svg.path [ d area, stroke "none", strokeWidth "3px", fill "rgba(255, 0, 0, 0.54)" ] []
+                , Svg.path [ d line, stroke "red", strokeWidth "3px", fill "none" ] []
+                ]
             ]
-            { data = data
-            , xScale = xScale width
-            , yScale = yScale height
-            }
-        ]

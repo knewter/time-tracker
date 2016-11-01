@@ -17,10 +17,10 @@
         "elm-lang/svg": "1.1.1 <= v < 2.0.0",
         "etaque/elm-simple-form": "4.0.0 <= v < 5.0.0",
         "evancz/elm-http": "3.0.1 <= v < 4.0.0",
+        "gampleman/elm-visualization": "1.0.0 <= v < 2.0.0",
         "justinmimbs/elm-date-extra": "2.0.0 <= v < 3.0.0",
         "knewter/elm-rfc5988-parser": "1.0.0 <= v < 2.0.0",
-        "krisajenkins/remotedata": "2.4.0 <= v < 3.0.0",
-        "wuct/elm-charts": "1.0.1 <= v < 2.0.0"
+        "krisajenkins/remotedata": "2.4.0 <= v < 3.0.0"
     },
     "elm-version": "0.17.1 <= v < 0.18.0"
 }
