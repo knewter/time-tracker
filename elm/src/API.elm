@@ -32,6 +32,8 @@ import Types
         , RemotePaginated
         , Sorted(..)
         , UserSortableField(..)
+        , ProjectSortableField(..)
+        , OrganizationSortableField(..)
         )
 import Decoders
 import OurHttp exposing (Error)
@@ -83,30 +85,39 @@ fetchResourcesWithUrl url decoder model msg =
         getPaginated model apiPath decoder msg
 
 
+sortableBaseUrl : String -> Maybe ( Sorted, a ) -> (a -> String) -> String
+sortableBaseUrl baseUrl maybeSort sortableFieldToServerField =
+    case maybeSort of
+        Nothing ->
+            baseUrl
+
+        Just ( sortOrder, field ) ->
+            let
+                fieldString =
+                    sortableFieldToServerField field
+
+                params =
+                    case sortOrder of
+                        Ascending ->
+                            "order=" ++ (uriEncode <| "asc " ++ fieldString)
+
+                        Descending ->
+                            "order=" ++ (uriEncode <| "desc " ++ fieldString)
+            in
+                baseUrl ++ "?" ++ params
+
+
 fetchUsers : Model -> (RemotePaginated User -> Msg) -> Cmd Msg
 fetchUsers model msg =
     let
+        userSortableFieldToServerField : UserSortableField -> String
+        userSortableFieldToServerField field =
+            case field of
+                UserName ->
+                    "name"
+
         url =
-            case model.usersModel.usersSort of
-                Nothing ->
-                    "/users"
-
-                Just ( sortOrder, field ) ->
-                    let
-                        fieldString =
-                            case field of
-                                UserName ->
-                                    "name"
-
-                        params =
-                            case sortOrder of
-                                Ascending ->
-                                    "order=" ++ (uriEncode <| "asc " ++ fieldString)
-
-                                Descending ->
-                                    "order=" ++ (uriEncode <| "desc " ++ fieldString)
-                    in
-                        "/users?" ++ params
+            sortableBaseUrl "/users" model.usersModel.usersSort userSortableFieldToServerField
     in
         fetchResources url Decoders.usersDecoder model msg
 
@@ -177,7 +188,17 @@ encodeUser user =
 
 fetchProjects : Model -> (RemotePaginated Project -> Msg) -> Cmd Msg
 fetchProjects model msg =
-    fetchResources "/projects" Decoders.projectsDecoder model msg
+    let
+        projectSortableFieldToServerField : ProjectSortableField -> String
+        projectSortableFieldToServerField field =
+            case field of
+                ProjectName ->
+                    "name"
+
+        url =
+            sortableBaseUrl "/projects" model.projectsModel.projectsSort projectSortableFieldToServerField
+    in
+        fetchResources url Decoders.projectsDecoder model msg
 
 
 fetchProjectsWithUrl : String -> Model -> (RemotePaginated Project -> Msg) -> Cmd Msg
@@ -228,7 +249,17 @@ encodeProject project =
 
 fetchOrganizations : Model -> (RemotePaginated Organization -> Msg) -> Cmd Msg
 fetchOrganizations model msg =
-    fetchResources "/organizations" Decoders.organizationsDecoder model msg
+    let
+        organizationSortableFieldToServerField : OrganizationSortableField -> String
+        organizationSortableFieldToServerField field =
+            case field of
+                OrganizationName ->
+                    "name"
+
+        url =
+            sortableBaseUrl "/organizations" model.organizationsModel.organizationsSort organizationSortableFieldToServerField
+    in
+        fetchResources url Decoders.organizationsDecoder model msg
 
 
 fetchOrganizationsWithUrl : String -> Model -> (RemotePaginated Organization -> Msg) -> Cmd Msg

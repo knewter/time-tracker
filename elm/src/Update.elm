@@ -111,13 +111,6 @@ update msg model =
             model ! []
 
 
-userSortableFieldFun : UserSortableField -> (User -> String)
-userSortableFieldFun sortableField =
-    case sortableField of
-        UserName ->
-            .name
-
-
 updateLoginMsg : LoginMsg -> Model -> ( Model, Cmd Msg )
 updateLoginMsg msg model =
     case msg of
@@ -339,11 +332,14 @@ updateProjectMsg model msg projectsModel =
             )
 
         ReorderProjects field ->
-            --reorderProjects field model ! []
-            ( projectsModel
-            , Cmd.none
-            , Nothing
-            )
+            let
+                newProjectsModel =
+                    reorderProjects field projectsModel
+            in
+                ( newProjectsModel
+                , API.fetchProjects { model | projectsModel = newProjectsModel } <| ProjectMsg' << GotProjects
+                , Nothing
+                )
 
         SetShownProjectName name ->
             case projectsModel.shownProject of
@@ -474,11 +470,14 @@ updateOrganizationMsg model msg organizationsModel =
             )
 
         ReorderOrganizations field ->
-            --reorderOrganizations field model ! []
-            ( organizationsModel
-            , Cmd.none
-            , Nothing
-            )
+            let
+                newOrganizationsModel =
+                    reorderOrganizations field organizationsModel
+            in
+                ( newOrganizationsModel
+                , API.fetchOrganizations { model | organizationsModel = newOrganizationsModel } <| OrganizationMsg' << GotOrganizations
+                , Nothing
+                )
 
         SetShownOrganizationName name ->
             case organizationsModel.shownOrganization of
@@ -620,6 +619,13 @@ updateRemotePersistent newValue persistentWrapped =
             { current = newValue, previous = Nothing }
 
 
+userSortableFieldFun : UserSortableField -> (User -> String)
+userSortableFieldFun sortableField =
+    case sortableField of
+        UserName ->
+            .name
+
+
 reorderUsers : UserSortableField -> UsersModel -> UsersModel
 reorderUsers sortableField model =
     let
@@ -652,4 +658,88 @@ reorderUsers sortableField model =
                     False ->
                         { loadingModel
                             | usersSort = Just ( Ascending, sortableField )
+                        }
+
+
+projectSortableFieldFun : ProjectSortableField -> (User -> String)
+projectSortableFieldFun sortableField =
+    case sortableField of
+        ProjectName ->
+            .name
+
+
+reorderProjects : ProjectSortableField -> ProjectsModel -> ProjectsModel
+reorderProjects sortableField model =
+    let
+        fun =
+            projectSortableFieldFun sortableField
+
+        loadingModel =
+            { model | projects = updateRemotePersistent Loading model.projects }
+    in
+        case loadingModel.projectsSort of
+            Nothing ->
+                { loadingModel
+                    | projectsSort = Just ( Ascending, sortableField )
+                }
+
+            Just ( sortOrder, currentSortableField ) ->
+                case currentSortableField == sortableField of
+                    True ->
+                        case sortOrder of
+                            Ascending ->
+                                { loadingModel
+                                    | projectsSort = Just ( Descending, sortableField )
+                                }
+
+                            Descending ->
+                                { loadingModel
+                                    | projectsSort = Just ( Ascending, sortableField )
+                                }
+
+                    False ->
+                        { loadingModel
+                            | projectsSort = Just ( Ascending, sortableField )
+                        }
+
+
+organizationSortableFieldFun : OrganizationSortableField -> (User -> String)
+organizationSortableFieldFun sortableField =
+    case sortableField of
+        OrganizationName ->
+            .name
+
+
+reorderOrganizations : OrganizationSortableField -> OrganizationsModel -> OrganizationsModel
+reorderOrganizations sortableField model =
+    let
+        fun =
+            organizationSortableFieldFun sortableField
+
+        loadingModel =
+            { model | organizations = updateRemotePersistent Loading model.organizations }
+    in
+        case loadingModel.organizationsSort of
+            Nothing ->
+                { loadingModel
+                    | organizationsSort = Just ( Ascending, sortableField )
+                }
+
+            Just ( sortOrder, currentSortableField ) ->
+                case currentSortableField == sortableField of
+                    True ->
+                        case sortOrder of
+                            Ascending ->
+                                { loadingModel
+                                    | organizationsSort = Just ( Descending, sortableField )
+                                }
+
+                            Descending ->
+                                { loadingModel
+                                    | organizationsSort = Just ( Ascending, sortableField )
+                                }
+
+                    False ->
+                        { loadingModel
+                            | organizationsSort = Just ( Ascending, sortableField )
                         }
