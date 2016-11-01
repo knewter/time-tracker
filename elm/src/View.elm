@@ -83,13 +83,13 @@ header model =
             View.Organizations.header model
 
         Just Home ->
-            Helpers.defaultHeaderWithGitHubLink model "Dashboard"
+            Helpers.defaultHeaderWithGitHubLink "Dashboard"
 
         Just route ->
-            Helpers.defaultHeader model <| Helpers.routeHeaderText route
+            Helpers.defaultHeader <| Helpers.routeHeaderText route
 
         Nothing ->
-            Helpers.defaultHeader model "Time Tracker"
+            Helpers.defaultHeader "Time Tracker"
 
 
 type alias MenuItem =

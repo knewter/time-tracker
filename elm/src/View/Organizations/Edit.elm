@@ -73,7 +73,7 @@ header : Model -> Int -> List (Html Msg)
 header model id =
     case model.organizationsModel.shownOrganization of
         Nothing ->
-            Helpers.defaultHeader model "No such organization"
+            Helpers.defaultHeader "No such organization"
 
         Just organization ->
             let
@@ -82,7 +82,7 @@ header model id =
                     , { route = Organizations, linkText = "Organizations" }
                     ]
             in
-                Helpers.defaultHeaderWithNavigation model
+                Helpers.defaultHeaderWithNavigation
                     ("Edit " ++ organization.name)
                     (List.map
                         (\{ route, linkText } ->

@@ -235,7 +235,7 @@ editButton mdl index user =
 
 header : Model -> List (Html Msg)
 header model =
-    Helpers.defaultHeaderWithNavigation model
+    Helpers.defaultHeaderWithNavigation
         "Users"
         [ switchViewButton model.usersModel.usersListView model.mdl
         , addUserButton model.mdl

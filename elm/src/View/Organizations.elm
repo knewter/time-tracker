@@ -185,4 +185,4 @@ thOptions sortableField model =
 
 header : Model -> List (Html Msg)
 header model =
-    Helpers.defaultHeaderWithNavigation model "Organizations" [ addButton model ]
+    Helpers.defaultHeaderWithNavigation "Organizations" [ addButton model ]
