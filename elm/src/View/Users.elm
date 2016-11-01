@@ -1,6 +1,6 @@
 module View.Users exposing (view, header)
 
-import Model exposing (Model, UsersModel)
+import Model exposing (UsersModel)
 import Types exposing (User, UserSortableField(..), Sorted(..), UsersListView(..), Paginated)
 import Msg exposing (Msg(..), UserMsg(..))
 import Route exposing (Location(..))
@@ -233,12 +233,12 @@ editButton mdl index user =
                 [ Icon.i "edit" ]
 
 
-header : Model -> List (Html Msg)
-header model =
+header : Material.Model -> UsersListView -> List (Html Msg)
+header mdl usersListView =
     Helpers.defaultHeaderWithNavigation
         "Users"
-        [ switchViewButton model.usersModel.usersListView model.mdl
-        , addUserButton model.mdl
+        [ switchViewButton usersListView mdl
+        , addUserButton mdl
         ]
 
 

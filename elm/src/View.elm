@@ -62,7 +62,7 @@ header model =
             View.Users.Edit.header model id
 
         Just Users ->
-            View.Users.header model
+            View.Users.header model.mdl model.usersModel.usersListView
 
         Just (ShowProject id) ->
             View.Projects.Show.header model id
