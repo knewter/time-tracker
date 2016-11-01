@@ -176,8 +176,8 @@ viewUserRow model index user =
             , Table.td [] [ text "20" ]
             , Table.td [] [ text "8" ]
             , Table.td []
-                [ editButton model index user
-                , deleteButton model index user
+                [ editButton model.mdl index user
+                , deleteButton model.mdl index user
                 ]
             ]
 
@@ -202,11 +202,11 @@ addUserButton mdl =
         [ Icon.i "add" ]
 
 
-deleteButton : Model -> Int -> User -> Html Msg
-deleteButton model index user =
+deleteButton : Material.Model -> Int -> User -> Html Msg
+deleteButton mdl index user =
     Button.render Mdl
         [ 0, 1, index ]
-        model.mdl
+        mdl
         [ Button.minifab
         , Button.colored
         , Button.ripple
@@ -215,8 +215,8 @@ deleteButton model index user =
         [ Icon.i "delete" ]
 
 
-editButton : Model -> Int -> User -> Html Msg
-editButton model index user =
+editButton : Material.Model -> Int -> User -> Html Msg
+editButton mdl index user =
     case user.id of
         Nothing ->
             text ""
@@ -224,7 +224,7 @@ editButton model index user =
         Just id ->
             Button.render Mdl
                 [ 0, 2, index ]
-                model.mdl
+                mdl
                 [ Button.minifab
                 , Button.colored
                 , Button.ripple
