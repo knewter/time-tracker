@@ -7,8 +7,8 @@ import Route
 import Types
     exposing
         ( User
-        , Sorted
-        , UserSortableField
+        , Sorted(..)
+        , UserSortableField(..)
         , Project
         , ProjectSortableField
         , Organization
@@ -82,7 +82,7 @@ initialModel location =
         , users = { current = NotAsked, previous = Nothing }
         , newUserForm = ( Form.initial [] Validators.validateNewUser, Nothing )
         , shownUser = Nothing
-        , usersSort = Nothing
+        , usersSort = Just ( Descending, UserName )
         , userSearchQuery = ""
         }
     , projectsModel =

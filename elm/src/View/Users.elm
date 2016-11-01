@@ -83,15 +83,17 @@ userCard user =
             ]
 
 
-renderTable : Material.Model -> String -> Paginated User -> Html Msg
-renderTable mdl searchQuery paginatedUsers =
+renderTable : Material.Model -> Maybe ( Sorted, UserSortableField ) -> String -> Paginated User -> Html Msg
+renderTable mdl sort searchQuery paginatedUsers =
     Table.table
         [ Options.css "width" "100%"
         , Elevation.e2
         ]
         [ Table.thead []
             [ Table.th [] []
-            , Table.th [] [ text "Name" ]
+            , Table.th
+                (thOptions UserName sort)
+                [ text "Name" ]
             , Table.th [] [ text "Position" ]
             , Table.th [] [ text "Email" ]
             , Table.th [] [ text "Today" ]
@@ -133,7 +135,7 @@ usersTable mdl usersModel =
 
                 Just previousUsers ->
                     div [ class "loading" ]
-                        [ renderTable mdl usersModel.userSearchQuery previousUsers
+                        [ renderTable mdl usersModel.usersSort usersModel.userSearchQuery previousUsers
                         ]
 
         Failure err ->
@@ -144,11 +146,11 @@ usersTable mdl usersModel =
                 Just previousUsers ->
                     div []
                         [ text <| "There was a problem fetching the users: " ++ toString err
-                        , renderTable mdl usersModel.userSearchQuery previousUsers
+                        , renderTable mdl usersModel.usersSort usersModel.userSearchQuery previousUsers
                         ]
 
         Success paginatedUsers ->
-            renderTable mdl usersModel.userSearchQuery paginatedUsers
+            renderTable mdl usersModel.usersSort usersModel.userSearchQuery paginatedUsers
 
 
 viewUserRow : Material.Model -> Int -> User -> Html Msg
@@ -262,3 +264,26 @@ switchViewButton listView mdl =
             , Options.css "margin-right" "6rem"
             ]
             [ Icon.i icon ]
+
+
+thOptions : UserSortableField -> Maybe ( Sorted, UserSortableField ) -> List (Options.Property (Util.MaterialTableHeader Msg) Msg)
+thOptions sortableField usersSort =
+    [ Table.onClick <| UserMsg' <| ReorderUsers sortableField
+    , Options.css "cursor" "pointer"
+    ]
+        ++ case usersSort of
+            Nothing ->
+                []
+
+            Just ( sorted, sortedField ) ->
+                case sortedField == sortableField of
+                    True ->
+                        case sorted of
+                            Ascending ->
+                                [ Table.sorted Table.Ascending ]
+
+                            Descending ->
+                                [ Table.sorted Table.Descending ]
+
+                    False ->
+                        []

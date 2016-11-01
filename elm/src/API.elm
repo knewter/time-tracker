@@ -23,10 +23,19 @@ module API
 
 import Model exposing (Model)
 import Msg exposing (Msg(..))
-import Types exposing (User, Project, Organization, Paginated, RemotePaginated)
+import Types
+    exposing
+        ( User
+        , Project
+        , Organization
+        , Paginated
+        , RemotePaginated
+        , Sorted(..)
+        , UserSortableField(..)
+        )
 import Decoders
 import OurHttp exposing (Error)
-import Http
+import Http exposing (uriEncode)
 import Task
 import Json.Encode as JE
 import Json.Decode as JD exposing ((:=))
@@ -76,7 +85,30 @@ fetchResourcesWithUrl url decoder model msg =
 
 fetchUsers : Model -> (RemotePaginated User -> Msg) -> Cmd Msg
 fetchUsers model msg =
-    fetchResources "/users" Decoders.usersDecoder model msg
+    let
+        url =
+            case model.usersModel.usersSort of
+                Nothing ->
+                    "/users"
+
+                Just ( sortOrder, field ) ->
+                    let
+                        fieldString =
+                            case field of
+                                UserName ->
+                                    "name"
+
+                        params =
+                            case sortOrder of
+                                Ascending ->
+                                    "order=" ++ (uriEncode <| "asc " ++ fieldString)
+
+                                Descending ->
+                                    "order=" ++ (uriEncode <| "desc " ++ fieldString)
+                    in
+                        "/users?" ++ params
+    in
+        fetchResources url Decoders.usersDecoder model msg
 
 
 fetchUsersWithUrl : String -> Model -> (RemotePaginated User -> Msg) -> Cmd Msg

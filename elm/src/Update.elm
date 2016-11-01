@@ -192,11 +192,14 @@ updateUserMsg model msg usersModel =
             )
 
         ReorderUsers field ->
-            --( reorderUsers field model.usersModel
-            ( usersModel
-            , Cmd.none
-            , Nothing
-            )
+            let
+                newUsersModel =
+                    reorderUsers field usersModel
+            in
+                ( newUsersModel
+                , API.fetchUsers { model | usersModel = newUsersModel } <| UserMsg' << GotUsers
+                , Nothing
+                )
 
         SetShownUserName name ->
             case usersModel.shownUser of
@@ -615,3 +618,38 @@ updateRemotePersistent newValue persistentWrapped =
 
         _ ->
             { current = newValue, previous = Nothing }
+
+
+reorderUsers : UserSortableField -> UsersModel -> UsersModel
+reorderUsers sortableField model =
+    let
+        fun =
+            userSortableFieldFun sortableField
+
+        loadingModel =
+            { model | users = updateRemotePersistent Loading model.users }
+    in
+        case loadingModel.usersSort of
+            Nothing ->
+                { loadingModel
+                    | usersSort = Just ( Ascending, sortableField )
+                }
+
+            Just ( sortOrder, currentSortableField ) ->
+                case currentSortableField == sortableField of
+                    True ->
+                        case sortOrder of
+                            Ascending ->
+                                { loadingModel
+                                    | usersSort = Just ( Descending, sortableField )
+                                }
+
+                            Descending ->
+                                { loadingModel
+                                    | usersSort = Just ( Ascending, sortableField )
+                                }
+
+                    False ->
+                        { loadingModel
+                            | usersSort = Just ( Ascending, sortableField )
+                        }
