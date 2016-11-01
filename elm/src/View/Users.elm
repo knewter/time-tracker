@@ -182,11 +182,11 @@ viewUserRow model index user =
             ]
 
 
-addUserButton : Model -> Html Msg
-addUserButton model =
+addUserButton : Material.Model -> Html Msg
+addUserButton mdl =
     Button.render Mdl
         [ 0, 0 ]
-        model.mdl
+        mdl
         [ Options.css "position" "fixed"
         , Options.css "display" "block"
         , Options.css "right" "0"
@@ -238,7 +238,7 @@ header model =
     Helpers.defaultHeaderWithNavigation model
         "Users"
         [ switchViewButton model.usersModel.usersListView model.mdl
-        , addUserButton model
+        , addUserButton model.mdl
         ]
 
 
