@@ -27,7 +27,7 @@ view model =
 viewActivitySummary : Model -> Html a
 viewActivitySummary model =
     [ Card.text []
-        [ View.Charts.activity ( 800, 200 ) model.chartData
+        [ View.Charts.activity model.chartData
         ]
     ]
         |> viewGridCard

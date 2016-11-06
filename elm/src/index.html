@@ -19,6 +19,27 @@
       .loading {
         position: relative;
       }
+      svg.activity .line {
+        stroke: #ff0000;
+        stroke-width: 3px;
+        fill: none;
+      }
+      svg.activity .area {
+        stroke: none;
+        stroke-width: 3px;
+        fill: rgba(255, 0, 0, 0.54);
+      }
+      @media (max-width: 600px) {
+        svg.activity text {
+          font-size: 18px;
+        }
+        svg.activity .line {
+          stroke-width: 6px;
+        }
+        svg.activity .area {
+          stroke-width: 6px;
+        }
+      }
     </style>
   </head>
   <body>

@@ -20,9 +20,15 @@ type alias LineChartData =
     List ( Date, Float )
 
 
-activity : ( Float, Float ) -> LineChartData -> Svg msg
-activity ( w, h ) lineChartData =
+activity : LineChartData -> Svg msg
+activity lineChartData =
     let
+        w =
+            800
+
+        h =
+            300
+
         xScale : ContinuousTimeScale
         xScale =
             Scale.time ( Date.fromTime 1448928000000, Date.fromTime 1456790400000 ) ( 0, w - 2 * padding )
@@ -61,13 +67,13 @@ activity ( w, h ) lineChartData =
             List.map lineGenerator lineChartData
                 |> Shape.line Shape.monotoneInXCurve
     in
-        svg [ width (toString w ++ "px"), height (toString h ++ "px") ]
+        svg [ viewBox ("0 0 " ++ (toString w) ++ " " ++ (toString h)), class "activity" ]
             [ g [ transform ("translate(" ++ toString (padding - 1) ++ ", " ++ toString (h - padding) ++ ")") ]
                 [ xAxis ]
             , g [ transform ("translate(" ++ toString (padding - 1) ++ ", " ++ toString padding ++ ")") ]
                 [ yAxis ]
             , g [ transform ("translate(" ++ toString padding ++ ", " ++ toString padding ++ ")"), class "series" ]
-                [ Svg.path [ d area, stroke "none", strokeWidth "3px", fill "rgba(255, 0, 0, 0.54)" ] []
-                , Svg.path [ d line, stroke "red", strokeWidth "3px", fill "none" ] []
+                [ Svg.path [ d area, class "area" ] []
+                , Svg.path [ d line, class "line" ] []
                 ]
             ]
