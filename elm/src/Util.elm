@@ -44,6 +44,9 @@ cmdsForModelRoute model =
         Just (EditOrganization id) ->
             [ API.fetchOrganization model id (always NoOp) <| OrganizationMsg' << GotOrganization ]
 
+        Just Home ->
+            [ API.fetchChartData model GotChartData ]
+
         _ ->
             []
 

@@ -8,6 +8,7 @@ import Http
 import OurHttp
 import Form
 import RemoteData exposing (RemoteData)
+import Date exposing (Date)
 
 
 type Msg
@@ -19,6 +20,7 @@ type Msg
     | LoginMsg' LoginMsg
     | NavigateTo (Maybe Route.Location)
     | ClearApiKey
+    | GotChartData (List ( Date, Float ))
     | NoOp
 
 

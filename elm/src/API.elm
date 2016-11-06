@@ -19,6 +19,7 @@ module API
         , deleteOrganization
         , fetchOrganization
         , updateOrganization
+        , fetchChartData
         )
 
 import Model exposing (Model)
@@ -46,6 +47,7 @@ import RFC5988
 import Combine exposing (parse)
 import String
 import RemoteData
+import Date exposing (Date)
 
 
 login : Model -> ( String, String ) -> (Error -> Msg) -> (String -> Msg) -> Cmd Msg
@@ -306,6 +308,11 @@ encodeOrganization organization =
                 ]
           )
         ]
+
+
+fetchChartData : Model -> (List ( Date, Float ) -> Msg) -> Cmd Msg
+fetchChartData model msg =
+    get model "/charts" Decoders.chartDataDecoder (always NoOp) msg
 
 
 defaultRequest : Model -> String -> Http.Request

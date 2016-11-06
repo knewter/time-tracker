@@ -107,6 +107,9 @@ update msg model =
         ClearApiKey ->
             { model | apiKey = Nothing } ! [ Navigation.newUrl <| Route.urlFor Login ]
 
+        GotChartData chartData ->
+            { model | chartData = chartData } ! []
+
         NoOp ->
             model ! []
 

@@ -8,12 +8,22 @@ module Decoders
         , organizationDecoder
         , apiFieldErrorsDecoder
         , dayActivityDecoder
+        , chartDataDecoder
         )
 
 import Json.Decode as JD exposing ((:=))
 import Json.Decode.Extra as JDE
 import Types exposing (User, Project, Organization, APIFieldErrors, DayActivity(..))
 import Dict
+import Date exposing (Date)
+
+
+chartDataDecoder : JD.Decoder (List ( Date, Float ))
+chartDataDecoder =
+    JD.list <|
+        JD.tuple2 (,)
+            (JD.map Date.fromTime JD.float)
+            JD.float
 
 
 usersDecoder : JD.Decoder (List User)
