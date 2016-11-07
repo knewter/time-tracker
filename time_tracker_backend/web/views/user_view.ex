@@ -12,7 +12,13 @@ defmodule TimeTrackerBackend.UserView do
   def render("user.json", %{user: user}) do
     %{
       id: user.id,
-      name: user.name
+      name: user.name,
+      avatar: user.avatar,
+      email: user.email,
+      gender: user.gender,
+      is_active: user.is_active,
+      is_superuser: user.is_superuser,
+      username: user.username
     }
   end
 end

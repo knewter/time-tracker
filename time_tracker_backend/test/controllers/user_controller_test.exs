@@ -56,10 +56,19 @@ defmodule TimeTrackerBackend.UserControllerTest do
     end
 
     test "shows chosen resource", %{conn: conn} do
-      user = Repo.insert! %User{}
+      user = insert(:user)
       conn = get conn, user_path(conn, :show, user)
-      assert json_response(conn, 200)["data"] == %{"id" => user.id,
-       "name" => user.name}
+      expected_response = %{
+        "id" => user.id,
+        "name" => user.name,
+        "avatar" => user.avatar,
+        "email" => user.email,
+        "gender" => user.gender,
+        "is_active" => user.is_active,
+        "is_superuser" => user.is_superuser,
+        "username" => user.username
+     }
+      assert json_response(conn, 200)["data"] == expected_response
     end
 
     test "renders page not found when id is nonexistent", %{conn: conn} do
@@ -69,21 +78,22 @@ defmodule TimeTrackerBackend.UserControllerTest do
     end
 
     test "creates and renders resource when data is valid", %{conn: conn} do
-      conn = post conn, user_path(conn, :create), user: @valid_attrs
+      params = user_params()
+      conn = post conn, user_path(conn, :create), user: params
       assert json_response(conn, 201)["data"]["id"]
-      assert Repo.get_by(User, @valid_attrs)
+      assert Repo.get_by(User, params)
     end
 
     test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-      conn = post conn, user_path(conn, :create), user: @invalid_attrs
+      conn = post conn, user_path(conn, :create), user: user_params() |> Map.delete(:name)
       assert json_response(conn, 422)["errors"] != %{}
     end
 
     test "updates and renders chosen resource when data is valid", %{conn: conn} do
-      user = Repo.insert! %User{}
-      conn = put conn, user_path(conn, :update, user), user: @valid_attrs
+      user = insert(:user)
+      conn = put conn, user_path(conn, :update, user), user: %{name: "foo"}
       assert json_response(conn, 200)["data"]["id"]
-      assert Repo.get_by(User, @valid_attrs)
+      assert Repo.get_by(User, %{name: "foo"})
     end
 
     test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
@@ -105,5 +115,17 @@ defmodule TimeTrackerBackend.UserControllerTest do
     new_conn = Guardian.Plug.api_sign_in(conn, bob)
     jwt = Guardian.Plug.current_token(new_conn)
     %{ conn: conn |> put_req_header("authorization", "Bearer #{jwt}") }
+  end
+
+  def user_params() do
+    user = build(:user)
+    %{
+      name: user.name,
+      avatar: user.avatar,
+      email: user.email,
+      gender: user.gender,
+      password: user.password,
+      username: user.username
+    }
   end
 end
