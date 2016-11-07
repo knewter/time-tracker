@@ -4,7 +4,14 @@ defmodule TimeTrackerBackend.Factory do
 
   def user_factory do
     %User{
-      name: sequence(:name, &("Some User - #{&1}"))
+      name: sequence(:name, &("Some User - #{&1}")),
+      avatar: "prueba_avatar.png",
+      email: "user_1@systrix.net",
+      gender: "Female",
+      is_active: true,
+      is_superuser: true,
+      password: "1234",
+      username: sequence(:username, &("sys.user_#{&1}")),
     }
   end
 

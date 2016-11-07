@@ -22,6 +22,7 @@ defmodule TimeTrackerBackend.ModelCase do
       import Ecto.Changeset
       import Ecto.Query
       import TimeTrackerBackend.ModelCase
+      import TimeTrackerBackend.Factory
     end
   end
 
