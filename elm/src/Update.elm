@@ -58,17 +58,22 @@ update msg model =
                 ( usersModel, cmd, maybeLog ) =
                     updateUserMsg model msg model.usersModel
             in
-                case maybeLog of
-                    Nothing ->
-                        ( { model | usersModel = usersModel }
-                        , cmd
-                        )
+                case usersModel.users.current of
+                    Failure (BadResponse 401 _ _) ->
+                        { model | apiKey = Nothing } ! [ Navigation.newUrl <| Route.urlFor Login ]
 
-                    Just ( tag, value ) ->
-                        ( { model | usersModel = usersModel }
-                        , cmd
-                        )
-                            |> andLog tag value
+                    _ ->
+                        case maybeLog of
+                            Nothing ->
+                                ( { model | usersModel = usersModel }
+                                , cmd
+                                )
+
+                            Just ( tag, value ) ->
+                                ( { model | usersModel = usersModel }
+                                , cmd
+                                )
+                                    |> andLog tag value
 
         ProjectMsg' msg ->
             let
@@ -132,7 +137,7 @@ updateLoginMsg msg model =
                         ! []
 
         LoginSucceeded apiKey ->
-            { model | apiKey = Just apiKey } ! [ Ports.storeApiKey apiKey ] |> andLog "Login success" apiKey
+            { model | apiKey = Just apiKey } ! [ Ports.storeApiKey apiKey, Navigation.newUrl <| Route.urlFor Home ]
 
         LoginFailed error ->
             model ! [] |> andLog "Login failed" (toString <| decodeError error)
