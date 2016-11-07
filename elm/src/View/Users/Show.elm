@@ -14,6 +14,7 @@ import Material.Tabs as Tabs
 import Material.Options as Options
 import Material.Icon as Icon
 import Material.Color as Color
+import Material.Grid exposing (grid, size, cell, Device(..))
 
 
 view : Model -> Int -> Html Msg
@@ -154,19 +155,35 @@ info icon title content =
         ]
 
 
+twoColumns : List (Html Msg) -> List (Html Msg) -> Html Msg
+twoColumns left right =
+    grid []
+        [ cell [ size All 6 ] left
+        , cell [ size All 6 ] right
+        ]
+
+
 generalInfo : Model -> User -> Html Msg
 generalInfo model user =
-    infoPanel "info"
-        "General Information"
-        [ info "date_range"
-            "Date of Admission"
-            [ text "March 24th, 2016" ]
-        , info "person"
-            "Full Name"
-            [ text user.name ]
-        , info "person_outline"
-            "Username"
-            [ text "Kyle_89" ]
+    infoPanel "info" "General Information" <|
+        [ twoColumns
+            [ info "date_range"
+                "Date of Admission"
+                [ text "March 24th, 2016" ]
+            , info "person"
+                "Full Name"
+                [ text user.name ]
+            , info "person_outline"
+                "Username"
+                [ text "Kyle_89" ]
+            ]
+            [ info "email"
+                "Email"
+                [ text "user@example.com" ]
+            , info "schedule"
+                "Time Zone"
+                [ text "UTC-4" ]
+            ]
         ]
 
 
@@ -174,14 +191,54 @@ paymentInfo : Model -> User -> Html Msg
 paymentInfo model user =
     infoPanel "credit_card"
         "Payment Information"
-        []
+        [ twoColumns
+            [ info "date_range"
+                "Salary"
+                [ text "$2,000" ]
+            , info "schedule"
+                "Hourly Rate"
+                [ text "*******" ]
+            , info "credit_card"
+                "Payment Method"
+                [ text "*******" ]
+            ]
+            [ info "attach_money"
+                "Earned so far in the month"
+                [ text "*******" ]
+            , info "check_circle"
+                "Benefits"
+                [ div [] [ text "*******" ]
+                , div [] [ text "*******" ]
+                , div [] [ text "*******" ]
+                ]
+            ]
+        ]
 
 
 jobInfo : Model -> User -> Html Msg
 jobInfo model user =
     infoPanel "work"
         "Job Information"
-        []
+        [ twoColumns
+            [ info "date_range"
+                "Position"
+                [ text "IT Staff" ]
+            , info "supervisor_account"
+                "Supervisor"
+                [ text "Ryan Wavers" ]
+            , info "trending_up"
+                "Productivity"
+                [ text "75%" ]
+            ]
+            [ info "schedule"
+                "Hours of Work per week"
+                [ text "40" ]
+            , info "work"
+                "Job Description"
+                [ text "Ut non cum consequat condimentum nam vel facilisis tempor blandit eu dis a tempor himenaeos vivamus vestibulum metus cursus ullamcorper. Sociis amet a pharetra at placerat gravida dictum ac egestas dignissim dis vestibulum at a a montes a vestibulum vestibulum aliquet."
+                ]
+            ]
+        ]
 
 
 header : Model -> Int -> List (Html Msg)
