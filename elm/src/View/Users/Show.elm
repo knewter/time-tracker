@@ -320,7 +320,14 @@ usersCards model =
         Success paginatedUsers ->
             grid [] <|
                 List.map
-                    (\user -> cell [ size All 3 ] [ userCard model user ])
+                    (\user ->
+                        cell
+                            [ size Desktop 3
+                            , size Tablet 4
+                            , size Desktop 3
+                            ]
+                            [ userCard model user ]
+                    )
                     paginatedUsers.items
 
 
