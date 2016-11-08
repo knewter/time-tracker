@@ -15,9 +15,12 @@ import Material.Elevation as Elevation
 import Material.Tabs as Tabs
 import Material.Options as Options
 import Material.Icon as Icon
-import Material.Color as Color
+import Material.Color as Color exposing (Hue(..), Shade(..))
 import Material.Grid exposing (grid, size, cell, Device(..))
+import Material.Menu as Menu
 import RemoteData exposing (RemoteData(..))
+import Types.ActivityStreams exposing (Activity)
+import Date
 
 
 view : Model -> Int -> Html Msg
@@ -59,7 +62,77 @@ showTab model user =
 
 timeline : Model -> User -> Html Msg
 timeline model user =
-    text "timeline"
+    div [] <|
+        List.indexedMap (activityView model) activities
+
+
+activityView : Model -> Int -> Activity -> Html Msg
+activityView model index activity =
+    div
+        [ style
+            [ ( "margin-bottom", "16px" )
+            ]
+        ]
+        [ activityCard model index activity ]
+
+
+activityCard : Model -> Int -> Activity -> Html Msg
+activityCard model index activity =
+    Card.view
+        [ Options.css "width" "100%"
+        , Elevation.e2
+        ]
+        [ Card.title
+            []
+            [ text activity.name ]
+        , Card.text
+            [ Options.css "width" "calc(100% - 32px)"
+            , Options.css "background-color" "#9b769f"
+            , Options.css "min-height" "200px"
+            , Options.css "padding" "16px"
+            ]
+            [ div []
+                [ h3
+                    [ style
+                        [ ( "margin-top", "0" ) ]
+                    ]
+                    [ text activity.type_ ]
+                ]
+            ]
+        , Card.actions
+            [ Options.css "text-align" "right"
+            , Color.text <| Color.color Grey S500
+            ]
+            [ Button.render Mdl
+                [ 10, 2, 0, index ]
+                model.mdl
+                [ Button.icon, Button.ripple ]
+                [ Icon.i "message" ]
+            , Button.render Mdl
+                [ 10, 2, 1, index ]
+                model.mdl
+                [ Button.icon, Button.ripple ]
+                [ Icon.i "share" ]
+            , Button.render Mdl
+                [ 10, 2, 2, index ]
+                model.mdl
+                [ Button.icon, Button.ripple ]
+                [ Icon.i "favorite_border" ]
+            ]
+        , Card.menu []
+            [ Menu.render Mdl
+                [ 10, 2, 3, index ]
+                model.mdl
+                [ Menu.bottomRight
+                , Menu.ripple
+                ]
+                [ Menu.item []
+                    [ text "Action 1" ]
+                , Menu.item []
+                    [ text "Action 2" ]
+                ]
+            ]
+        ]
 
 
 connections : Model -> User -> Html Msg
@@ -381,3 +454,26 @@ userCard model user =
                     [ Icon.i "star_border" ]
                 ]
             ]
+
+
+activities : List Activity
+activities =
+    [ { name = "Kyle Byrne posted a snippet"
+      , type_ = "Snippet"
+      , actor = "Kyle Byrne"
+      , object = "http://localhost:3000/snippets/1"
+      , published = Date.fromTime 1478579422
+      }
+    , { name = "Kyle Byrne shared a project"
+      , type_ = "Project"
+      , actor = "Kyle Byrne"
+      , object = "http://localhost:3000/projects/1"
+      , published = Date.fromTime 1478579421
+      }
+    , { name = "Kyle Byrne shared a project"
+      , type_ = "Project"
+      , actor = "Kyle Byrne"
+      , object = "http://localhost:3000/projects/2"
+      , published = Date.fromTime 1478579420
+      }
+    ]
