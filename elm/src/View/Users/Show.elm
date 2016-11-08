@@ -62,33 +62,167 @@ showTab model user =
 
 timeline : Model -> User -> Html Msg
 timeline model user =
-    div [] <|
-        List.indexedMap (activityView model) activities
-
-
-activityView : Model -> Int -> Activity -> Html Msg
-activityView model index activity =
     div
         [ style
-            [ ( "margin-bottom", "16px" )
+            [ ( "border-left", "3px solid rgba(0, 0, 0, 0.1)" )
+            , ( "margin-left", "32px" )
+            , ( "padding-left", "64px" )
+            , ( "padding-top", "32px" )
+            , ( "margin-top", "-32px" )
             ]
         ]
-        [ activityCard model index activity ]
+        (List.indexedMap (activityView model user) activities)
 
 
-activityCard : Model -> Int -> Activity -> Html Msg
-activityCard model index activity =
+activityView : Model -> User -> Int -> Activity -> Html Msg
+activityView model user index activity =
+    let
+        leftLine =
+            Html.hr
+                [ style
+                    [ ( "position", "absolute" )
+                    , ( "width", "64px" )
+                    , ( "border-width", "3px" )
+                    , ( "border-color", "rgba(0, 0, 0, 0.1)" )
+                    , ( "top", "22px" )
+                    , ( "left", "-64px" )
+                    ]
+                ]
+                []
+
+        typeBadgeColor =
+            case activity.type_ of
+                "Snippet" ->
+                    "#9b769f"
+
+                "Project" ->
+                    "#fab03c"
+
+                _ ->
+                    "#999"
+
+        typeBadgeIcon =
+            case activity.type_ of
+                "Snippet" ->
+                    Icon.i "code"
+
+                "Project" ->
+                    Icon.i "assessment"
+
+                _ ->
+                    Icon.i "subject"
+
+        typeBadge =
+            div
+                [ style
+                    [ ( "border-radius", "50%" )
+                    , ( "width", "42px" )
+                    , ( "height", "42px" )
+                    , ( "background-color", "white" )
+                    , ( "position", "absolute" )
+                    , ( "left", "-95px" )
+                    , ( "top", "9px" )
+                    , ( "padding", "5px" )
+                    , ( "border-style", "solid" )
+                    , ( "border-width", "3px" )
+                    , ( "border-color", "rgba(0, 0, 0, 0.1)" )
+                    ]
+                ]
+                [ div
+                    [ style
+                        [ ( "border-radius", "50%" )
+                        , ( "width", "100%" )
+                        , ( "height", "100%" )
+                        , ( "position", "relative" )
+                        , ( "background-color", typeBadgeColor )
+                        ]
+                    ]
+                    [ span
+                        [ style
+                            [ ( "position", "absolute" )
+                            , ( "top", "9px" )
+                            , ( "left", "9px" )
+                            , ( "color", "white" )
+                            ]
+                        ]
+                        [ typeBadgeIcon ]
+                    ]
+                ]
+
+        timeBadge =
+            div
+                [ style
+                    [ ( "background-color", "#aaa" )
+                    , ( "border-radius", "2px" )
+                    , ( "color", "white" )
+                    , ( "position", "absolute" )
+                    , ( "left", "-104px" )
+                    , ( "top", "80px" )
+                    , ( "width", "80px" )
+                    , ( "height", "20px" )
+                    , ( "text-align", "center" )
+                    ]
+                ]
+                [ text "8:00 pm" ]
+    in
+        div
+            [ style
+                [ ( "margin-bottom", "16px" )
+                , ( "position", "relative" )
+                ]
+            ]
+            [ leftLine
+            , typeBadge
+            , timeBadge
+            , activityCard model user index activity
+            ]
+
+
+buttonStat : Model -> List Int -> String -> String -> Html Msg
+buttonStat model mdlIndex icon content =
+    div
+        [ style
+            [ ( "display", "inline-block" ) ]
+        ]
+        [ Button.render Mdl
+            mdlIndex
+            model.mdl
+            [ Button.icon, Button.ripple ]
+            [ Icon.i icon ]
+        , text content
+        ]
+
+
+activityCard : Model -> User -> Int -> Activity -> Html Msg
+activityCard model user index activity =
     Card.view
         [ Options.css "width" "100%"
         , Elevation.e2
         ]
         [ Card.title
             []
-            [ text activity.name ]
+            [ div []
+                [ Html.img
+                    [ src <| avatarUrl 40 user.name
+                    , style
+                        [ ( "border-radius", "50%" )
+                        , ( "display", "inline-block" )
+                        , ( "margin-right", "16px" )
+                        , ( "vertical-align", "middle" )
+                        ]
+                    ]
+                    []
+                , span
+                    [ style
+                        [ ( "vertical-align", "middle" ) ]
+                    ]
+                    [ text activity.name ]
+                ]
+            ]
         , Card.text
             [ Options.css "width" "calc(100% - 32px)"
             , Options.css "background-color" "#9b769f"
-            , Options.css "min-height" "200px"
+            , Options.css "min-height" "100px"
             , Options.css "padding" "16px"
             ]
             [ div []
@@ -103,21 +237,9 @@ activityCard model index activity =
             [ Options.css "text-align" "right"
             , Color.text <| Color.color Grey S500
             ]
-            [ Button.render Mdl
-                [ 10, 2, 0, index ]
-                model.mdl
-                [ Button.icon, Button.ripple ]
-                [ Icon.i "message" ]
-            , Button.render Mdl
-                [ 10, 2, 1, index ]
-                model.mdl
-                [ Button.icon, Button.ripple ]
-                [ Icon.i "share" ]
-            , Button.render Mdl
-                [ 10, 2, 2, index ]
-                model.mdl
-                [ Button.icon, Button.ripple ]
-                [ Icon.i "favorite_border" ]
+            [ buttonStat model [ 10, 2, 0, index ] "favorite_border" "4"
+            , buttonStat model [ 10, 2, 1, index ] "share" "2"
+            , buttonStat model [ 10, 2, 2, index ] "message" "3"
             ]
         , Card.menu []
             [ Menu.render Mdl
@@ -157,16 +279,17 @@ iconText icon content =
         ]
 
 
+avatarUrl : Int -> String -> String
+avatarUrl size key =
+    "https://api.adorable.io/avatars/" ++ (toString size) ++ "/" ++ key ++ ".png"
+
+
 detailsCard : Model -> User -> Html Msg
 detailsCard model user =
     let
         stats : List (Html Msg) -> Html Msg
         stats =
             div [ style [ ( "display", "flex" ), ( "flex-direction", "row" ), ( "justify-content", "space-around" ) ] ]
-
-        avatarUrl : String
-        avatarUrl =
-            "https://api.adorable.io/avatars/100/" ++ user.name ++ ".png"
     in
         Card.view
             [ Elevation.e2
@@ -186,7 +309,7 @@ detailsCard model user =
                     , Options.css "top" "-66px"
                     , Options.css "margin-bottom" "-33px"
                     ]
-                    [ src avatarUrl ]
+                    [ src <| avatarUrl 100 user.name ]
                   -- We can't use the Card.head function here because we can't
                   -- successfully set the `align-self` property to center in this
                   -- release of elm-mdl, sadly - I'd expect not to need this hack
@@ -406,54 +529,50 @@ usersCards model =
 
 userCard : Model -> User -> Html Msg
 userCard model user =
-    let
-        userPhotoUrl =
-            "https://api.adorable.io/avatars/400/" ++ user.name ++ ".png"
-    in
-        Card.view
-            [ Options.css "width" "100%"
-            , Options.css "cursor" "pointer"
-            , Options.attribute <| onClick <| NavigateTo <| Maybe.map ShowUser user.id
-            , Elevation.e2
+    Card.view
+        [ Options.css "width" "100%"
+        , Options.css "cursor" "pointer"
+        , Options.attribute <| onClick <| NavigateTo <| Maybe.map ShowUser user.id
+        , Elevation.e2
+        ]
+        [ Card.title
+            [ Options.css "background" ("url('" ++ (avatarUrl 400 user.name) ++ "') center / cover")
+            , Options.css "min-height" "250px"
+            , Options.css "padding" "0"
             ]
-            [ Card.title
-                [ Options.css "background" ("url('" ++ userPhotoUrl ++ "') center / cover")
-                , Options.css "min-height" "250px"
-                , Options.css "padding" "0"
-                ]
-                []
-            , Card.text []
-                [ h3
-                    [ style [ ( "margin", "0" ) ] ]
-                    [ text user.name ]
-                , Options.styled p
-                    [ Color.text Color.accent ]
-                    [ text "Software Zealot" ]
-                , iconText "email" "user@example.com"
-                , iconText "history" "7h 34m"
-                , iconText "access_time" "48h 20m"
-                ]
-            , Card.actions
-                [ Options.css "text-align" "right"
-                , Color.text Color.accent
-                ]
-                [ Button.render Mdl
-                    [ 10, 1, 0 ]
-                    model.mdl
-                    [ Button.icon, Button.ripple ]
-                    [ Icon.i "phone" ]
-                , Button.render Mdl
-                    [ 10, 1, 1 ]
-                    model.mdl
-                    [ Button.icon, Button.ripple ]
-                    [ Icon.i "message" ]
-                , Button.render Mdl
-                    [ 10, 1, 2 ]
-                    model.mdl
-                    [ Button.icon, Button.ripple ]
-                    [ Icon.i "star_border" ]
-                ]
+            []
+        , Card.text []
+            [ h3
+                [ style [ ( "margin", "0" ) ] ]
+                [ text user.name ]
+            , Options.styled p
+                [ Color.text Color.accent ]
+                [ text "Software Zealot" ]
+            , iconText "email" "user@example.com"
+            , iconText "history" "7h 34m"
+            , iconText "access_time" "48h 20m"
             ]
+        , Card.actions
+            [ Options.css "text-align" "right"
+            , Color.text Color.accent
+            ]
+            [ Button.render Mdl
+                [ 10, 1, 0 ]
+                model.mdl
+                [ Button.icon, Button.ripple ]
+                [ Icon.i "phone" ]
+            , Button.render Mdl
+                [ 10, 1, 1 ]
+                model.mdl
+                [ Button.icon, Button.ripple ]
+                [ Icon.i "message" ]
+            , Button.render Mdl
+                [ 10, 1, 2 ]
+                model.mdl
+                [ Button.icon, Button.ripple ]
+                [ Icon.i "star_border" ]
+            ]
+        ]
 
 
 activities : List Activity
