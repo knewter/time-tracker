@@ -50,6 +50,7 @@ type alias UsersModel =
     , shownUser : Maybe User
     , usersSort : Maybe ( Sorted, UserSortableField )
     , userSearchQuery : String
+    , userShowTab : Int
     }
 
 
@@ -86,6 +87,7 @@ initialModel location =
         , shownUser = Nothing
         , usersSort = Just ( Descending, UserName )
         , userSearchQuery = ""
+        , userShowTab = 3
         }
     , projectsModel =
         { projects = { current = NotAsked, previous = Nothing }

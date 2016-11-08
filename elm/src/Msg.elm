@@ -47,6 +47,7 @@ type UserMsg
     | NewUserFormMsg Form.Msg
     | SwitchUsersListView UsersListView
     | SetUserSearchQuery String
+    | SelectUserShowTab Int
 
 
 type ProjectMsg

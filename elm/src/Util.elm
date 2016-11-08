@@ -21,7 +21,11 @@ cmdsForModelRoute model =
             ]
 
         Just (ShowUser id) ->
-            [ API.fetchUser model id (always NoOp) <| UserMsg' << GotUser ]
+            [ API.fetchUser model id (always NoOp) <| UserMsg' << GotUser
+              -- FIXME: We shouldn't fetch users here, just doing this while
+              -- we've mocked out the connections tab
+            , API.fetchUsers model <| UserMsg' << GotUsers
+            ]
 
         Just (EditUser id) ->
             [ API.fetchUser model id (always NoOp) <| UserMsg' << GotUser ]

@@ -285,6 +285,12 @@ updateUserMsg model msg usersModel =
             , Nothing
             )
 
+        SelectUserShowTab tabIndex ->
+            ( { usersModel | userShowTab = tabIndex }
+            , Cmd.none
+            , Nothing
+            )
+
 
 updateProjectMsg : Model -> ProjectMsg -> ProjectsModel -> ( ProjectsModel, Cmd Msg, Maybe ( String, String ) )
 updateProjectMsg model msg projectsModel =
