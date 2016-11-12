@@ -60,7 +60,10 @@ urlUpdate location oldModel =
                     newModelWithClearedForms ! []
     in
         ( newModel
-        , Cmd.batch <| loginRedirectCmd :: (Util.cmdsForModelRoute newModel)
+        , Cmd.batch <|
+            loginRedirectCmd
+                :: Material.init Mdl
+                :: (Util.cmdsForModelRoute newModel)
         )
 
 
