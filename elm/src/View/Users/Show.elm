@@ -1,7 +1,7 @@
 module View.Users.Show exposing (view, header)
 
 import Model exposing (Model, UsersModel)
-import Types exposing (User)
+import Types exposing (User, Project)
 import Msg exposing (Msg(..), UserMsg(..))
 import Html exposing (Html, text, h2, div, a, span, h3, p)
 import Html.Attributes exposing (href, style, src)
@@ -264,7 +264,89 @@ connections model user =
 
 projects : Model -> User -> Html Msg
 projects model user =
-    text "projects"
+    projectsCards model
+
+
+projectsCards : Model -> Html Msg
+projectsCards model =
+    case model.projectsModel.projects.current of
+        NotAsked ->
+            text "Initialising..."
+
+        Loading ->
+            text "Loading..."
+
+        Failure err ->
+            text <| "There was a problem fetching the projecs: " ++ toString err
+
+        Success paginatedProjects ->
+            grid [] <|
+                List.indexedMap
+                    (\index project ->
+                        cell
+                            [ size Desktop 3
+                            , size Tablet 4
+                            , size Desktop 3
+                            ]
+                            [ projectCard model project index ]
+                    )
+                    paginatedProjects.items
+
+
+projectCard : Model -> Project -> Int -> Html Msg
+projectCard model project index =
+    Card.view
+        [ Options.css "width" "100%"
+        , Options.css "cursor" "pointer"
+        , Options.attribute <| onClick <| NavigateTo <| Maybe.map ShowProject project.id
+        , Elevation.e2
+        ]
+        [ Card.title
+            []
+            [ Html.img
+                [ style
+                    [ ( "border-radius", "50%" )
+                    , ( "margin", "0 auto" )
+                    ]
+                , src <| avatarUrl 150 project.name
+                ]
+                []
+            ]
+        , Card.text []
+            [ h3
+                [ style [ ( "margin", "0" ) ] ]
+                [ text project.name ]
+            , div [] [ text "Start Date:" ]
+            , div [] [ text "10/05/2018" ]
+            , div [] [ text "Supervisor:" ]
+            , div [] [ text "Matthew James" ]
+            ]
+        , Card.actions
+            [ Options.css "text-align" "right"
+            , Color.text Color.accent
+            ]
+            [ Button.render Mdl
+                [ 10, 3, 0, index ]
+                model.mdl
+                [ Button.ripple
+                , Color.text Color.accent
+                ]
+                [ text "Open" ]
+            ]
+        , Card.menu []
+            [ Menu.render Mdl
+                [ 10, 3, 1, index ]
+                model.mdl
+                [ Menu.bottomRight
+                , Menu.ripple
+                ]
+                [ Menu.item []
+                    [ text "Action 1" ]
+                , Menu.item []
+                    [ text "Action 2" ]
+                ]
+            ]
+        ]
 
 
 iconText : String -> String -> Html Msg

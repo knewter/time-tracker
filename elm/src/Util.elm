@@ -25,6 +25,9 @@ cmdsForModelRoute model =
               -- FIXME: We shouldn't fetch users here, just doing this while
               -- we've mocked out the connections tab
             , API.fetchUsers model <| UserMsg' << GotUsers
+              -- FIXME: We shouldn't fetch projects here, just doing this while
+              -- we've mocked out the projects tab
+            , API.fetchProjects model <| ProjectMsg' << GotProjects
             ]
 
         Just (EditUser id) ->
