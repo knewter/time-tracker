@@ -11,4 +11,13 @@ defmodule TimeTrackerBackend.UserResolver do
       user -> {:ok, user}
     end
   end
+
+  def create(args, _info) do
+    changeset = User.changeset(%User{}, args)
+
+    case Repo.insert(changeset) do
+      {:ok, user} -> {:ok, user}
+      {:error, changeset} -> {:error, inspect(changeset.errors)}
+    end
+  end
 end
