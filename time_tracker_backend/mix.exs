@@ -29,6 +29,7 @@ defmodule TimeTrackerBackend.Mixfile do
         :phoenix_ecto,
         :postgrex,
         :scrivener_ecto,
+        :absinthe,
       ]
     ]
   end
@@ -56,6 +57,7 @@ defmodule TimeTrackerBackend.Mixfile do
       {:scrivener_headers, "~> 3.0"},
       {:ex_machina, "~> 1.0", only: :test},
       {:ex_link_header, "~> 0.0.5"},
+      {:absinthe, "~> 1.2.0"},
     ]
   end
 
