@@ -4,7 +4,7 @@ defmodule TimeTrackerBackend.Schema do
 
   query do
     field :users, list_of(:user) do
-      resolve &TimeTrackerBackend.UserReolver.all/2
+      resolve &TimeTrackerBackend.UserResolver.all/2
     end
   end
 end
