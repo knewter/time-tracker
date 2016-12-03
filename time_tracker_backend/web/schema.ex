@@ -4,7 +4,7 @@ defmodule TimeTrackerBackend.Schema do
 
   mutation do
     @desc "Create a user"
-    field :create_user, type: :user do
+    field :user, type: :user do
       arg :name, non_null(:string)
       arg :gender, non_null(:string)
       arg :email, non_null(:string)
