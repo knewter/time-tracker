@@ -7,6 +7,9 @@ defmodule TimeTrackerBackend.Router do
     plug Guardian.Plug.LoadResource
   end
 
+  forward "/graphql", Absinthe.Plug,
+    schema: TimeTrackerBackend.Schema
+
   scope "/", TimeTrackerBackend do
     pipe_through :api
 
