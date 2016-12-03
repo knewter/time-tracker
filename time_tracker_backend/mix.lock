@@ -1,4 +1,5 @@
 %{"absinthe": {:hex, :absinthe, "1.2.1", "67099c701aca32c8f5cc8a0147d578eaecccf1bcb460edc746d467ccc7881ed8", [:mix], []},
+  "absinthe_plug": {:hex, :absinthe_plug, "1.2.0", "5cccb5ee6bb26ab7e0e9285731db1d1ac30864a7217fb1a76b6a3edb3070af4a", [:mix], [{:absinthe, "~> 1.2.0", [hex: :absinthe, optional: false]}, {:plug, "~> 1.0", [hex: :plug, optional: false]}]},
   "base64url": {:hex, :base64url, "0.0.1", "36a90125f5948e3afd7be97662a1504b934dd5dac78451ca6e9abf85a10286be", [:rebar], []},
   "connection": {:hex, :connection, "1.0.4", "a1cae72211f0eef17705aaededacac3eb30e6625b04a6117c1b2db6ace7d5976", [:mix], []},
   "cors_plug": {:hex, :cors_plug, "1.1.2", "3e7451286996f745c7b629c39d24a6493e59b0c8191f27e67f6ab097f96ffd23", [:mix], [{:cowboy, "~> 1.0.0", [hex: :cowboy, optional: false]}, {:plug, "> 0.8.0", [hex: :plug, optional: false]}]},
