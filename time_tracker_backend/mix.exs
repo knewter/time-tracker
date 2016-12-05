@@ -60,6 +60,7 @@ defmodule TimeTrackerBackend.Mixfile do
       {:ex_link_header, "~> 0.0.5"},
       {:absinthe, "~> 1.2.0"},
       {:absinthe_plug, "~> 1.2.0"},
+      {:credo, "~> 0.5", only: [:dev, :test]},
     ]
   end
 

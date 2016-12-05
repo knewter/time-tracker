@@ -24,7 +24,7 @@ defmodule TimeTrackerBackend.SessionController do
     new_conn
       |> put_resp_header("authorization", "Bearer #{jwt}")
       |> put_resp_header("x-expires", "#{exp}")
-      |> json(%{ data: %{ token: jwt } })
+      |> json(%{data: %{token: jwt}})
   end
   def create(conn, _) do
     conn

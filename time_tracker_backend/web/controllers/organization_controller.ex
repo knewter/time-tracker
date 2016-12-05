@@ -3,7 +3,7 @@ defmodule TimeTrackerBackend.OrganizationController do
 
   alias TimeTrackerBackend.Organization
 
-  defp search(query, %{ "q" => q }) do
+  defp search(query, %{"q" => q}) do
     from u in query,
       where: ilike(u.name, ^"%#{q}%")
   end
