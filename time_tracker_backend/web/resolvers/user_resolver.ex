@@ -1,4 +1,8 @@
 defmodule TimeTrackerBackend.UserResolver do
+  @moduledoc """
+  Functions used to resolve user-related data for our GraphQL endpoint
+  """
+
   alias TimeTrackerBackend.{Repo, User}
 
   def all(_args, _info) do

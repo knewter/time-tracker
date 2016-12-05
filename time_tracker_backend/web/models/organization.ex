@@ -1,4 +1,8 @@
 defmodule TimeTrackerBackend.Organization do
+  @moduledoc """
+  Organizations have many users and projects
+  """
+
   use TimeTrackerBackend.Web, :model
 
   schema "organizations" do

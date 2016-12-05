@@ -1,4 +1,9 @@
 defmodule TimeTrackerBackend do
+  @moduledoc """
+  This is primarily an example phoenix application for use showing off elm and
+  phoenix integration.
+  """
+
   use Application
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html

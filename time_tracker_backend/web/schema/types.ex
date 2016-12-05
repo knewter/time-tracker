@@ -1,4 +1,5 @@
 defmodule TimeTrackerBackend.Schema.Types do
+  @moduledoc "The types used in our GraphQL endpoint"
   use Absinthe.Schema.Notation
 
   @desc "A user of our system"

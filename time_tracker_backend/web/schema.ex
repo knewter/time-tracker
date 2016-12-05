@@ -1,4 +1,5 @@
 defmodule TimeTrackerBackend.Schema do
+  @moduledoc "The schema for our GraphQL endpoint"
   use Absinthe.Schema
   import_types TimeTrackerBackend.Schema.Types
 

@@ -1,4 +1,8 @@
 defmodule TimeTrackerBackend.Project do
+  @moduledoc """
+  Projects in our system
+  """
+
   use TimeTrackerBackend.Web, :model
 
   schema "projects" do

@@ -39,12 +39,12 @@ defmodule TimeTrackerBackend.Web do
 
       alias TimeTrackerBackend.{User, Project, Organization}
 
-      defp order(query, "asc "<>field) do
+      defp order(query, "asc " <> field) do
         field = String.to_existing_atom(field)
         from u in query,
           order_by: [asc: ^field]
       end
-      defp order(query, "desc "<>field) do
+      defp order(query, "desc " <> field) do
         field = String.to_existing_atom(field)
         from u in query,
           order_by: [desc: ^field]

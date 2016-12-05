@@ -3,15 +3,15 @@ defmodule TimeTrackerBackend.ChartController do
 
   def index(conn, _params) do
     conn
-    |> render("index.json", data: static_data())
+      |> render("index.json", data: static_data())
   end
 
   defp static_data() do
     [
-      [ 1448928000000, 2 ],
-      [ 1451606400000, 2 ],
-      [ 1454284800000, 1 ],
-      [ 1456790400000, 1 ]
+      [1_448_928_000_000, 2],
+      [1_451_606_400_000, 2],
+      [1_454_284_800_000, 1],
+      [1_456_790_400_000, 1]
     ]
   end
 end

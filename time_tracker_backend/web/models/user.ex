@@ -1,4 +1,8 @@
 defmodule TimeTrackerBackend.User do
+  @moduledoc """
+  Users of our system.
+  """
+
   use TimeTrackerBackend.Web, :model
 
   schema "users" do
